@@ -194,6 +194,8 @@ table.cov td:last-child { text-align: right; }
 .lr span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .lr .ok { color: var(--ok); } .lr .bad { color: var(--bad); } .lr .q { color: var(--muted); text-align: right; }
 .tm.live strong { color: var(--amber); }
+#userPick { font: 12px var(--mono); color: var(--fg); background: var(--void); border: 1px solid var(--line-hi); padding: 5px 8px; }
+#replayBar .seg button[aria-pressed="true"] { background: var(--brand-soft); color: var(--brand); }
 
 body.wide main { grid-template-columns: 1fr; }
 body.wide aside { display: none; }
@@ -281,8 +283,15 @@ body.wide aside { display: none; }
     </section>
     <section class="sec" id="secLive" data-collapsed="true">
       <button class="label" type="button" aria-expanded="false">Live requests<span class="chev">▾</span></button>
-      <div class="sec-b"><div id="liveList"><p class="empty">Turn on the Live lens to watch requests move through the graph.</p></div>
-      <p class="ro">Simulated until the Monday agent is installed and the collector is deployed. Real traffic replaces it with the same view.</p></div>
+      <div class="sec-b">
+        <div id="replayBar" class="row" hidden>
+          <div class="seg" role="group" aria-label="Replay speed"><button type="button" data-speed="1">1×</button><button type="button" data-speed="4" aria-pressed="true">4×</button><button type="button" data-speed="16">16×</button></div>
+          <select id="userPick" aria-label="Follow one user"><option value="">All users</option></select>
+          <span id="replayClock" class="ro" style="margin:0"></span>
+        </div>
+        <div id="liveList"><p class="empty">Turn on the Live lens to watch requests move through the graph.</p></div>
+        <p class="ro" id="liveNote">Simulated until real traffic is available. Real traffic replaces it with the same view.</p>
+      </div>
     </section>
     <section class="sec" id="secPath">
       <button class="label" type="button" aria-expanded="true">Request path<span class="chev">▾</span></button>
@@ -368,6 +377,7 @@ async function loadGraph() {
   renderThreats();
   renderCoverage();
   buildLegend();
+  await loadRun();
   layoutTree();
   draw();
 }
@@ -924,7 +934,32 @@ async function tracePath(ep, steps) {
   lis.forEach(l => l.classList.remove("on"));
 }
 
-// ---------- live monitor (simulated until the collector is deployed) ----------
+// ---------- recorded traffic (real requests Monday's agent recorded) ----------
+// A project's registry row may name a traffic file: real requests exported from Monday's replay.
+// The Live lens plays it back on the graph; with no file it falls back to clearly labelled simulation.
+let RUN = null, replaySpeed = 4, replayUser = "";
+async function loadRun() {
+  RUN = null;
+  if (!PROJECT.traffic) return;
+  try {
+    const res = await fetch(PROJECT.traffic); if (!res.ok) return;
+    const data = await res.json();
+    const rows = (data.requests || []).map(r => ({ ...r, t: Date.parse(r.at) })).filter(r => !isNaN(r.t)).sort((a, b) => a.t - b.t);
+    if (!rows.length) return;
+    RUN = { rows, t0: rows[0].t, t1: rows[rows.length - 1].t, recordedAt: data.recordedAt, source: data.source };
+    const users = [...new Set(rows.map(r => r.userHash).filter(Boolean))];
+    $("userPick").innerHTML = `<option value="">All users</option>` + users.map((u, i) => `<option value="${esc(u)}">User ${i + 1} · ${esc(u.slice(0, 6))}</option>`).join("");
+  } catch (_) { RUN = null; }
+}
+$("replayBar").addEventListener("click", e => {
+  const b = e.target.closest("[data-speed]"); if (!b) return;
+  replaySpeed = +b.dataset.speed;
+  $("replayBar").querySelectorAll("[data-speed]").forEach(x => x.setAttribute("aria-pressed", x === b));
+});
+$("userPick").addEventListener("change", e => { replayUser = e.target.value; if (live && live.recorded) { live.cursor = 0; live.clock = 0; live.done = []; } });
+const fmtClock = ms => { const s = Math.max(0, Math.round(ms / 1000)); return `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`; };
+
+// ---------- live monitor ----------
 // Each request walks the same chain the Request path shows: endpoint → middleware → guards → handler → calls.
 let liveNodes = new Set(), live = null;
 function chainFor(ep) {
@@ -948,15 +983,23 @@ function startLive() {
   const weight = e => e.route.startsWith("GET") ? 3 : e.route.includes("/ingest/") ? 4 : 1;
   const bag = eps.flatMap(e => Array(weight(e)).fill(e));
   const users = Array.from({ length: 12 }, () => "u·" + Math.floor(Math.random() * 65536).toString(16).padStart(4, "0"));
-  live = { reqs: [], done: [], seq: 0, chains, bag, users, timer: null, raf: null, lastSpawn: 0 };
+  live = { reqs: [], done: [], seq: 0, chains, bag, users, timer: null, raf: null, lastSpawn: 0, recorded: !!RUN, cursor: 0, clock: 0, last: performance.now() };
   ["tmInflightBox", "tmRpsBox", "tmP95Box", "tmErrBox"].forEach(id => $(id).hidden = false);
   $("liveTag").hidden = false;
-  setStatus("run", "Live");
+  $("replayBar").hidden = !RUN;
+  $("liveTag").textContent = RUN ? `RECORDED · ${RUN.rows.length} REAL REQUESTS` : "SIMULATED TRAFFIC";
+  $("liveNote").textContent = RUN
+    ? `Real requests recorded by Monday's own agent (${RUN.source || "local run"}, ${new Date(RUN.recordedAt).toLocaleString()}), replayed at their real pace × speed. Once Monday is deployed this view shows requests as they happen.`
+    : "Simulated until real traffic is available. Real traffic replaces it with the same view.";
+  setStatus("run", RUN ? "Replay" : "Live");
   network.on("afterDrawing", drawLive);
   const tick = now => {
     if (!live) return;
-    const rate = 4 + 3 * Math.sin(now / 9000);               // gentle waves of traffic, 1–7 req/s
-    if (now - live.lastSpawn > 1000 / rate) { spawn(now); live.lastSpawn = now; }
+    if (live.recorded) playRecorded(now);
+    else {
+      const rate = 4 + 3 * Math.sin(now / 9000);             // simulation: gentle waves of traffic, 1–7 req/s
+      if (now - live.lastSpawn > 1000 / rate) { spawn(now); live.lastSpawn = now; }
+    }
     advance(now);
     network.redraw();
     live.raf = requestAnimationFrame(tick);
@@ -971,8 +1014,31 @@ function stopLive() {
   live = null; liveNodes = new Set();
   ["tmInflightBox", "tmRpsBox", "tmP95Box", "tmErrBox"].forEach(id => $(id).hidden = true);
   $("liveTag").hidden = true;
+  $("replayBar").hidden = true;
   setStatus("live", "Live");
   network.redraw();
+}
+// Recorded mode: requests start at their real offsets (scaled by speed) and stop where they really stopped.
+function playRecorded(now) {
+  live.clock += (now - live.last) * replaySpeed; live.last = now;
+  const rows = RUN.rows;
+  while (live.cursor < rows.length && rows[live.cursor].t - RUN.t0 <= live.clock) {
+    const r = rows[live.cursor++];
+    if (replayUser && r.userHash !== replayUser) continue;
+    spawnRecorded(r, now);
+  }
+  $("replayClock").textContent = `${fmtClock(live.clock)} / ${fmtClock(RUN.t1 - RUN.t0)}`;
+  if (live.cursor >= rows.length && live.clock > RUN.t1 - RUN.t0 + 3000) { live.cursor = 0; live.clock = 0; }   // loop
+}
+function spawnRecorded(row, now) {
+  const ep = byId.get(`endpoint:${row.method} ${row.route}`);
+  const chain = ep ? live.chains.get(ep.id) : null;
+  const ms = Math.max(1, row.durationMs);
+  if (!ep || !chain) { finish({ ep: { route: `${row.method} ${row.route}`, id: "app" }, status: row.status, ms: Math.round(ms), user: row.userHash ? "u·" + row.userHash.slice(0, 4) : "anon" }); return; }
+  const endAt = chain.indexOf(ep.id);
+  const stopAt = row.outcome === "Unauthorized" ? (chain.gate ?? endAt) : row.outcome === "NotFound" || row.outcome === "Invalid" || row.outcome === "RateLimited" ? endAt : chain.length - 1;
+  live.reqs.push({ id: ++live.seq, ep, chain, stopAt: Math.max(0, stopAt), status: row.status, start: now, hop: 0, hopStart: now, hopMs: 110 + Math.min(220, ms * 4) / replaySpeed * 2,
+    realMs: Math.round(ms * 10) / 10, user: row.userHash ? "u·" + row.userHash.slice(0, 4) : "anon" });
 }
 function spawn(now) {
   const ep = live.bag[Math.floor(Math.random() * live.bag.length)];
@@ -989,7 +1055,7 @@ function advance(now) {
   for (const r of live.reqs) {
     if (r.end) continue;
     if (now - r.hopStart >= r.hopMs) {
-      if (r.hop >= r.stopAt) { r.end = now; r.ms = Math.round((now - r.start) / 6 + Math.random() * 40); finish(r); }
+      if (r.hop >= r.stopAt) { r.end = now; r.ms = r.realMs ?? Math.round((now - r.start) / 6 + Math.random() * 40); finish(r); }
       else { r.hop++; r.hopStart = now; r.hopMs = 120 + Math.random() * 200; }
     }
   }
@@ -1035,7 +1101,7 @@ function liveStats() {
   const lat = live.done.slice(0, 200).map(d => d.ms).sort((a, b) => a - b);
   const p95 = lat.length ? lat[Math.min(lat.length - 1, Math.floor(lat.length * .95))] : 0;
   const errs = recent.length ? Math.round(recent.filter(d => d.status >= 400).length / recent.length * 100) : 0;
-  $("tmInflight").textContent = inflight; $("tmRps").textContent = (recent.length / 5).toFixed(1); $("tmP95").textContent = p95; $("tmErr").textContent = errs + "%";
+  $("tmInflight").textContent = inflight; $("tmRps").textContent = (recent.length / 5 / (live.recorded ? replaySpeed : 1)).toFixed(1); $("tmP95").textContent = p95; $("tmErr").textContent = errs + "%";
   $("liveList").innerHTML = live.done.slice(0, 40).map(d => `<button type="button" class="lr" data-go="${esc(d.id)}" title="${esc(d.user)}"><span>${d.at.toLocaleTimeString([], { hour12: false })}</span><span class="${d.status >= 400 ? "bad" : "ok"}">${d.status}</span><span>${esc(d.route)}</span><span class="q">${d.ms}ms</span></button>`).join("");
 }
 
@@ -1149,7 +1215,7 @@ $("panelToggle").onclick = () => {
 // one new row plus its published graph file; these built-ins cover the first load and a store that's unavailable.
 // A row: { key, name, file, live, order }. A project's activity lives in "activity" (Monday) or "activity-<key>".
 const BUILT_IN = [
-  { key: "monday", name: "Monday", file: "graph.json", live: true, order: 0 },
+  { key: "monday", name: "Monday", file: "graph.json", traffic: "traffic-run.json", live: true, order: 0 },
   { key: "demo", name: "Demo shop (planted flaws)", file: "demo-shop.json", live: false, order: 99 },
 ];
 let PROJECTS = BUILT_IN, PROJECT = BUILT_IN[0], startLens = "structure";
