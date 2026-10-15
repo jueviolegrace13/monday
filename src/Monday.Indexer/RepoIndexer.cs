@@ -86,9 +86,21 @@ internal sealed partial class RepoIndexer(string root, string appName)
 
     private sealed record Module(string Id, string Name, string Dir, string ProjectFile, bool IsTest);
 
+    /// <summary>Repo-relative folders listed in .monday/ignore (one per line) are left out of the graph.</summary>
+    private IReadOnlyList<string> Ignored() =>
+        File.Exists(Path.Combine(root, ".monday", "ignore"))
+            ? File.ReadAllLines(Path.Combine(root, ".monday", "ignore")).Select(l => l.Trim().TrimEnd('/')).Where(l => l.Length > 0 && !l.StartsWith('#')).ToList()
+            : [];
+
+    private bool IsIgnored(string path)
+    {
+        var rel = Rel(path);
+        return Ignored().Any(prefix => rel.StartsWith(prefix + "/", StringComparison.Ordinal));
+    }
+
     private List<Module> FindModules() =>
         Directory.EnumerateFiles(root, "*.csproj", SearchOption.AllDirectories)
-            .Where(f => !IsSkipped(f))
+            .Where(f => !IsSkipped(f) && !IsIgnored(f))
             .Select(f =>
             {
                 var name = Path.GetFileNameWithoutExtension(f);
