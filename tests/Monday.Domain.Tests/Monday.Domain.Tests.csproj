@@ -6,8 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <ProjectReference Include="..\..\src\Monday.Domain\Monday.Domain.csproj" />
     <ProjectReference Include="..\..\src\Monday.Application\Monday.Application.csproj" />
+    <ProjectReference Include="..\..\src\Monday.Agent\Monday.Agent.csproj" />
   </ItemGroup>
 
 

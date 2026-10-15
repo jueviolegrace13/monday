@@ -4,6 +4,7 @@ using Monday.Application.Activity;
 using Monday.Application.CodeGraph;
 using Monday.Application.Decisions;
 using Monday.Application.Projects;
+using Monday.Application.Traffic;
 using Monday.Infrastructure.InMemory;
 
 namespace Monday.Infrastructure;
@@ -19,12 +20,15 @@ public static class DependencyInjection
         services.AddSingleton<IActivityStore, InMemoryActivityStore>();
         services.AddSingleton<IDecisionRepository, InMemoryDecisionRepository>();
         services.AddSingleton<IAuditLog, InMemoryAuditLog>();
+        services.AddSingleton<ITrafficStore, InMemoryTrafficStore>();
+        services.AddSingleton<ITrafficFeed, TrafficFeed>();
 
         services.AddScoped<ApiKeyAuthenticator>();
         services.AddScoped<ProjectService>();
         services.AddScoped<GraphService>();
         services.AddScoped<ActivityService>();
         services.AddScoped<DecisionService>();
+        services.AddScoped<TrafficService>();
         return services;
     }
 }

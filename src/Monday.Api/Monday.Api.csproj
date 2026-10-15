@@ -4,6 +4,7 @@
     <ProjectReference Include="..\Monday.Application\Monday.Application.csproj" />
     <ProjectReference Include="..\Monday.Domain\Monday.Domain.csproj" />
     <ProjectReference Include="..\Monday.Infrastructure\Monday.Infrastructure.csproj" />
+    <ProjectReference Include="..\Monday.Agent\Monday.Agent.csproj" />
   </ItemGroup>
 
 

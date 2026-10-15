@@ -20,6 +20,8 @@ public sealed record ApiKeyRevoked(ProjectId ProjectId, ApiKeyId KeyId, UserId B
 
 public sealed record MemberChanged(ProjectId ProjectId, UserId Member, Role? Role, UserId By, DateTimeOffset OccurredAt) : IDomainEvent;
 
+public sealed record UserHashKeyRevealed(ProjectId ProjectId, UserId By, DateTimeOffset OccurredAt) : IDomainEvent;
+
 public sealed record EnvironmentKindChanged(ProjectId ProjectId, EnvironmentId EnvironmentId, EnvironmentKind From, EnvironmentKind To, UserId By, DateTimeOffset OccurredAt) : IDomainEvent;
 
 /// <summary>
@@ -40,6 +42,29 @@ public sealed class Project : AggregateRoot<ProjectId>
     {
         Name = Guard.NotBlank(name, "project.name_required", "A project needs a name", 80);
         CreatedAt = createdAt;
+        UserHashKey = Convert.ToHexString(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32)).ToLowerInvariant();
+    }
+
+    /// <summary>
+    /// The key apps use to hash user ids before sending traffic (HMAC-SHA256). Monday holds it so a
+    /// Debugger can type a user id and see that user's requests, while stored traffic never names anyone.
+    /// </summary>
+    public string UserHashKey { get; private set; }
+
+    /// <summary>The same keyed hash the agent computes for a user id.</summary>
+    public string HashUser(string userId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(userId);
+        using var hmac = new System.Security.Cryptography.HMACSHA256(Convert.FromHexString(UserHashKey));
+        return Convert.ToHexString(hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(userId.Trim())))[..32].ToLowerInvariant();
+    }
+
+    /// <summary>Hands the user-hash key to the Owner for an app's configuration. Audited.</summary>
+    public string RevealUserHashKey(UserId by, DateTimeOffset now)
+    {
+        EnsureOwner(by);
+        Raise(new UserHashKeyRevealed(Id, by, now));
+        return UserHashKey;
     }
 
     public string Name { get; private set; }

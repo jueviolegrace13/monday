@@ -2,6 +2,7 @@ using Monday.Api.Security;
 using Monday.Application.Activity;
 using Monday.Application.CodeGraph;
 using Monday.Application.Decisions;
+using Monday.Application.Traffic;
 
 namespace Monday.Api.Endpoints;
 
@@ -25,6 +26,7 @@ public static class IngestEndpoints
         ingest.MapPost("/explanations", IngestExplanations);
         ingest.MapPost("/activity", IngestActivity);
         ingest.MapPost("/decisions", ProposeDecision);
+        ingest.MapPost("/traffic", IngestTraffic);
         return app;
     }
 
@@ -36,6 +38,9 @@ public static class IngestEndpoints
 
     private static async Task<IResult> IngestActivity(IReadOnlyList<ActivityUpload> uploads, HttpContext http, ActivityService activity) =>
         Results.Ok(new { events = await activity.RecordAsync(http.Reporter(), uploads, http.RequestAborted) });
+
+    private static async Task<IResult> IngestTraffic(IReadOnlyList<TrafficUpload> uploads, HttpContext http, TrafficService traffic) =>
+        Results.Ok(new { requests = await traffic.IngestAsync(http.Reporter(), uploads, http.RequestAborted) });
 
     private static async Task<IResult> ProposeDecision(DecisionProposal proposal, HttpContext http, DecisionService decisions)
     {

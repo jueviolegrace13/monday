@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Monday.Agent</PackageId>
+    <Description>Reports how requests move through an ASP.NET Core app to Monday. Never sends bodies, queries, headers, IPs or user names.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+</Project>

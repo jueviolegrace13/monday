@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/Monday.Agent/Monday.Agent.csproj" />
     <Project Path="src/Monday.Api/Monday.Api.csproj" />
     <Project Path="src/Monday.Application/Monday.Application.csproj" />
     <Project Path="src/Monday.Domain/Monday.Domain.csproj" />

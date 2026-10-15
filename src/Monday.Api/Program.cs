@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
+using Monday.Agent;
 using Monday.Api.Endpoints;
 using Monday.Api.Security;
 using Monday.Infrastructure;
@@ -7,6 +8,14 @@ using Monday.Infrastructure;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddMonday();
+
+// Monday watches itself: its own agent records every request it serves (never bodies, queries,
+// headers or IPs). Locally it reports in-process; deployed, set Monday:Agent:Self=true and its key.
+builder.Services.AddMondayAgent(builder.Configuration, o => o.ExcludeRoutes.Add("/ingest/traffic"));
+if (builder.Environment.IsDevelopment() || builder.Configuration.GetValue<bool>("Monday:Agent:Self"))
+{
+    builder.Services.AddSingleton<ITraceSink, SelfTraceSink>();
+}
 builder.Services.AddMondayUserAuthentication(builder.Environment);
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<ErrorHandling>();
@@ -36,6 +45,9 @@ builder.WebHost.ConfigureKestrel(o => o.Limits.MaxRequestBodySize = 8 * 1024 * 1
 
 var app = builder.Build();
 
+await DevBootstrap.RunAsync(app);
+
+app.UseMondayAgent();
 app.UseExceptionHandler();
 if (!app.Environment.IsDevelopment())
 {
@@ -50,6 +62,7 @@ app.UseRateLimiter();
 app.MapGet("/health", () => Results.Ok(new { status = "ok" })).WithTags("Health").AllowAnonymous();
 app.MapIngest();
 app.MapProjects();
+app.MapTraffic();
 
 app.Run();
 

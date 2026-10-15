@@ -16,9 +16,10 @@ public sealed record AuditEntry(ProjectId ProjectId, UserId Actor, string Action
         MemberChanged e => new(e.ProjectId, e.By, e.Role is null ? "member.removed" : "member.set", $"{e.Member} {e.Role}".Trim(), e.OccurredAt),
         EnvironmentKindChanged e => new(e.ProjectId, e.By, "environment.kind_changed", $"{e.EnvironmentId}: {e.From} -> {e.To}", e.OccurredAt),
         ProjectCreated e => new(e.ProjectId, e.Owner, "project.created", e.Name, e.OccurredAt),
+        UserHashKeyRevealed e => new(e.ProjectId, e.By, "user_hash_key.revealed", "shown to the Owner for app configuration", e.OccurredAt),
         _ => throw new ArgumentOutOfRangeException(nameof(domainEvent), domainEvent.GetType().Name, "Not an audited event."),
     };
 
     public static bool IsAudited(IDomainEvent domainEvent) =>
-        domainEvent is ApiKeyIssued or ApiKeyRevoked or MemberChanged or EnvironmentKindChanged or ProjectCreated;
+        domainEvent is ApiKeyIssued or ApiKeyRevoked or MemberChanged or EnvironmentKindChanged or ProjectCreated or UserHashKeyRevealed;
 }

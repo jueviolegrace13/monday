@@ -76,6 +76,15 @@ public sealed class ProjectService(IProjectRepository projects, IAuditLog audit,
         await SaveAsync(project, ct).ConfigureAwait(false);
     }
 
+    /// <summary>The Owner copies this into the app's agent settings. Audited.</summary>
+    public async Task<string> RevealUserHashKeyAsync(ProjectId id, UserId by, CancellationToken ct)
+    {
+        var project = await LoadForMemberAsync(id, by, ct).ConfigureAwait(false);
+        var key = project.RevealUserHashKey(by, clock.Now);
+        await SaveAsync(project, ct).ConfigureAwait(false);
+        return key;
+    }
+
     public async Task SetEnvironmentKindAsync(ProjectId id, EnvironmentId environment, EnvironmentKind kind, UserId by, CancellationToken ct)
     {
         var project = await LoadForMemberAsync(id, by, ct).ConfigureAwait(false);
