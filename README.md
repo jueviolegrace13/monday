@@ -19,10 +19,16 @@ Production is read-only: Monday watches it, never changes it.
 | 2 | Postgres store, GitHub sign-in, agent, Angular viewer | Next |
 | 3–7 | Request path, live traffic, replay and archive, chat, second project | Planned |
 
-## Connect a project
+## Add a project (any time)
 
-1. In Monday, create the project and issue an API key for its environment.
-2. Add the key to the repo's CI secrets as `MONDAY_KEY` and Monday's URL as `MONDAY_URL`.
-3. Add the indexer step to CI (see `.github/workflows/ci.yml`).
+Monday watches itself for now. Adding another project later takes no change to Monday's code:
+
+1. **Register it.** Create the project in Monday and issue an API key per environment. Mark production
+   read-only (Owner only).
+2. **Map its code.** Run `monday-index --root <repo> --name "<Project>"` (C# today; more languages to come),
+   or add the indexer step to the project's CI with `MONDAY_URL` and `MONDAY_KEY` as secrets.
+3. **Show it in the Monday Graph.** Publish the graph file beside the viewer and add a row to the viewer's
+   `projects` registry: `{ key, name, file, live, order }`. Its activity goes in `activity-<key>`.
+4. **Live traffic (when the collector is deployed).** Install the Monday agent in the app with its key.
 
 See `CLAUDE.md` for the rules and layout.

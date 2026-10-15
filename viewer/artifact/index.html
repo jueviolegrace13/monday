@@ -213,7 +213,7 @@ body.wide aside { display: none; }
 <header>
   <div class="brand"><h1><b>Monday</b> Graph</h1><span class="ver" id="ver">// CODE · ACTIVITY · SECURITY</span></div>
   <div class="telemetry">
-    <label class="tm env" for="projectPick"><span>Project</span><select id="projectPick" aria-label="Project"><option value="">Monday</option><option value="demo">Demo shop (planted flaws)</option></select></label>
+    <label class="tm env" for="projectPick"><span>Project</span><select id="projectPick" aria-label="Project"><option value="monday">Monday</option></select></label>
     <div class="tm"><span>Nodes</span><strong id="tmNodes">0</strong></div>
     <div class="tm"><span>Links</span><strong id="tmEdges">0</strong></div>
     <div class="tm"><span>Endpoints</span><strong id="tmEndpoints">0</strong></div>
@@ -954,26 +954,54 @@ $("panelToggle").onclick = () => {
   $("panelToggle").setAttribute("aria-pressed", wide); $("panelToggle").textContent = wide ? "Show panel" : "Hide panel";
   setTimeout(() => network && network.redraw(), 50);
 };
-// Projects this viewer can show. The demo is a sample API with planted flaws, to see the Threats lens at work.
-const PROJECTS = { "": { file: "graph.json", name: "Monday", live: true }, demo: { file: "demo-shop.json", name: "Demo shop", live: false } };
-let startLens = "structure", PROJECT = PROJECTS[""];
-try { if (location.hash.slice(1).split("-")[0] === "demo") { PROJECT = PROJECTS.demo; startLens = "security"; } } catch (_) {}
-$("projectPick").value = PROJECT === PROJECTS.demo ? "demo" : "";
-$("projectPick").addEventListener("change", e => { try { location.hash = e.target.value || "monday"; location.reload(); } catch (_) {} });
-try { const h = location.hash.slice(1); if (["security", "threats", "coverage", "live"].includes(h)) startLens = h === "threats" ? "security" : h; } catch (_) {}
+// Projects this viewer can show. The registry lives in the shared store ("projects"), so adding a project is
+// one new row plus its published graph file; these built-ins cover the first load and a store that's unavailable.
+// A row: { key, name, file, live, order }. A project's activity lives in "activity" (Monday) or "activity-<key>".
+const BUILT_IN = [
+  { key: "monday", name: "Monday", file: "graph.json", live: true, order: 0 },
+  { key: "demo", name: "Demo shop (planted flaws)", file: "demo-shop.json", live: false, order: 99 },
+];
+let PROJECTS = BUILT_IN, PROJECT = BUILT_IN[0], startLens = "structure";
+const hashTokens = () => { try { return location.hash.slice(1).split("-").filter(Boolean); } catch (_) { return []; } };
+function pickProject() {
+  const tokens = hashTokens();
+  PROJECT = PROJECTS.find(p => tokens.includes(p.key)) || PROJECTS[0];
+  const lensToken = tokens.find(t => ["security", "threats", "coverage", "live"].includes(t));
+  startLens = lensToken ? (lensToken === "threats" ? "security" : lensToken) : PROJECT.key === "demo" ? "security" : "structure";
+  $("projectPick").innerHTML = PROJECTS.map(p => `<option value="${esc(p.key)}">${esc(p.name)}</option>`).join("");
+  $("projectPick").value = PROJECT.key;
+}
+$("projectPick").addEventListener("change", e => { try { location.hash = e.target.value; location.reload(); } catch (_) {} });
+
+async function loadRegistry() {
+  if (!window.claude || !window.claude.use) return;
+  db = await Promise.race([claude.use("db"), new Promise(r => setTimeout(() => r(null), 4000))]);
+  if (!db) return;
+  try {
+    const snap = await db.collection("projects").get();
+    const rows = snap.docs.map(d => d.data()).filter(r => r && r.key && r.file && r.name);
+    if (rows.length) {
+      const byKey = new Map(BUILT_IN.map(p => [p.key, p]));
+      rows.forEach(r => byKey.set(r.key, { ...byKey.get(r.key), ...r }));
+      PROJECTS = [...byKey.values()].sort((a, b) => (a.order ?? 50) - (b.order ?? 50));
+    }
+  } catch (_) { /* keep the built-ins */ }
+}
 
 // ---------- boot ----------
 (async () => {
+  await loadRegistry();
+  pickProject();
   try { await loadGraph(); if (startLens !== "structure") setLens(startLens); }
   catch (e) { setStatus("", "No graph"); $("roLine").textContent = "GRAPH FILE COULD NOT BE LOADED"; return; }
   if (!window.claude || !window.claude.use) { $("askForm").hidden = true; return; }
   claude.use("sample").then(s => { sample = s; if (!s) { $("askForm").hidden = true; } });
-  db = await claude.use("db");
   if (!db) return;
-  if (!PROJECT.live) { $("activity").innerHTML = `<p class="empty">The demo has no working sessions. Switch to Monday to see Claude's activity.</p>`; return; }
-  db.collection("activity").orderBy("at", "desc").limit(300).onSnapshot(snap => {
+  if (!PROJECT.live) { $("activity").innerHTML = `<p class="empty">${esc(PROJECT.name)} has no working sessions recorded. Switch to Monday to see Claude's activity.</p>`; return; }
+  const activityCollection = PROJECT.key === "monday" ? "activity" : "activity-" + PROJECT.key;
+  db.collection(activityCollection).orderBy("at", "desc").limit(300).onSnapshot(snap => {
     events = snap.docs.map(d => d.data()); renderActivity();
   }, () => {});
-  db.collection("decisions").orderBy("proposedAt").onSnapshot(snap => renderDecisions(snap.docs.map(d => d.data())), () => {});
+  if (PROJECT.key === "monday") db.collection("decisions").orderBy("proposedAt").onSnapshot(snap => renderDecisions(snap.docs.map(d => d.data())), () => {});
 })();
 </script>
