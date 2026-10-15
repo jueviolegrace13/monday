@@ -15,6 +15,12 @@ public enum NodeKind
     Method,
     Endpoint,
     Test,
+
+    /// <summary>One step of the request pipeline (UseAuthentication, UseRateLimiter…), in order.</summary>
+    Middleware,
+
+    /// <summary>A route group (MapGroup) carrying the guards every endpoint in it shares.</summary>
+    RouteGroup,
 }
 
 /// <summary>How two nodes relate.</summary>
@@ -37,6 +43,9 @@ public enum EdgeKind
 
     /// <summary>An endpoint is handled by a method.</summary>
     HandledBy,
+
+    /// <summary>A request moves on: one middleware step to the next, the pipeline to a route group, a group to its endpoints.</summary>
+    Next,
 }
 
 /// <summary>

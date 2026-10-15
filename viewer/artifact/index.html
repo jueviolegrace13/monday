@@ -14,7 +14,7 @@
   --line: #16283a; --line-hi: #27486a; --fg: #dce9f5; --muted: #6f88a3; --faint: #34495f;
   --brand: #3cf0a8; --brand-soft: rgba(60, 240, 168, .13); --amber: #ffb547; --amber-soft: rgba(255, 181, 71, .15);
   --ok: #3cf0a8; --bad: #ff5f8a; --bad-soft: rgba(255, 95, 138, .14);
-  --k-app: #3ee6ff; --k-module: #b18cff; --k-feature: #4d9dff; --k-type: #7af0d0; --k-method: #8fa7c4; --k-endpoint: #ffb547; --k-test: #ff5f8a;
+  --k-app: #3ee6ff; --k-module: #b18cff; --k-feature: #4d9dff; --k-type: #7af0d0; --k-method: #8fa7c4; --k-endpoint: #ffb547; --k-test: #ff5f8a; --k-routegroup: #ffd36b; --k-middleware: #6ab8ff;
   --display: "Chakra Petch", "Segoe UI", system-ui, sans-serif;
   --mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
   color-scheme: dark;
@@ -76,6 +76,9 @@ main { flex: 1; display: grid; grid-template-columns: 1fr 420px; min-height: 0; 
 #results button { display: block; width: 100%; text-align: left; background: none; border: 0; border-bottom: 1px solid var(--line); padding: 7px 10px; cursor: pointer; font: 12px var(--mono); }
 #results button:hover { background: var(--glass-hi); }
 #results small { display: block; color: var(--muted); font-size: 10.5px; letter-spacing: .06em; }
+#crumb { position: absolute; left: 36px; bottom: 66px; z-index: 3; font: 11px var(--mono); color: var(--muted); max-width: calc(100% - 72px); pointer-events: none; }
+#crumb b { color: var(--fg); font-weight: 500; }
+.seg button:disabled { opacity: .35; cursor: default; }
 #lensNote { position: absolute; left: 36px; bottom: 44px; z-index: 3; font-family: var(--mono); font-size: 11px; color: var(--muted); max-width: calc(100% - 72px); pointer-events: none; }
 #lensNote b { color: var(--ok); font-weight: 500; } #lensNote em { color: var(--bad); font-style: normal; }
 #legend { position: absolute; left: 36px; bottom: 18px; z-index: 3; display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); pointer-events: none; max-width: calc(100% - 72px); }
@@ -239,10 +242,15 @@ body.wide aside { display: none; }
         <button type="button" id="lensCoverage" aria-pressed="false">Coverage</button>
         <button type="button" id="lensLive" aria-pressed="false">Live</button>
       </div>
-      <div class="chips" id="kinds" role="group" aria-label="Show node kinds"></div>
+      <div class="seg" role="group" aria-label="Navigate">
+        <button type="button" id="backBtn" title="Back (Esc)">← Back</button>
+        <button type="button" id="homeBtn" title="Close everything and show the modules">Home</button>
+        <button type="button" id="openAllBtn" title="Open every ring">Open all</button>
+      </div>
       <input id="search" type="search" placeholder="Find a method, type, route…" autocomplete="off" aria-label="Find in graph">
     </div>
     <div id="results" hidden></div>
+    <div id="crumb" aria-live="polite"></div>
     <div id="lensNote" hidden></div>
     <div id="legend"></div>
     <div id="liveTag" hidden>SIMULATED TRAFFIC</div>
@@ -253,7 +261,7 @@ body.wide aside { display: none; }
       <div class="sec-b">
         <div class="row">
           <button class="btn" id="playBtn" type="button" disabled>Replay session</button>
-          <button class="btn ghost" id="clearBtn" type="button">Whole graph</button>
+          <button class="btn ghost" id="clearBtn" type="button">Clear</button>
         </div>
         <div id="activity"><p class="empty">No activity yet. When Claude works on this project, each read, edit, test run and decision appears here and lights up its nodes.</p></div>
       </div>
@@ -294,7 +302,7 @@ body.wide aside { display: none; }
     </section>
     <section class="sec note" id="secAbout" data-collapsed="true">
       <button class="label" type="button" aria-expanded="false">About<span class="chev">▾</span></button>
-      <div class="sec-b note">Monday reads the project's code with Roslyn on every push and draws it here: modules, features, types, methods and endpoints. Lines show calls, dependencies, test coverage and which method handles each endpoint. Production is read-only: Monday only watches it.</div>
+      <div class="sec-b note">The map opens on the modules. Click a ring to open it and again to close it; double-click anything to focus on it and what it touches. Back, Esc or a click on empty space always returns, and Home closes everything. Monday reads the code with Roslyn on every push: the request pipeline, route groups and their guards, endpoints, types and methods, with lines for calls, request flow, tests and dependencies. Production is read-only: Monday only watches it.</div>
     </section>
   </aside>
 </main>
@@ -308,12 +316,14 @@ const md = s => window.marked && window.DOMPurify ? DOMPurify.sanitize(marked.pa
 const reduceMotion = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
 const sleep = ms => new Promise(r => setTimeout(r, reduceMotion ? 0 : ms));
 
-const KINDS = ["App", "Module", "Feature", "Type", "Method", "Endpoint", "Test"];
+const KINDS = ["App", "Module", "Feature", "Type", "RouteGroup", "Middleware", "Method", "Endpoint", "Test"];
+const CONTAINERS = new Set(["App", "Module", "Feature", "Type", "RouteGroup"]);
 const KCOLOR = k => css("--k-" + k.toLowerCase());
-const SIZE = { App: 34, Module: 22, Feature: 15, Type: 8, Method: 4.5, Endpoint: 10, Test: 5 };
-const LABELLED = new Set(["App", "Module", "Feature", "Endpoint"]);
+const SIZE = { App: 30, Module: 20, Feature: 14, Type: 9, RouteGroup: 11, Middleware: 8, Method: 5, Endpoint: 9, Test: 5 };
+const SHAPE = { Endpoint: "diamond", Type: "square", RouteGroup: "triangle", Middleware: "hexagon" };
 const EDGE_STYLE = {
   Contains: { color: "#1d3550", dashes: false, width: .6 },
+  Next: { color: "#3cf0a8", dashes: false, width: 1.4 },
   Calls: { color: "#2f5f8a", dashes: false, width: .8 },
   DependsOn: { color: "#5a4a8f", dashes: [2, 4], width: .7 },
   Implements: { color: "#7af0d0", dashes: [6, 3], width: .8 },
@@ -323,9 +333,11 @@ const EDGE_STYLE = {
 const AUTH_GUARDS = /^(RequireAuthorization|RequireReporterKey)/;
 
 let G = null, byId = new Map(), out = new Map(), inn = new Map();
-let network, nodesDS, edgesDS;
-let lens = "structure", shown = new Set(["App", "Module", "Feature", "Type", "Endpoint"]);
-let selected = null, lit = new Set(), events = [], selectedEvent = null;
+let kids = new Map(), leafCount = new Map(), POS = new Map();
+let network, nodesDS, edgesDS, shownNodes = new Set(), shownEdges = new Set();
+let lens = "structure", selected = null, lit = new Set(), events = [], selectedEvent = null;
+// Navigation state: what's open, what's in focus, and a history so Back (or Esc) always returns.
+let expanded = new Set(["app"]), focusId = null, forced = new Set(), history = [];
 let db = null, sample = null;
 let findings = [], findingsByNode = new Map(), cov = new Map();
 const SEV_RANK = { High: 3, Medium: 2, Low: 1 };
@@ -339,13 +351,13 @@ async function loadGraph() {
   const res = await fetch(PROJECT.file);
   if (!res.ok) throw new Error("graph.json " + res.status);
   G = await res.json();
-  G.nodes.forEach(n => { byId.set(n.id, n); out.set(n.id, []); inn.set(n.id, []); });
+  G.nodes.forEach(n => { byId.set(n.id, n); out.set(n.id, []); inn.set(n.id, []); kids.set(n.id, []); });
   G.edges.forEach(e => { if (out.has(e.from) && inn.has(e.to)) { out.get(e.from).push(e); inn.get(e.to).push(e); } });
+  G.nodes.forEach(n => { if (n.parentId && kids.has(n.parentId)) kids.get(n.parentId).push(n.id); });
   const count = k => G.nodes.filter(n => n.kind === k).length;
   $("tmNodes").textContent = G.nodes.length;
   $("tmEdges").textContent = G.edges.length;
   $("tmEndpoints").textContent = count("Endpoint");
-  $("tmTests") && ($("tmTests").textContent = count("Test"));
   const app = G.nodes.find(n => n.kind === "App");
   if (app) { $("roProject").textContent = app.name.toUpperCase(); }
   $("roCommit").textContent = G.commit;
@@ -355,104 +367,215 @@ async function loadGraph() {
   computeCoverage();
   renderThreats();
   renderCoverage();
-  buildKinds();
   buildLegend();
+  layoutTree();
   draw();
-}
-
-function buildKinds() {
-  $("kinds").innerHTML = KINDS.filter(k => k !== "App").map(k =>
-    `<button type="button" class="chip" data-kind="${k}" aria-pressed="${shown.has(k)}"><i style="background:${KCOLOR(k)}"></i>${k}s</button>`).join("");
-  $("kinds").addEventListener("click", e => {
-    const b = e.target.closest(".chip"); if (!b) return;
-    const k = b.dataset.kind;
-    shown.has(k) ? shown.delete(k) : shown.add(k);
-    b.setAttribute("aria-pressed", shown.has(k));
-    applyVisibility();
-  });
 }
 
 function buildLegend() {
   $("legend").innerHTML = Object.entries(EDGE_STYLE).filter(([k]) => k !== "Contains")
-    .map(([k, s]) => `<span><i style="border-color:${s.color};${s.dashes ? "border-top-style:dashed" : ""}"></i>${k === "HandledBy" ? "Handled by" : k === "DependsOn" ? "Depends on" : k}</span>`).join("");
+    .map(([k, s]) => `<span><i style="border-color:${s.color};${s.dashes ? "border-top-style:dashed" : ""}"></i>${k === "HandledBy" ? "Handled by" : k === "DependsOn" ? "Depends on" : k === "Next" ? "Request flow" : k}</span>`).join("");
 }
 
-// ---------- draw ----------
+// ---------- tidy neighbourhoods: a fixed radial tree, so every module keeps its own area ----------
+// Each node gets a slice of the circle sized by how much it contains; children sit further out inside
+// their parent's slice. Positions never change, so opening and closing things doesn't reshuffle the map.
+function layoutTree() {
+  const rank = id => KINDS.indexOf(byId.get(id).kind);
+  kids.forEach(list => list.sort((a, b) => rank(a) - rank(b) || byId.get(a).name.localeCompare(byId.get(b).name)));
+  const weigh = id => { const c = kids.get(id); const w = c.length ? c.reduce((s, k) => s + weigh(k), 0) : 1; leafCount.set(id, w); return w; };
+  const roots = G.nodes.filter(n => !n.parentId || !byId.has(n.parentId)).map(n => n.id);
+  roots.forEach(weigh);
+  const R = [0, 430, 780, 1080, 1340, 1560, 1760];
+  const place = (id, a0, a1, d) => {
+    const a = (a0 + a1) / 2, r = R[Math.min(d, R.length - 1)];
+    POS.set(id, { x: Math.cos(a) * r, y: Math.sin(a) * r });
+    const c = kids.get(id), ws = c.map(k => Math.sqrt(leafCount.get(k))), sum = ws.reduce((s, w) => s + w, 0) || 1;
+    let cur = a0;
+    c.forEach((k, i) => { const span = (a1 - a0) * ws[i] / sum; place(k, cur, cur + span, d + 1); cur += span; });
+  };
+  roots.forEach((id, i) => place(id, -Math.PI / 2 + i * 0.001, Math.PI * 1.5, 0));
+}
+
+// ---------- what's on screen ----------
+const isContainer = n => CONTAINERS.has(n.kind) && (kids.get(n.id) || []).length > 0;
+const ancestors = id => { const list = []; let p = byId.get(id)?.parentId; while (p && byId.has(p)) { list.push(p); p = byId.get(p).parentId; } return list; };
+const isOpenPath = id => ancestors(id).every(a => expanded.has(a));
+const isVisible = id => byId.has(id) && (isOpenPath(id) || forced.has(id));
+const repOf = id => { let cur = id; while (cur && !isVisible(cur)) cur = byId.get(cur)?.parentId; return cur || null; };
+const isAncestor = (a, b) => ancestors(b).includes(a);
+function neighbours(id) {
+  const set = new Set([id]);
+  (out.get(id) || []).forEach(e => set.add(e.to));
+  (inn.get(id) || []).forEach(e => set.add(e.from));
+  const n = byId.get(id); if (n?.parentId) set.add(n.parentId);
+  (kids.get(id) || []).forEach(k => set.add(k));
+  return set;
+}
+function computeForced() {
+  forced = new Set(lit);
+  if (selected) forced.add(selected);
+  if (focusId) neighbours(focusId).forEach(i => forced.add(i));
+  if (live) liveNodes.forEach(i => { if (byId.get(i)?.kind === "Endpoint") forced.add(i); });
+}
+
+const shortName = n => n.kind === "Module" ? n.name.replace(/^Monday\./, "") : n.kind === "Endpoint" || n.kind === "RouteGroup" ? (n.route || n.name) : n.kind === "Middleware" ? n.name.replace(/^Use/, "") : n.name;
+const isGuarded = n => (n.guards || []).some(g => AUTH_GUARDS.test(g)) && !(n.guards || []).includes("AllowAnonymous");
+function under(id) { const list = []; const walk = i => (kids.get(i) || []).forEach(k => { list.push(k); walk(k); }); walk(id); return list; }
+function worstUnder(id) { return [id, ...under(id)].map(worstAt).reduce((w, s) => s && (!w || SEV_RANK[s] > SEV_RANK[w]) ? s : w, null); }
+function covUnder(id) {
+  const ms = [id, ...under(id)].filter(i => cov.has(i) && byId.get(i).kind === "Method");
+  return ms.length ? ms.filter(i => cov.get(i) !== "none").length / ms.length : null;
+}
+
 function nodeStyle(n) {
+  const collapsed = isContainer(n) && !expanded.has(n.id);
   let c = KCOLOR(n.kind), dim = false, glow = n.kind === "App" || n.kind === "Module";
   if (lens === "security") {
-    const worst = worstAt(n.id);
+    const worst = collapsed ? worstUnder(n.id) : worstAt(n.id);
     if (worst) { c = sevColor(worst); glow = true; }
-    else if (n.kind === "Endpoint") { c = isGuarded(n) ? css("--ok") : css("--bad"); }
-    else if (n.kind !== "App" && n.kind !== "Module") dim = true;
+    else if (n.kind === "Endpoint" || n.kind === "RouteGroup") c = isGuarded(n) ? css("--ok") : css("--bad");
+    else if (!CONTAINERS.has(n.kind) && n.kind !== "Middleware") dim = true;
   } else if (lens === "coverage") {
     const st = cov.get(n.id);
-    if (st) { c = COV_COLOR[st]; glow = st === "none"; } else if (n.kind !== "App" && n.kind !== "Module") dim = true;
+    if (st && !collapsed) { c = COV_COLOR[st]; glow = st === "none"; }
+    else { const f = covUnder(n.id); if (f === null) dim = !CONTAINERS.has(n.kind); else c = f >= .7 ? COV_COLOR.direct : f >= .3 ? css("--amber") : COV_COLOR.none; }
   } else if (lens === "live") {
-    if (n.kind !== "Endpoint" && n.kind !== "App" && n.kind !== "Module" && !liveNodes.has(n.id)) dim = true;
+    if (!CONTAINERS.has(n.kind) && n.kind !== "Endpoint" && n.kind !== "Middleware" && !liveNodes.has(n.id)) dim = true;
   }
-  if (lit.size && !lit.has(n.id)) dim = true;
-  if (lit.has(n.id)) glow = true;
+  if (focusId && !neighbours(focusId).has(n.id)) dim = true;
+  if (lit.size && !lit.has(n.id) && !(focusId && neighbours(focusId).has(n.id))) dim = true;
+  const isLit = lit.has(n.id), isSel = selected === n.id, isFocus = focusId === n.id;
+  if (isLit || isSel || isFocus) { glow = true; dim = false; }
   const color = dim ? "#1a2a3c" : c;
-  const big = SIZE[n.kind] || 5;
+  const size = (SIZE[n.kind] || 5) + (collapsed ? Math.min(14, Math.sqrt(leafCount.get(n.id) || 1) * 1.6) : 0) + (isFocus ? 4 : isLit ? 3 : 0);
+  const siblings = (kids.get(n.parentId) || []).length;
+  const showLabel = CONTAINERS.has(n.kind) || n.kind === "Endpoint" || n.kind === "Middleware" || isLit || isSel || isFocus || siblings <= 14 || (focusId && neighbours(focusId).has(n.id));
+  const label = showLabel ? shortName(n) + (collapsed ? `  +${(leafCount.get(n.id) || 0)}` : "") : undefined;
   return {
-    id: n.id, label: LABELLED.has(n.kind) || lit.has(n.id) || selected === n.id ? shortName(n) : undefined,
-    title: `${n.kind}: ${n.name}`, shape: n.kind === "Endpoint" ? "diamond" : n.kind === "Type" ? "square" : "dot",
-    size: lit.has(n.id) ? big + 3 : big,
-    color: { background: lit.has(n.id) ? "#ffffff" : color, border: lit.has(n.id) ? css("--amber") : color, highlight: { background: "#ffffff", border: c }, hover: { background: "#ffffff", border: c } },
-    shadow: { enabled: glow && !dim, color: lit.has(n.id) ? css("--amber") : c, size: lit.has(n.id) ? 22 : 14, x: 0, y: 0 },
-    font: { size: n.kind === "App" ? 15 : n.kind === "Module" ? 13 : 11, color: dim ? "#3a4f66" : css("--fg"), face: n.kind === "Endpoint" || n.kind === "Method" || n.kind === "Test" || n.kind === "Type" ? "JetBrains Mono" : "Chakra Petch", strokeWidth: 4, strokeColor: css("--void") },
-    hidden: !visible(n),
+    id: n.id, label, x: POS.get(n.id).x, y: POS.get(n.id).y, fixed: true,
+    title: `${n.kind}: ${n.kind === "Endpoint" ? n.route : n.name}${collapsed ? " — click to open" : ""}`,
+    shape: SHAPE[n.kind] || "dot", size,
+    borderWidth: collapsed ? 2 : 1, shapeProperties: { borderDashes: collapsed ? [3, 3] : false },
+    color: { background: isLit || isFocus ? "#ffffff" : collapsed ? "rgba(6,11,18,.85)" : color, border: isLit ? css("--amber") : color, highlight: { background: "#ffffff", border: c }, hover: { background: "#ffffff", border: c } },
+    shadow: { enabled: glow && !dim, color: isLit ? css("--amber") : c, size: isLit || isFocus ? 22 : 12, x: 0, y: 0 },
+    font: { size: n.kind === "App" ? 16 : n.kind === "Module" ? 14 : CONTAINERS.has(n.kind) ? 12 : 11, color: dim ? "#3a4f66" : css("--fg"), face: CONTAINERS.has(n.kind) && n.kind !== "Type" ? "Chakra Petch" : "JetBrains Mono", strokeWidth: 4, strokeColor: css("--void") },
   };
 }
-const shortName = n => n.kind === "Module" ? n.name.replace(/^Monday\./, "") : n.kind === "Endpoint" ? n.route : n.name;
-const visible = n => n.kind === "App" || shown.has(n.kind) || lit.has(n.id) || selected === n.id;
-const isGuarded = n => (n.guards || []).some(g => AUTH_GUARDS.test(g)) && !(n.guards || []).includes("AllowAnonymous");
 
+// Edges between hidden things are drawn between the nearest visible boxes, thicker when they bundle several.
 function edgeList() {
-  const list = [];
-  G.nodes.forEach(n => { if (n.parentId) list.push({ id: "p:" + n.id, from: n.parentId, to: n.id, kind: "Contains" }); });
-  G.edges.forEach((e, i) => list.push({ id: "e" + i, from: e.from, to: e.to, kind: e.kind }));
-  return list;
+  const list = [], agg = new Map();
+  G.nodes.forEach(n => { if (n.parentId && isVisible(n.id) && isVisible(n.parentId)) list.push({ id: "p:" + n.id, from: n.parentId, to: n.id, kind: "Contains", count: 1 }); });
+  G.edges.forEach(e => {
+    const a = repOf(e.from), b = repOf(e.to);
+    if (!a || !b || a === b || isAncestor(a, b) || isAncestor(b, a)) return;
+    const key = a + "→" + b + "|" + e.kind, x = agg.get(key);
+    if (x) x.count++; else agg.set(key, { id: "e:" + key, from: a, to: b, kind: e.kind, count: 1 });
+  });
+  return list.concat([...agg.values()]);
 }
 function edgeStyle(e) {
   const s = EDGE_STYLE[e.kind] || EDGE_STYLE.Calls;
-  const hot = lit.size && lit.has(e.from) && lit.has(e.to) && e.kind !== "Contains";
-  const faded = (lit.size && !hot) || (lens === "security" && e.kind !== "HandledBy" && e.kind !== "Calls");
-  return { id: e.id, from: e.from, to: e.to, dashes: s.dashes, width: hot ? 2.2 : s.width,
-    color: { color: hot ? css("--amber") : s.color, opacity: faded ? .12 : (e.kind === "Contains" ? .5 : .65) },
+  const touchesFocus = focusId && (e.from === focusId || e.to === focusId);
+  const hot = (lit.size && lit.has(e.from) && lit.has(e.to) && e.kind !== "Contains") || touchesFocus;
+  const faded = (lit.size && !hot) || (focusId && !touchesFocus) || (lens === "security" && !["HandledBy", "Calls", "Next"].includes(e.kind));
+  const width = (hot ? 2.2 : s.width) * (e.count > 1 ? Math.min(3, 1 + Math.log2(e.count) / 2) : 1);
+  return { id: e.id, from: e.from, to: e.to, dashes: s.dashes, width, title: e.count > 1 ? `${e.count} ${e.kind} links` : e.kind,
+    color: { color: hot ? css("--amber") : s.color, opacity: faded ? .08 : (e.kind === "Contains" ? .45 : .6) },
     arrows: e.kind === "Contains" ? undefined : { to: { enabled: true, scaleFactor: .35 } } };
 }
 
 function draw() {
-  // Seed positions: modules on a ring, everything else near its parent, so physics settles fast.
-  const pos = new Map(); const modules = G.nodes.filter(n => n.kind === "Module");
-  pos.set("app", { x: 0, y: 0 });
-  modules.forEach((m, i) => { const a = i / modules.length * Math.PI * 2; pos.set(m.id, { x: Math.cos(a) * 520, y: Math.sin(a) * 520 }); });
-  const place = n => {
-    if (pos.has(n.id)) return pos.get(n.id);
-    const p = n.parentId && byId.has(n.parentId) ? place(byId.get(n.parentId)) : { x: 0, y: 0 };
-    const h = [...n.id].reduce((a, c) => (a * 31 + c.charCodeAt(0)) | 0, 7);
-    const r = n.kind === "Feature" ? 180 : 70;
-    const v = { x: p.x + Math.cos(h) * r, y: p.y + Math.sin(h) * r }; pos.set(n.id, v); return v;
-  };
-  nodesDS = new vis.DataSet(G.nodes.map(n => Object.assign(nodeStyle(n), place(n))));
-  edgesDS = new vis.DataSet(edgeList().map(edgeStyle));
+  nodesDS = new vis.DataSet([]);
+  edgesDS = new vis.DataSet([]);
   network = new vis.Network($("graph"), { nodes: nodesDS, edges: edgesDS }, {
-    physics: { solver: "forceAtlas2Based", forceAtlas2Based: { gravitationalConstant: -46, centralGravity: .004, springLength: 70, springConstant: .06, damping: .5, avoidOverlap: .4 }, stabilization: { iterations: 260, fit: true } },
-    interaction: { hover: true, tooltipDelay: 150, hideEdgesOnDrag: true, multiselect: false },
-    edges: { smooth: { type: "continuous", roundness: .15 }, selectionWidth: 1.2 },
+    physics: { enabled: false },
+    interaction: { hover: true, tooltipDelay: 150, hideEdgesOnDrag: true, multiselect: false, dragNodes: false },
+    edges: { smooth: { type: "curvedCW", roundness: .12 }, selectionWidth: 1.2 },
   });
-  network.once("stabilizationIterationsDone", () => network.setOptions({ physics: { enabled: false } }));
-  network.on("click", p => { if (p.nodes[0]) select(p.nodes[0], { focus: false }); });
+  network.on("click", p => {
+    const id = p.nodes[0];
+    if (!id) { if (!p.edges.length) clearView(); return; }
+    const n = byId.get(id);
+    if (isContainer(n) && n.kind !== "App") toggleExpand(id); else select(id, { focus: false });
+  });
+  network.on("doubleClick", p => { if (p.nodes[0]) focusOn(p.nodes[0]); });
+  refresh();
+  network.fit({ animation: false });
   setStatus("live", "Live");
 }
 
-function restyle() {
-  nodesDS.update(G.nodes.map(nodeStyle));
-  edgesDS.update(edgeList().map(edgeStyle));
+function refresh() {
+  computeForced();
+  const nodes = G.nodes.filter(n => isVisible(n.id));
+  const ids = new Set(nodes.map(n => n.id));
+  nodesDS.remove([...shownNodes].filter(i => !ids.has(i)));
+  nodesDS.update(nodes.map(nodeStyle));
+  shownNodes = ids;
+  const edges = edgeList().map(edgeStyle);
+  const eids = new Set(edges.map(e => e.id));
+  edgesDS.remove([...shownEdges].filter(i => !eids.has(i)));
+  edgesDS.update(edges);
+  shownEdges = eids;
+  renderNav();
 }
-const applyVisibility = restyle;
+const restyle = refresh;
+
+// ---------- navigation: expand, focus, back ----------
+const snapshot = () => ({ expanded: [...expanded], focusId, lit: [...lit], selected, selectedEvent });
+function remember() { history.push(snapshot()); if (history.length > 60) history.shift(); }
+function restore(s) { expanded = new Set(s.expanded); focusId = s.focusId; lit = new Set(s.lit); selected = s.selected; selectedEvent = s.selectedEvent; }
+function toggleExpand(id) {
+  remember();
+  if (expanded.has(id)) { expanded.delete(id); under(id).forEach(i => expanded.delete(i)); }
+  else expanded.add(id);
+  selected = id;
+  refresh();
+  renderInspector(byId.get(id));
+}
+function focusOn(id) {
+  remember();
+  focusId = id; selected = id; lit = new Set();
+  refresh();
+  renderInspector(byId.get(id));
+  network.fit({ nodes: [...neighbours(id)].filter(i => shownNodes.has(i)), animation: reduceMotion ? false : { duration: 450, easingFunction: "easeInOutQuad" } });
+}
+function back() {
+  if (!history.length) { clearView(); return; }
+  restore(history.pop());
+  if (live) stopTrace();
+  refresh();
+  renderActivity();
+  if (selected && byId.has(selected)) renderInspector(byId.get(selected));
+  network.fit({ nodes: focusId ? [...neighbours(focusId)].filter(i => shownNodes.has(i)) : undefined, animation: reduceMotion ? false : { duration: 400 } });
+}
+function clearView() {
+  if (!focusId && !lit.size && !selected) return;
+  remember();
+  focusId = null; lit = new Set(); selected = null; selectedEvent = null;
+  network.unselectAll();
+  refresh(); renderActivity();
+}
+function home() {
+  remember();
+  expanded = new Set(["app"]); focusId = null; lit = new Set(); selected = null; selectedEvent = null;
+  refresh(); renderActivity();
+  network.fit({ animation: reduceMotion ? false : { duration: 450 } });
+}
+function expandAll() { remember(); G.nodes.filter(isContainer).forEach(n => expanded.add(n.id)); refresh(); network.fit({ animation: false }); }
+function stopTrace() { /* trace animation finishes on its own; kept for symmetry with live */ }
+function renderNav() {
+  const crumbs = [];
+  if (focusId) crumbs.push(`Focused on <b>${esc(shortName(byId.get(focusId)))}</b>`);
+  if (lit.size) crumbs.push(`<b>${lit.size}</b> nodes lit`);
+  $("crumb").innerHTML = crumbs.join(" · ") || `${shownNodes.size} of ${G.nodes.length} nodes shown · click a ring to open it · double-click to focus`;
+  $("backBtn").disabled = !history.length && !focusId && !lit.size;
+}
+document.addEventListener("keydown", e => {
+  const typing = e.target && e.target.closest && e.target.closest("input, textarea, select");
+  if (e.key === "Escape" && !typing) { e.preventDefault(); back(); }
+});
 
 function setLens(next) {
   lens = next;
@@ -461,25 +584,19 @@ function setLens(next) {
   note.hidden = next === "structure";
   if (next === "security") {
     const c = sevCounts();
-    note.innerHTML = findings.length ? `<em>${c.High} high</em> · ${c.Medium} medium · ${c.Low} low — red, amber and yellow nodes are where a threat could come from`
-      : `<b>No findings</b> in this commit · endpoints shown green when guarded`;
-    showKinds(["Endpoint", "Method", "Type"]);
+    note.innerHTML = findings.length ? `<em>${c.High} high</em> · ${c.Medium} medium · ${c.Low} low — closed rings show the worst finding inside them`
+      : `<b>No findings</b> in this commit · endpoints and groups green when guarded`;
     openSec("secThreats");
   } else if (next === "coverage") {
     const c = covSummary();
-    note.innerHTML = `<b>${c.pct}% of methods reached by tests</b> · <em>${c.none} untested</em> shown red`;
-    showKinds(["Method", "Endpoint"]);
+    note.innerHTML = `<b>${c.pct}% of methods reached by tests</b> · <em>${c.none} untested</em> · closed rings: green 70%+, amber 30–70%, red under 30%`;
     openSec("secCoverage");
   } else if (next === "live") {
-    note.innerHTML = `Requests move from the endpoint through its guards to the handler · red flashes are requests stopped by a guard`;
-    showKinds(["Endpoint"]);
+    note.innerHTML = `Requests flow through the pipeline and their guards to the handler · red flashes are requests a guard stopped`;
     openSec("secLive");
   }
   next === "live" ? startLive() : stopLive();
-  restyle();
-}
-function showKinds(kinds) {
-  kinds.forEach(k => { shown.add(k); document.querySelector(`.chip[data-kind="${k}"]`)?.setAttribute("aria-pressed", "true"); });
+  refresh();
 }
 
 // ---------- threats ----------
@@ -555,12 +672,13 @@ function endpointsReaching(id) {
   }
   return found;
 }
-const children = id => G.nodes.filter(n => n.parentId === id);
+const children = id => (kids.get(id) || []).map(i => byId.get(i)).filter(Boolean);
 
 function select(id, { focus = true } = {}) {
   const n = byId.get(id); if (!n) return;
+  if (!isOpenPath(id)) { remember(); ancestors(id).forEach(a => expanded.add(a)); }
   selected = id;
-  if (!visible(n)) restyle(); else nodesDS.update(nodeStyle(n));
+  refresh();
   network.selectNodes([id]);
   if (focus) network.focus(id, { scale: 1.1, animation: reduceMotion ? false : { duration: 500, easingFunction: "easeInOutQuad" } });
   renderInspector(n);
@@ -579,7 +697,8 @@ function renderInspector(n) {
   const loc = n.file ? `${n.file}${n.startLine ? ":" + n.startLine + "–" + n.endLine : ""}` : "";
   const kc = KCOLOR(n.kind);
   let h = `<p id="iName">${esc(n.kind === "Endpoint" ? n.route : n.name)}</p>
-    <p id="iMeta"><span class="kpill" style="color:${kc};border-color:${kc}">${n.kind}</span>${esc(loc || n.id)}</p>`;
+    <p id="iMeta"><span class="kpill" style="color:${kc};border-color:${kc}">${n.kind}</span>${esc(loc || n.id)}</p>
+    <div class="row">${focusId === n.id ? `<button class="btn ghost" type="button" data-act="back">← Back</button>` : `<button class="btn" type="button" data-act="focus">Focus</button>`}${isContainer(n) && n.kind !== "App" ? `<button class="btn ghost" type="button" data-act="toggle">${expanded.has(n.id) ? "Close" : "Open"}</button>` : ""}</div>`;
   if (n.guards && n.guards.length) {
     h += `<div class="sub">${n.kind === "Endpoint" ? "Guards" : "Request pipeline"}</div><div class="guards">${n.guards.map(g => `<span class="guard${/AllowAnonymous|Disable/.test(g) ? " open" : ""}">${esc(g)}</span>`).join("")}</div>`;
   } else if (n.kind === "Endpoint") {
@@ -609,6 +728,10 @@ function renderInspector(n) {
   h += relList("Depends on", related(n.id, "DependsOn", "out"));
   h += relList("Used by", related(n.id, "DependsOn", "in"));
   $("inspect").innerHTML = h;
+  $("inspect").querySelectorAll("[data-act]").forEach(b => b.addEventListener("click", () => {
+    const act = b.dataset.act;
+    if (act === "focus") focusOn(n.id); else if (act === "back") back(); else toggleExpand(n.id);
+  }));
   openSec("secInspect");
   if ($("groupBtn")) { if (!sample) $("groupBtn").hidden = true; else $("groupBtn").onclick = () => explainGroup(n); loadGroupExplanation(n); }
   if (n.code) {
@@ -692,16 +815,31 @@ ${code}`;
 
 // ---------- request path ----------
 function moduleOf(n) { let cur = n; while (cur && cur.kind !== "Module") cur = byId.get(cur.parentId); return cur; }
+function pipelineSteps(mod) {
+  if (!mod) return [];
+  const steps = G.nodes.filter(n => n.kind === "Middleware" && n.parentId === "pipeline:" + mod.name);
+  const order = []; let cur = steps.find(m => !(inn.get(m.id) || []).some(e => e.kind === "Next" && byId.get(e.from)?.kind === "Middleware"));
+  while (cur && !order.includes(cur.id)) { order.push(cur.id); const nx = (out.get(cur.id) || []).find(e => e.kind === "Next" && byId.get(e.to)?.kind === "Middleware"); cur = nx && byId.get(nx.to); }
+  return order.map(i => byId.get(i));
+}
+const groupOf = ep => { const p = byId.get(ep.parentId); return p && p.kind === "RouteGroup" ? p : null; };
+const guardMethodsOf = node => related(node.id, "Calls", "out").filter(m => (node.guards || []).some(g => g.startsWith(m.name)));
 function renderPath(ep) {
-  const mod = moduleOf(ep);
-  const startup = mod && byId.get("startup:" + mod.name);
+  const mod = moduleOf(ep), group = groupOf(ep);
   const steps = [];
   steps.push({ cls: "mw", mark: "→", name: "Request arrives", why: ep.route });
-  (startup?.guards || []).forEach(g => steps.push({ cls: "mw", mark: "M", name: g, why: "Middleware, in the order Program.cs adds it", node: startup.id }));
-  (ep.guards || []).forEach(g => {
+  const mws = pipelineSteps(mod);
+  if (mws.length) mws.forEach(m => steps.push({ cls: "mw", mark: "M", name: m.name, why: "Middleware, in the order Program.cs adds it", node: m.id }));
+  else (byId.get("startup:" + mod?.name)?.guards || []).forEach(g => steps.push({ cls: "mw", mark: "M", name: g, why: "Middleware" }));
+  if (group) {
+    steps.push({ cls: "gd", mark: "R", name: "Route group " + (group.route || group.name), why: "Shared by every endpoint in the group", node: group.id });
+    (group.guards || []).forEach(g => { const m = guardMethodsOf(group).find(x => g.startsWith(x.name)); steps.push({ cls: "gd", mark: "G", name: g, why: m ? `Runs ${m.name} on every request` : guardWhy(g), node: m?.id || group.id }); });
+  }
+  (ep.guards || []).filter(g => !(group?.guards || []).includes(g)).forEach(g => {
     const m = related(ep.id, "Calls", "out").find(x => g.startsWith(x.name));
-    steps.push({ cls: "gd", mark: "G", name: g, why: m ? `Runs ${m.name} on every request` : guardWhy(g), node: m?.id });
+    steps.push({ cls: "gd", mark: "G", name: g, why: m ? `Runs ${m.name} on every request` : guardWhy(g), node: m?.id || ep.id });
   });
+  steps.push({ cls: "gd", mark: "E", name: ep.route, why: "Endpoint", node: ep.id });
   const handler = related(ep.id, "HandledBy", "out")[0];
   if (handler) {
     steps.push({ cls: "hd", mark: "H", name: handler.name, why: "Handler: " + parentName(handler), node: handler.id });
@@ -731,7 +869,8 @@ const guardWhy = g => g.startsWith("RequireAuthorization") ? "Signed-in person r
   : g.startsWith("DisableAntiforgery") ? "No browser form posts here; API-key callers only" : "Endpoint guard";
 
 async function tracePath(ep, steps) {
-  lit = new Set([ep.id]); restyle();
+  remember();
+  focusId = null; lit = new Set([ep.id]); refresh();
   const lis = [...$("path").querySelectorAll("li")];
   for (let i = 0; i < steps.length; i++) {
     lis.forEach(l => l.classList.remove("on")); lis[i]?.classList.add("on");
@@ -745,12 +884,15 @@ async function tracePath(ep, steps) {
 // Each request walks the same chain the Request path shows: endpoint → middleware → guards → handler → calls.
 let liveNodes = new Set(), live = null;
 function chainFor(ep) {
-  const mod = moduleOf(ep), startup = mod && byId.get("startup:" + mod.name);
-  const chain = [ep.id];
-  if (startup) chain.push(startup.id);
+  const mod = moduleOf(ep), group = groupOf(ep);
+  const chain = pipelineSteps(mod).map(m => m.id);
+  if (group) { chain.push(group.id); guardMethodsOf(group).forEach(m => chain.push(m.id)); }
+  const gate = chain.length;                                  // where an unauthenticated call gets stopped
+  chain.push(ep.id);
   related(ep.id, "Calls", "out").filter(m => (ep.guards || []).some(g => g.startsWith(m.name))).forEach(m => chain.push(m.id));
   let cur = related(ep.id, "HandledBy", "out")[0] || related(ep.id, "Calls", "out").find(m => !chain.includes(m.id));
   for (let d = 0; cur && d < 3; d++) { chain.push(cur.id); cur = related(cur.id, "Calls", "out").find(m => !chain.includes(m.id)); }
+  chain.gate = Math.min(gate, chain.length - 1);
   return chain;
 }
 function startLive() {
@@ -795,7 +937,7 @@ function spawn(now) {
   const roll = Math.random();
   // Where it stops: a guard rejects a few unauthenticated calls; a rare server error at the deepest step.
   let stopAt = chain.length - 1, status = 200;
-  if (guarded && roll < .07) { stopAt = Math.min(2, chain.length - 1); status = ep.guards.some(g => g.startsWith("RequireReporterKey")) ? 401 : 403; }
+  if (guarded && roll < .07) { stopAt = chain.gate ?? Math.min(2, chain.length - 1); status = ep.guards.some(g => g.startsWith("RequireReporterKey")) ? 401 : 403; }
   else if (roll > .985) { status = 500; }
   live.reqs.push({ id: ++live.seq, ep, chain, stopAt, status, start: now, hop: 0, hopStart: now, hopMs: 140 + Math.random() * 160, user: live.users[Math.floor(Math.random() * live.users.length)] });
 }
@@ -815,8 +957,9 @@ function finish(r) {
 }
 function drawLive(ctx) {
   if (!live) return;
-  const ids = new Set(); live.reqs.forEach(r => r.chain.forEach(i => ids.add(i)));
-  const pos = network.getPositions([...ids]);
+  const ids = new Set(); live.reqs.forEach(r => r.chain.forEach(i => { const v = repOf(i); if (v) ids.add(v); }));
+  const vis = network.getPositions([...ids]);
+  const pos = new Proxy({}, { get: (_, id) => vis[repOf(id)] });
   const now = performance.now(), amber = css("--amber"), bad = css("--bad"), ok = css("--ok");
   const counts = new Map();
   for (const r of live.reqs) {
@@ -834,7 +977,7 @@ function drawLive(ctx) {
   }
   ctx.font = "600 11px JetBrains Mono, monospace"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
   for (const [id, n] of counts) {
-    const p = network.getPositions([id])[id]; if (!p) continue;
+    const p = pos[id]; if (!p) continue;
     const bx = p.x + 16, by = p.y - 16;
     ctx.beginPath(); ctx.arc(bx, by, 9, 0, Math.PI * 2); ctx.fillStyle = amber; ctx.fill();
     ctx.fillStyle = "#04070b"; ctx.fillText(String(n), bx, by + .5);
@@ -867,23 +1010,27 @@ $("activity").addEventListener("click", e => {
   const b = e.target.closest(".ev"); if (!b) return;
   showEvent(+b.dataset.i);
 });
-function showEvent(i) {
+function showEvent(i, { record = true } = {}) {
+  if (record) remember();
   selectedEvent = i; const ev = events[i];
+  focusId = null;
   lit = new Set((ev.nodes || []).filter(id => byId.has(id)));
-  renderActivity(); restyle();
-  const first = (ev.nodes || []).find(id => byId.has(id));
-  if (first) select(first, { focus: true });
+  const first = [...lit][0];
+  selected = first || null;
+  renderActivity(); refresh();
+  if (first) { renderInspector(byId.get(first)); network.fit({ nodes: [...lit].filter(x => shownNodes.has(x)), animation: reduceMotion ? false : { duration: 450 } }); }
 }
 $("playBtn").onclick = async () => {
   setStatus("run", "Replaying");
   const order = events.map((_, i) => i).reverse();
-  for (const i of order) { showEvent(i); await sleep(1100); }
+  remember();
+  for (const i of order) { showEvent(i, { record: false }); await sleep(1100); }
   setStatus("live", "Live");
 };
-$("clearBtn").onclick = () => {
-  lit = new Set(); selectedEvent = null; selected = null; renderActivity(); restyle();
-  network.unselectAll(); network.fit({ animation: reduceMotion ? false : { duration: 500 } });
-};
+$("clearBtn").onclick = () => { clearView(); network.fit({ animation: reduceMotion ? false : { duration: 500 } }); };
+$("backBtn").onclick = back;
+$("homeBtn").onclick = home;
+$("openAllBtn").onclick = expandAll;
 
 // ---------- decisions ----------
 function renderDecisions(list) {

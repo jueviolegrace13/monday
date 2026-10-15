@@ -38,12 +38,14 @@ internal sealed partial class RepoIndexer(string root, string appName)
 
     private readonly Dictionary<string, CodeNode> _nodes = new(StringComparer.Ordinal);
     private readonly HashSet<CodeEdge> _edges = [];
+    private readonly Dictionary<string, string> _lastMiddleware = new(StringComparer.Ordinal);
+    private List<Module> _modules = [];
 
     public GraphFile Index(string commit)
     {
         Add(new CodeNode { Id = AppId, Kind = NodeKind.App, Name = appName });
 
-        var modules = FindModules();
+        var modules = _modules = FindModules();
         var trees = new List<(SyntaxTree Tree, Module Module)>();
         foreach (var module in modules)
         {
@@ -164,12 +166,14 @@ internal sealed partial class RepoIndexer(string root, string appName)
             Add(Located(new CodeNode { Id = id, Kind = isTest ? NodeKind.Test : NodeKind.Method, Name = symbol.Name, ParentId = typeId }, method, file, withCode: true));
         }
 
-        // Top-level statements (Program.cs) become one "startup" node per module, with the request pipeline as its guards.
+        // Top-level statements (Program.cs) become one "startup" node per module. The request pipeline it builds
+        // becomes real nodes: a "Request pipeline" container holding each middleware step, linked in order.
         var globals = rootNode.ChildNodes().OfType<GlobalStatementSyntax>().ToList();
         if (globals.Count > 0)
         {
-            var pipeline = globals.SelectMany(g => g.DescendantNodes().OfType<InvocationExpressionSyntax>())
-                .Select(MethodName).Where(n => n is not null && PipelineMethods.Contains(n)).Select(n => n!).ToList();
+            var steps = globals.SelectMany(g => g.DescendantNodes().OfType<InvocationExpressionSyntax>())
+                .Where(i => MethodName(i) is { } n && PipelineMethods.Contains(n)).ToList();
+            var pipeline = steps.Select(i => MethodName(i)!).ToList();
             var span = globals[0].GetLocation().GetLineSpan();
             var end = globals[^1].GetLocation().GetLineSpan();
             var code = string.Join(Environment.NewLine, globals.Select(g => g.ToString()));
@@ -179,6 +183,26 @@ internal sealed partial class RepoIndexer(string root, string appName)
                 StartLine = span.StartLinePosition.Line + 1, EndLine = end.EndLinePosition.Line + 1,
                 Code = code, CodeHash = CodeNode.HashCode(code), Guards = pipeline,
             });
+
+            if (steps.Count > 0)
+            {
+                Add(new CodeNode { Id = PipelineId(module), Kind = NodeKind.Feature, Name = "Request pipeline", ParentId = module.Id, File = Rel(file) });
+                string? previous = null;
+                foreach (var step in steps)
+                {
+                    var id = MiddlewareId(module, MethodName(step)!);
+                    var line = step.GetLocation().GetLineSpan().StartLinePosition.Line + 1;
+                    Add(new CodeNode { Id = id, Kind = NodeKind.Middleware, Name = MethodName(step)!, ParentId = PipelineId(module), File = Rel(file), StartLine = line, EndLine = line, Code = step.ToString() });
+                    if (previous is not null)
+                    {
+                        _edges.Add(new CodeEdge(previous, id, EdgeKind.Next));
+                    }
+
+                    previous = id;
+                }
+
+                _lastMiddleware[module.Id] = previous!;
+            }
         }
 
         foreach (var invocation in rootNode.DescendantNodes().OfType<InvocationExpressionSyntax>())
@@ -211,6 +235,19 @@ internal sealed partial class RepoIndexer(string root, string appName)
             ? typeId
             : ParentFor(file, module);
         var span = invocation.GetLocation().GetLineSpan();
+
+        // Endpoints mapped on a route group sit under that group, which carries the guards they share.
+        if (prefix.Length > 0)
+        {
+            var groupId = GroupId(module, prefix);
+            if (!_nodes.ContainsKey(groupId))
+            {
+                Add(new CodeNode { Id = groupId, Kind = NodeKind.RouteGroup, Name = JoinRoute(prefix, string.Empty), ParentId = parent, File = Rel(file), StartLine = span.StartLinePosition.Line + 1, Route = JoinRoute(prefix, string.Empty), Guards = groupGuards });
+            }
+
+            parent = groupId;
+        }
+
         return new CodeNode
         {
             Id = EndpointId(route), Kind = NodeKind.Endpoint, Name = route, ParentId = parent, File = Rel(file),
@@ -302,11 +339,27 @@ internal sealed partial class RepoIndexer(string root, string appName)
         var (prefix, _) = GroupOf(access.Expression, model);
         var endpointId = EndpointId($"{access.Name.Identifier.Text["Map".Length..].ToUpperInvariant()} {JoinRoute(prefix, template)}");
         // Guards written in this repo (like RequireReporterKey) run on every request: link them so the path shows them.
+        var groupNode = prefix.Length > 0 && _nodes.TryGetValue(GroupId(ModuleOfId(endpointId), prefix), out var g) ? g : null;
+        var chained = new HashSet<InvocationExpressionSyntax>(ChainedGuardCalls(invocation));
         foreach (var guardCall in GuardCalls(access.Expression, invocation, model))
         {
             if (model.GetSymbolInfo(guardCall).Symbol is IMethodSymbol guard && TargetId(guard) is { } guardId)
             {
-                _edges.Add(new CodeEdge(endpointId, guardId, EdgeKind.Calls));
+                _edges.Add(new CodeEdge(groupNode is not null && !chained.Contains(guardCall) ? groupNode.Id : endpointId, guardId, EdgeKind.Calls));
+            }
+        }
+
+        // The request's way in: pipeline → group → endpoint (or pipeline → endpoint when it has no group).
+        if (_nodes.TryGetValue(endpointId, out var endpointNode) && ModuleOf(endpointNode) is { } moduleId && _lastMiddleware.TryGetValue(moduleId, out var last))
+        {
+            if (groupNode is not null)
+            {
+                _edges.Add(new CodeEdge(last, groupNode.Id, EdgeKind.Next));
+                _edges.Add(new CodeEdge(groupNode.Id, endpointId, EdgeKind.Next));
+            }
+            else
+            {
+                _edges.Add(new CodeEdge(last, endpointId, EdgeKind.Next));
             }
         }
 
@@ -428,6 +481,30 @@ internal sealed partial class RepoIndexer(string root, string appName)
     // ---------- ids and helpers ----------
 
     private static string EndpointId(string route) => $"endpoint:{route}";
+
+    private static string PipelineId(Module module) => $"pipeline:{module.Name}";
+
+    private static string MiddlewareId(Module module, string step) => $"middleware:{module.Name}:{step}";
+
+    private static string GroupId(Module module, string prefix) => $"group:{module.Name}:{JoinRoute(prefix, string.Empty)}";
+
+    private Module ModuleOfId(string nodeId) =>
+        _modules.First(m => m.Id == (ModuleOf(_nodes[nodeId]) ?? string.Empty));
+
+    /// <summary>Guard calls chained directly onto one MapX call (not inherited from its group).</summary>
+    private static IEnumerable<InvocationExpressionSyntax> ChainedGuardCalls(InvocationExpressionSyntax mapCall)
+    {
+        SyntaxNode current = mapCall;
+        while (current.Parent is MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax outer } access && access.Expression == current)
+        {
+            if (GuardMethods.Contains(access.Name.Identifier.Text))
+            {
+                yield return outer;
+            }
+
+            current = outer;
+        }
+    }
 
     private static string StartupId(Module module) => $"startup:{module.Name}";
 
