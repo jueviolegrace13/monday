@@ -24,6 +24,14 @@
       "guards": []
     },
     {
+      "id": "pipeline:Shop.Api",
+      "kind": "Feature",
+      "name": "Request pipeline",
+      "parentId": "module:Shop.Api",
+      "file": "Shop.Api/Program.cs",
+      "guards": []
+    },
+    {
       "id": "T:Shop.Api.Data.Repo",
       "kind": "Type",
       "name": "Repo",
@@ -107,6 +115,28 @@
       "endLine": 7,
       "route": "POST /orders",
       "guards": []
+    },
+    {
+      "id": "middleware:Shop.Api:UseAuthentication",
+      "kind": "Middleware",
+      "name": "UseAuthentication",
+      "parentId": "pipeline:Shop.Api",
+      "file": "Shop.Api/Program.cs",
+      "startLine": 6,
+      "endLine": 6,
+      "code": "app.UseAuthentication()",
+      "guards": []
+    },
+    {
+      "id": "middleware:Shop.Api:UseAuthorization",
+      "kind": "Middleware",
+      "name": "UseAuthorization",
+      "parentId": "pipeline:Shop.Api",
+      "file": "Shop.Api/Program.cs",
+      "startLine": 5,
+      "endLine": 5,
+      "code": "app.UseAuthorization()",
+      "guards": []
     }
   ],
   "edges": [
@@ -119,6 +149,26 @@
       "from": "endpoint:POST /orders",
       "to": "M:Shop.Api.Data.Repo.Find(System.String)",
       "kind": "Calls"
+    },
+    {
+      "from": "middleware:Shop.Api:UseAuthentication",
+      "to": "endpoint:GET /orders/{id}",
+      "kind": "Next"
+    },
+    {
+      "from": "middleware:Shop.Api:UseAuthentication",
+      "to": "endpoint:POST /auth/login",
+      "kind": "Next"
+    },
+    {
+      "from": "middleware:Shop.Api:UseAuthentication",
+      "to": "endpoint:POST /orders",
+      "kind": "Next"
+    },
+    {
+      "from": "middleware:Shop.Api:UseAuthorization",
+      "to": "middleware:Shop.Api:UseAuthentication",
+      "kind": "Next"
     },
     {
       "from": "startup:Shop.Api",
