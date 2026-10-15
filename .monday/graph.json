@@ -1,5 +1,5 @@
 {
-  "commit": "cc892b1f239d",
+  "commit": "2b7f3afd1268",
   "nodes": [
     {
       "id": "app",
@@ -173,6 +173,14 @@
       "name": "InMemory",
       "parentId": "module:Monday.Infrastructure",
       "file": "src/Monday.Infrastructure/InMemory",
+      "guards": []
+    },
+    {
+      "id": "pipeline:Monday.Api",
+      "kind": "Feature",
+      "name": "Request pipeline",
+      "parentId": "module:Monday.Api",
+      "file": "src/Monday.Api/Program.cs",
       "guards": []
     },
     {
@@ -621,8 +629,8 @@
       "name": "CodeEdge",
       "parentId": "feature:Monday.Domain/CodeGraph",
       "file": "src/Monday.Domain/CodeGraph/CodeGraph.cs",
-      "startLine": 80,
-      "endLine": 80,
+      "startLine": 89,
+      "endLine": 89,
       "guards": []
     },
     {
@@ -631,8 +639,8 @@
       "name": "CodeGraphSnapshot",
       "parentId": "feature:Monday.Domain/CodeGraph",
       "file": "src/Monday.Domain/CodeGraph/CodeGraph.cs",
-      "startLine": 120,
-      "endLine": 222,
+      "startLine": 129,
+      "endLine": 231,
       "guards": []
     },
     {
@@ -641,8 +649,8 @@
       "name": "CodeNode",
       "parentId": "feature:Monday.Domain/CodeGraph",
       "file": "src/Monday.Domain/CodeGraph/CodeGraph.cs",
-      "startLine": 46,
-      "endLine": 78,
+      "startLine": 55,
+      "endLine": 87,
       "guards": []
     },
     {
@@ -651,8 +659,8 @@
       "name": "EdgeKind",
       "parentId": "feature:Monday.Domain/CodeGraph",
       "file": "src/Monday.Domain/CodeGraph/CodeGraph.cs",
-      "startLine": 21,
-      "endLine": 40,
+      "startLine": 27,
+      "endLine": 49,
       "guards": []
     },
     {
@@ -661,8 +669,8 @@
       "name": "Explanation",
       "parentId": "feature:Monday.Domain/CodeGraph",
       "file": "src/Monday.Domain/CodeGraph/CodeGraph.cs",
-      "startLine": 225,
-      "endLine": 228,
+      "startLine": 234,
+      "endLine": 237,
       "guards": []
     },
     {
@@ -672,7 +680,7 @@
       "parentId": "feature:Monday.Domain/CodeGraph",
       "file": "src/Monday.Domain/CodeGraph/CodeGraph.cs",
       "startLine": 9,
-      "endLine": 18,
+      "endLine": 24,
       "guards": []
     },
     {
@@ -681,8 +689,8 @@
       "name": "SecurityFinding",
       "parentId": "feature:Monday.Domain/CodeGraph",
       "file": "src/Monday.Domain/CodeGraph/CodeGraph.cs",
-      "startLine": 93,
-      "endLine": 114,
+      "startLine": 102,
+      "endLine": 123,
       "guards": []
     },
     {
@@ -691,8 +699,8 @@
       "name": "Severity",
       "parentId": "feature:Monday.Domain/CodeGraph",
       "file": "src/Monday.Domain/CodeGraph/CodeGraph.cs",
-      "startLine": 82,
-      "endLine": 87,
+      "startLine": 91,
+      "endLine": 96,
       "guards": []
     },
     {
@@ -1041,8 +1049,8 @@
       "name": "Git",
       "parentId": "module:Monday.Indexer",
       "file": "src/Monday.Indexer/RepoIndexer.cs",
-      "startLine": 514,
-      "endLine": 534,
+      "startLine": 591,
+      "endLine": 611,
       "guards": []
     },
     {
@@ -1062,7 +1070,7 @@
       "parentId": "module:Monday.Indexer",
       "file": "src/Monday.Indexer/RepoIndexer.cs",
       "startLine": 17,
-      "endLine": 512,
+      "endLine": 589,
       "guards": []
     },
     {
@@ -1071,8 +1079,8 @@
       "name": "Module",
       "parentId": "T:Monday.Indexer.RepoIndexer",
       "file": "src/Monday.Indexer/RepoIndexer.cs",
-      "startLine": 87,
-      "endLine": 87,
+      "startLine": 89,
+      "endLine": 89,
       "guards": []
     },
     {
@@ -2109,8 +2117,8 @@
       "name": "Callees",
       "parentId": "T:Monday.Domain.CodeGraph.CodeGraphSnapshot",
       "file": "src/Monday.Domain/CodeGraph/CodeGraph.cs",
-      "startLine": 187,
-      "endLine": 187,
+      "startLine": 196,
+      "endLine": 196,
       "code": "public IEnumerable\u003CCodeNode\u003E Callees(string id) =\u003E Related(e =\u003E e.Kind == EdgeKind.Calls \u0026\u0026 e.From == id, e =\u003E e.To);",
       "codeHash": "F01AF00D956659E1",
       "guards": []
@@ -2121,8 +2129,8 @@
       "name": "Callers",
       "parentId": "T:Monday.Domain.CodeGraph.CodeGraphSnapshot",
       "file": "src/Monday.Domain/CodeGraph/CodeGraph.cs",
-      "startLine": 184,
-      "endLine": 184,
+      "startLine": 193,
+      "endLine": 193,
       "code": "public IEnumerable\u003CCodeNode\u003E Callers(string id) =\u003E Related(e =\u003E e.Kind == EdgeKind.Calls \u0026\u0026 e.To == id, e =\u003E e.From);",
       "codeHash": "1A22BBDAE6A8ED18",
       "guards": []
@@ -2133,8 +2141,8 @@
       "name": "CoveringTests",
       "parentId": "T:Monday.Domain.CodeGraph.CodeGraphSnapshot",
       "file": "src/Monday.Domain/CodeGraph/CodeGraph.cs",
-      "startLine": 190,
-      "endLine": 190,
+      "startLine": 199,
+      "endLine": 199,
       "code": "public IEnumerable\u003CCodeNode\u003E CoveringTests(string id) =\u003E Related(e =\u003E e.Kind == EdgeKind.Covers \u0026\u0026 e.To == id, e =\u003E e.From);",
       "codeHash": "46DB6A00218AD521",
       "guards": []
@@ -2145,8 +2153,8 @@
       "name": "Create",
       "parentId": "T:Monday.Domain.CodeGraph.CodeGraphSnapshot",
       "file": "src/Monday.Domain/CodeGraph/CodeGraph.cs",
-      "startLine": 146,
-      "endLine": 179,
+      "startLine": 155,
+      "endLine": 188,
       "code": "public static CodeGraphSnapshot Create(ProjectId projectId, string commit, DateTimeOffset indexedAt, IReadOnlyList\u003CCodeNode\u003E nodes, IReadOnlyList\u003CCodeEdge\u003E edges, IReadOnlyList\u003CSecurityFinding\u003E? findings = null)\n    {\n        ArgumentNullException.ThrowIfNull(nodes);\n        ArgumentNullException.ThrowIfNull(edges);\n        commit = Guard.NotBlank(commit, \u0022graph.commit_required\u0022, \u0022A graph snapshot needs the commit it was indexed from\u0022, 64);\n        Guard.That(nodes.Count \u003E 0, \u0022graph.empty\u0022, \u0022A graph snapshot needs at least one node.\u0022);\n\n        var ids = new HashSet\u003Cstring\u003E(StringComparer.Ordinal);\n        foreach (var node in nodes)\n        {\n            Guard.NotBlank(node.Id, \u0022graph.node_id_required\u0022, \u0022Every node needs an id\u0022, 1024);\n            Guard.That(ids.Add(node.Id), \u0022graph.duplicate_node\u0022, $\u0022Node \u0027{node.Id}\u0027 appears twice.\u0022);\n        }\n\n        foreach (var node in nodes.Where(n =\u003E n.ParentId is not null))\n        {\n            Guard.That(ids.Contains(node.ParentId!), \u0022graph.unknown_parent\u0022, $\u0022Node \u0027{node.Id}\u0027 has an unknown parent \u0027{node.ParentId}\u0027.\u0022);\n        }\n\n        foreach (var edge in edges)\n        {\n            Guard.That(ids.Contains(edge.From) \u0026\u0026 ids.Contains(edge.To), \u0022graph.dangling_edge\u0022, $\u0022Edge {edge.From} -\u003E {edge.To} points outside the graph.\u0022);\n        }\n\n        var checkedFindings = (findings ?? []).ToList();\n        foreach (var finding in checkedFindings)\n        {\n            Guard.That(ids.Contains(finding.NodeId), \u0022graph.finding_unknown_node\u0022, $\u0022Finding \u0027{finding.Rule}\u0027 points at unknown node \u0027{finding.NodeId}\u0027.\u0022);\n            Guard.NotBlank(finding.Title, \u0022graph.finding_title_required\u0022, \u0022Every finding needs a title\u0022, 200);\n        }\n\n        var ordered = checkedFindings.OrderByDescending(f =\u003E f.Severity).ThenBy(f =\u003E f.Rule, StringComparer.Ordinal).ToList();\n        return new CodeGraphSnapshot(projectId, commit, indexedAt, nodes, edges.Distinct().ToList(), ordered);\n    }",
       "codeHash": "1FE0A34DB27CC837",
       "guards": []
@@ -2157,8 +2165,8 @@
       "name": "EndpointsReaching",
       "parentId": "T:Monday.Domain.CodeGraph.CodeGraphSnapshot",
       "file": "src/Monday.Domain/CodeGraph/CodeGraph.cs",
-      "startLine": 193,
-      "endLine": 218,
+      "startLine": 202,
+      "endLine": 227,
       "code": "public IEnumerable\u003CCodeNode\u003E EndpointsReaching(string id)\n    {\n        var seen = new HashSet\u003Cstring\u003E(StringComparer.Ordinal) { id };\n        var queue = new Queue\u003Cstring\u003E([id]);\n        var endpoints = new List\u003CCodeNode\u003E();\n        while (queue.Count \u003E 0)\n        {\n            var current = queue.Dequeue();\n            foreach (var edge in Edges.Where(e =\u003E e.To == current \u0026\u0026 e.Kind is EdgeKind.Calls or EdgeKind.HandledBy))\n            {\n                if (!seen.Add(edge.From))\n                {\n                    continue;\n                }\n\n                if (Find(edge.From) is { Kind: NodeKind.Endpoint } endpoint)\n                {\n                    endpoints.Add(endpoint);\n                }\n\n                queue.Enqueue(edge.From);\n            }\n        }\n\n        return endpoints;\n    }",
       "codeHash": "54185F66124349FD",
       "guards": []
@@ -2169,8 +2177,8 @@
       "name": "Find",
       "parentId": "T:Monday.Domain.CodeGraph.CodeGraphSnapshot",
       "file": "src/Monday.Domain/CodeGraph/CodeGraph.cs",
-      "startLine": 181,
-      "endLine": 181,
+      "startLine": 190,
+      "endLine": 190,
       "code": "public CodeNode? Find(string id) =\u003E Nodes.FirstOrDefault(n =\u003E n.Id == id);",
       "codeHash": "2C5BAE47DF8F77F3",
       "guards": []
@@ -2181,8 +2189,8 @@
       "name": "Related",
       "parentId": "T:Monday.Domain.CodeGraph.CodeGraphSnapshot",
       "file": "src/Monday.Domain/CodeGraph/CodeGraph.cs",
-      "startLine": 220,
-      "endLine": 221,
+      "startLine": 229,
+      "endLine": 230,
       "code": "private IEnumerable\u003CCodeNode\u003E Related(Func\u003CCodeEdge, bool\u003E match, Func\u003CCodeEdge, string\u003E pick) =\u003E\n        Edges.Where(match).Select(pick).Distinct().Select(Find).OfType\u003CCodeNode\u003E();",
       "codeHash": "61C8934DB74FAE43",
       "guards": []
@@ -2193,8 +2201,8 @@
       "name": "HashCode",
       "parentId": "T:Monday.Domain.CodeGraph.CodeNode",
       "file": "src/Monday.Domain/CodeGraph/CodeGraph.cs",
-      "startLine": 76,
-      "endLine": 77,
+      "startLine": 85,
+      "endLine": 86,
       "code": "public static string HashCode(string code) =\u003E\n        Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(code.ReplaceLineEndings(\u0022\\n\u0022))))[..16];",
       "codeHash": "D97FE3556D6E7CC9",
       "guards": []
@@ -2205,8 +2213,8 @@
       "name": "IsCurrentFor",
       "parentId": "T:Monday.Domain.CodeGraph.Explanation",
       "file": "src/Monday.Domain/CodeGraph/CodeGraph.cs",
-      "startLine": 227,
-      "endLine": 227,
+      "startLine": 236,
+      "endLine": 236,
       "code": "public bool IsCurrentFor(CodeNode node) =\u003E node.CodeHash is not null \u0026\u0026 node.CodeHash == CodeHash;",
       "codeHash": "EC558422FC296A65",
       "guards": []
@@ -2829,8 +2837,8 @@
       "name": "HeadCommit",
       "parentId": "T:Monday.Indexer.Git",
       "file": "src/Monday.Indexer/RepoIndexer.cs",
-      "startLine": 516,
-      "endLine": 533,
+      "startLine": 593,
+      "endLine": 610,
       "code": "public static string HeadCommit(string root)\n    {\n        try\n        {\n            using var git = Process.Start(new ProcessStartInfo(\u0022git\u0022, [\u0022-C\u0022, root, \u0022rev-parse\u0022, \u0022--short=12\u0022, \u0022HEAD\u0022])\n            {\n                RedirectStandardOutput = true,\n                RedirectStandardError = true,\n            })!;\n            var sha = git.StandardOutput.ReadToEnd().Trim();\n            git.WaitForExit();\n            return git.ExitCode == 0 \u0026\u0026 sha.Length \u003E 0 ? sha : \u0022uncommitted\u0022;\n        }\n        catch (System.ComponentModel.Win32Exception)\n        {\n            return \u0022uncommitted\u0022;\n        }\n    }",
       "codeHash": "085C0E5FC4A315F0",
       "guards": []
@@ -2841,10 +2849,22 @@
       "name": "Add",
       "parentId": "T:Monday.Indexer.RepoIndexer",
       "file": "src/Monday.Indexer/RepoIndexer.cs",
-      "startLine": 458,
-      "endLine": 458,
+      "startLine": 535,
+      "endLine": 535,
       "code": "private void Add(CodeNode node) =\u003E _nodes.TryAdd(node.Id, node);",
       "codeHash": "77E27B11D4F1F69B",
+      "guards": []
+    },
+    {
+      "id": "M:Monday.Indexer.RepoIndexer.ChainedGuardCalls(InvocationExpressionSyntax)",
+      "kind": "Method",
+      "name": "ChainedGuardCalls",
+      "parentId": "T:Monday.Indexer.RepoIndexer",
+      "file": "src/Monday.Indexer/RepoIndexer.cs",
+      "startLine": 495,
+      "endLine": 507,
+      "code": "private static IEnumerable\u003CInvocationExpressionSyntax\u003E ChainedGuardCalls(InvocationExpressionSyntax mapCall)\n    {\n        SyntaxNode current = mapCall;\n        while (current.Parent is MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax outer } access \u0026\u0026 access.Expression == current)\n        {\n            if (GuardMethods.Contains(access.Name.Identifier.Text))\n            {\n                yield return outer;\n            }\n\n            current = outer;\n        }\n    }",
+      "codeHash": "B0B94222B572A5C5",
       "guards": []
     },
     {
@@ -2853,8 +2873,8 @@
       "name": "ChainedGuards",
       "parentId": "T:Monday.Indexer.RepoIndexer",
       "file": "src/Monday.Indexer/RepoIndexer.cs",
-      "startLine": 385,
-      "endLine": 398,
+      "startLine": 438,
+      "endLine": 451,
       "code": "private static IEnumerable\u003Cstring\u003E ChainedGuards(InvocationExpressionSyntax mapCall, SemanticModel model)\n    {\n        SyntaxNode current = mapCall;\n        while (current.Parent is MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax outer } access \u0026\u0026 access.Expression == current)\n        {\n            var name = access.Name.Identifier.Text;\n            if (GuardMethods.Contains(name))\n            {\n                yield return GuardLabel(outer, name, model);\n            }\n\n            current = outer;\n        }\n    }",
       "codeHash": "C16CD2D0B429E230",
       "guards": []
@@ -2877,8 +2897,8 @@
       "name": "CollectEdges",
       "parentId": "T:Monday.Indexer.RepoIndexer",
       "file": "src/Monday.Indexer/RepoIndexer.cs",
-      "startLine": 223,
-      "endLine": 253,
+      "startLine": 260,
+      "endLine": 290,
       "code": "private void CollectEdges(SyntaxTree tree, SemanticModel model, Module module)\n    {\n        var rootNode = tree.GetRoot();\n\n        foreach (var method in rootNode.DescendantNodes().OfType\u003CMethodDeclarationSyntax\u003E())\n        {\n            if (model.GetDeclaredSymbol(method) is IMethodSymbol symbol \u0026\u0026 IdOf(symbol) is { } from \u0026\u0026 _nodes.TryGetValue(from, out var node))\n            {\n                LinkCalls(from, method, model, node.Kind == NodeKind.Test);\n            }\n        }\n\n        var globals = rootNode.ChildNodes().OfType\u003CGlobalStatementSyntax\u003E().ToList();\n        foreach (var global in globals)\n        {\n            LinkCalls(StartupId(module), global, model, isTest: false);\n        }\n\n        foreach (var type in rootNode.DescendantNodes().OfType\u003CTypeDeclarationSyntax\u003E())\n        {\n            if (model.GetDeclaredSymbol(type) is INamedTypeSymbol symbol \u0026\u0026 IdOf(symbol) is { } typeId \u0026\u0026 _nodes.ContainsKey(typeId))\n            {\n                LinkTypeDependencies(typeId, symbol);\n            }\n        }\n\n        foreach (var invocation in rootNode.DescendantNodes().OfType\u003CInvocationExpressionSyntax\u003E())\n        {\n            LinkEndpointHandler(invocation, model);\n        }\n    }",
       "codeHash": "30C58A76C124D90A",
       "guards": []
@@ -2889,10 +2909,10 @@
       "name": "CollectNodes",
       "parentId": "T:Monday.Indexer.RepoIndexer",
       "file": "src/Monday.Indexer/RepoIndexer.cs",
-      "startLine": 140,
-      "endLine": 191,
-      "code": "private void CollectNodes(SyntaxTree tree, SemanticModel model, Module module)\n    {\n        var rootNode = tree.GetRoot();\n        var file = tree.FilePath;\n\n        foreach (var type in rootNode.DescendantNodes().OfType\u003CBaseTypeDeclarationSyntax\u003E())\n        {\n            if (model.GetDeclaredSymbol(type) is not INamedTypeSymbol symbol || IdOf(symbol) is not { } id)\n            {\n                continue;\n            }\n\n            var parent = symbol.ContainingType is { } outer \u0026\u0026 IdOf(outer) is { } outerId ? outerId : ParentFor(file, module);\n            Add(Located(new CodeNode { Id = id, Kind = NodeKind.Type, Name = symbol.Name, ParentId = parent }, type, file, withCode: false));\n        }\n\n        foreach (var method in rootNode.DescendantNodes().OfType\u003CMethodDeclarationSyntax\u003E())\n        {\n            if (model.GetDeclaredSymbol(method) is not IMethodSymbol symbol || IdOf(symbol) is not { } id || IdOf(symbol.ContainingType) is not { } typeId)\n            {\n                continue;\n            }\n\n            var isTest = module.IsTest \u0026\u0026 symbol.DeclaredAccessibility == Accessibility.Public \u0026\u0026 symbol.ContainingType.Name.EndsWith(\u0022Tests\u0022, StringComparison.Ordinal);\n            Add(Located(new CodeNode { Id = id, Kind = isTest ? NodeKind.Test : NodeKind.Method, Name = symbol.Name, ParentId = typeId }, method, file, withCode: true));\n        }\n\n        // Top-level statements (Program.cs) become one \u0022startup\u0022 node per module, with the request pipeline as its guards.\n        var globals = rootNode.ChildNodes().OfType\u003CGlobalStatementSyntax\u003E().ToList();\n        if (globals.Count \u003E 0)\n        {\n            var pipeline = globals.SelectMany(g =\u003E g.DescendantNodes().OfType\u003CInvocationExpressionSyntax\u003E())\n                .Select(MethodName).Where(n =\u003E n is not null \u0026\u0026 PipelineMethods.Contains(n)).Select(n =\u003E n!).ToList();\n            var span = globals[0].GetLocation().GetLineSpan();\n            var end = globals[^1].GetLocation().GetLineSpan();\n            var code = string.Join(Environment.NewLine, globals.Select(g =\u003E g.ToString()));\n            Add(new CodeNode\n            {\n                Id = StartupId(module), Kind = NodeKind.Method, Name = \u0022Startup\u0022, ParentId = module.Id, File = Rel(file),\n                StartLine = span.StartLinePosition.Line \u002B 1, EndLine = end.EndLinePosition.Line \u002B 1,\n                Code = code, CodeHash = CodeNode.HashCode(code), Guards = pipeline,\n            });\n        }\n\n        foreach (var invocation in rootNode.DescendantNodes().OfType\u003CInvocationExpressionSyntax\u003E())\n        {\n            if (Endpoint(invocation, model, module, file) is { } endpoint)\n            {\n                Add(endpoint);\n            }\n        }\n    }",
-      "codeHash": "AF27CCEADDB5692B",
+      "startLine": 142,
+      "endLine": 215,
+      "code": "private void CollectNodes(SyntaxTree tree, SemanticModel model, Module module)\n    {\n        var rootNode = tree.GetRoot();\n        var file = tree.FilePath;\n\n        foreach (var type in rootNode.DescendantNodes().OfType\u003CBaseTypeDeclarationSyntax\u003E())\n        {\n            if (model.GetDeclaredSymbol(type) is not INamedTypeSymbol symbol || IdOf(symbol) is not { } id)\n            {\n                continue;\n            }\n\n            var parent = symbol.ContainingType is { } outer \u0026\u0026 IdOf(outer) is { } outerId ? outerId : ParentFor(file, module);\n            Add(Located(new CodeNode { Id = id, Kind = NodeKind.Type, Name = symbol.Name, ParentId = parent }, type, file, withCode: false));\n        }\n\n        foreach (var method in rootNode.DescendantNodes().OfType\u003CMethodDeclarationSyntax\u003E())\n        {\n            if (model.GetDeclaredSymbol(method) is not IMethodSymbol symbol || IdOf(symbol) is not { } id || IdOf(symbol.ContainingType) is not { } typeId)\n            {\n                continue;\n            }\n\n            var isTest = module.IsTest \u0026\u0026 symbol.DeclaredAccessibility == Accessibility.Public \u0026\u0026 symbol.ContainingType.Name.EndsWith(\u0022Tests\u0022, StringComparison.Ordinal);\n            Add(Located(new CodeNode { Id = id, Kind = isTest ? NodeKind.Test : NodeKind.Method, Name = symbol.Name, ParentId = typeId }, method, file, withCode: true));\n        }\n\n        // Top-level statements (Program.cs) become one \u0022startup\u0022 node per module. The request pipeline it builds\n        // becomes real nodes: a \u0022Request pipeline\u0022 container holding each middleware step, linked in order.\n        var globals = rootNode.ChildNodes().OfType\u003CGlobalStatementSyntax\u003E().ToList();\n        if (globals.Count \u003E 0)\n        {\n            var steps = globals.SelectMany(g =\u003E g.DescendantNodes().OfType\u003CInvocationExpressionSyntax\u003E())\n                .Where(i =\u003E MethodName(i) is { } n \u0026\u0026 PipelineMethods.Contains(n)).ToList();\n            var pipeline = steps.Select(i =\u003E MethodName(i)!).ToList();\n            var span = globals[0].GetLocation().GetLineSpan();\n            var end = globals[^1].GetLocation().GetLineSpan();\n            var code = string.Join(Environment.NewLine, globals.Select(g =\u003E g.ToString()));\n            Add(new CodeNode\n            {\n                Id = StartupId(module), Kind = NodeKind.Method, Name = \u0022Startup\u0022, ParentId = module.Id, File = Rel(file),\n                StartLine = span.StartLinePosition.Line \u002B 1, EndLine = end.EndLinePosition.Line \u002B 1,\n                Code = code, CodeHash = CodeNode.HashCode(code), Guards = pipeline,\n            });\n\n            if (steps.Count \u003E 0)\n            {\n                Add(new CodeNode { Id = PipelineId(module), Kind = NodeKind.Feature, Name = \u0022Request pipeline\u0022, ParentId = module.Id, File = Rel(file) });\n                string? previous = null;\n                foreach (var step in steps)\n                {\n                    var id = MiddlewareId(module, MethodName(step)!);\n                    var line = step.GetLocation().GetLineSpan().StartLinePosition.Line \u002B 1;\n                    Add(new CodeNode { Id = id, Kind = NodeKind.Middleware, Name = MethodName(step)!, ParentId = PipelineId(module), File = Rel(file), StartLine = line, EndLine = line, Code = step.ToString() });\n                    if (previous is not null)\n                    {\n                        _edges.Add(new CodeEdge(previous, id, EdgeKind.Next));\n                    }\n\n                    previous = id;\n                }\n\n                _lastMiddleware[module.Id] = previous!;\n            }\n        }\n\n        foreach (var invocation in rootNode.DescendantNodes().OfType\u003CInvocationExpressionSyntax\u003E())\n        {\n            if (Endpoint(invocation, model, module, file) is { } endpoint)\n            {\n                Add(endpoint);\n            }\n        }\n    }",
+      "codeHash": "A7394F50BD3AF279",
       "guards": []
     },
     {
@@ -2913,10 +2933,10 @@
       "name": "Endpoint",
       "parentId": "T:Monday.Indexer.RepoIndexer",
       "file": "src/Monday.Indexer/RepoIndexer.cs",
-      "startLine": 193,
-      "endLine": 219,
-      "code": "private CodeNode? Endpoint(InvocationExpressionSyntax invocation, SemanticModel model, Module module, string file)\n    {\n        if (invocation.Expression is not MemberAccessExpressionSyntax access || !MapVerbs.Contains(access.Name.Identifier.Text))\n        {\n            return null;\n        }\n\n        if (invocation.ArgumentList.Arguments.FirstOrDefault()?.Expression is not LiteralExpressionSyntax { Token.Value: string template })\n        {\n            return null;\n        }\n\n        var (prefix, groupGuards) = GroupOf(access.Expression, model);\n        var verb = access.Name.Identifier.Text[\u0022Map\u0022.Length..].ToUpperInvariant();\n        var route = $\u0022{verb} {JoinRoute(prefix, template)}\u0022;\n        var guards = groupGuards.Concat(ChainedGuards(invocation, model)).Distinct().ToList();\n        var container = invocation.Ancestors().OfType\u003CMethodDeclarationSyntax\u003E().FirstOrDefault();\n        var parent = container is not null \u0026\u0026 model.GetDeclaredSymbol(container) is IMethodSymbol m \u0026\u0026 IdOf(m.ContainingType) is { } typeId\n            ? typeId\n            : ParentFor(file, module);\n        var span = invocation.GetLocation().GetLineSpan();\n        return new CodeNode\n        {\n            Id = EndpointId(route), Kind = NodeKind.Endpoint, Name = route, ParentId = parent, File = Rel(file),\n            StartLine = span.StartLinePosition.Line \u002B 1, EndLine = span.EndLinePosition.Line \u002B 1, Route = route, Guards = guards,\n        };\n    }",
-      "codeHash": "698DD0BEFA904092",
+      "startLine": 217,
+      "endLine": 256,
+      "code": "private CodeNode? Endpoint(InvocationExpressionSyntax invocation, SemanticModel model, Module module, string file)\n    {\n        if (invocation.Expression is not MemberAccessExpressionSyntax access || !MapVerbs.Contains(access.Name.Identifier.Text))\n        {\n            return null;\n        }\n\n        if (invocation.ArgumentList.Arguments.FirstOrDefault()?.Expression is not LiteralExpressionSyntax { Token.Value: string template })\n        {\n            return null;\n        }\n\n        var (prefix, groupGuards) = GroupOf(access.Expression, model);\n        var verb = access.Name.Identifier.Text[\u0022Map\u0022.Length..].ToUpperInvariant();\n        var route = $\u0022{verb} {JoinRoute(prefix, template)}\u0022;\n        var guards = groupGuards.Concat(ChainedGuards(invocation, model)).Distinct().ToList();\n        var container = invocation.Ancestors().OfType\u003CMethodDeclarationSyntax\u003E().FirstOrDefault();\n        var parent = container is not null \u0026\u0026 model.GetDeclaredSymbol(container) is IMethodSymbol m \u0026\u0026 IdOf(m.ContainingType) is { } typeId\n            ? typeId\n            : ParentFor(file, module);\n        var span = invocation.GetLocation().GetLineSpan();\n\n        // Endpoints mapped on a route group sit under that group, which carries the guards they share.\n        if (prefix.Length \u003E 0)\n        {\n            var groupId = GroupId(module, prefix);\n            if (!_nodes.ContainsKey(groupId))\n            {\n                Add(new CodeNode { Id = groupId, Kind = NodeKind.RouteGroup, Name = JoinRoute(prefix, string.Empty), ParentId = parent, File = Rel(file), StartLine = span.StartLinePosition.Line \u002B 1, Route = JoinRoute(prefix, string.Empty), Guards = groupGuards });\n            }\n\n            parent = groupId;\n        }\n\n        return new CodeNode\n        {\n            Id = EndpointId(route), Kind = NodeKind.Endpoint, Name = route, ParentId = parent, File = Rel(file),\n            StartLine = span.StartLinePosition.Line \u002B 1, EndLine = span.EndLinePosition.Line \u002B 1, Route = route, Guards = guards,\n        };\n    }",
+      "codeHash": "971DC92C5E3D7844",
       "guards": []
     },
     {
@@ -2925,8 +2945,8 @@
       "name": "EndpointId",
       "parentId": "T:Monday.Indexer.RepoIndexer",
       "file": "src/Monday.Indexer/RepoIndexer.cs",
-      "startLine": 430,
-      "endLine": 430,
+      "startLine": 483,
+      "endLine": 483,
       "code": "private static string EndpointId(string route) =\u003E $\u0022endpoint:{route}\u0022;",
       "codeHash": "61F4ABB24FA48F96",
       "guards": []
@@ -2937,8 +2957,8 @@
       "name": "FindModules",
       "parentId": "T:Monday.Indexer.RepoIndexer",
       "file": "src/Monday.Indexer/RepoIndexer.cs",
-      "startLine": 101,
-      "endLine": 110,
+      "startLine": 103,
+      "endLine": 112,
       "code": "private List\u003CModule\u003E FindModules() =\u003E\n        Directory.EnumerateFiles(root, \u0022*.csproj\u0022, SearchOption.AllDirectories)\n            .Where(f =\u003E !IsSkipped(f) \u0026\u0026 !IsIgnored(f))\n            .Select(f =\u003E\n            {\n                var name = Path.GetFileNameWithoutExtension(f);\n                return new Module($\u0022module:{name}\u0022, name, Path.GetDirectoryName(f)!, f, name.EndsWith(\u0022.Tests\u0022, StringComparison.Ordinal));\n            })\n            .OrderBy(m =\u003E m.Name, StringComparer.Ordinal)\n            .ToList();",
       "codeHash": "AB3E1F5C6181FD0A",
       "guards": []
@@ -2956,13 +2976,25 @@
       "guards": []
     },
     {
+      "id": "M:Monday.Indexer.RepoIndexer.GroupId(Monday.Indexer.RepoIndexer.Module,System.String)",
+      "kind": "Method",
+      "name": "GroupId",
+      "parentId": "T:Monday.Indexer.RepoIndexer",
+      "file": "src/Monday.Indexer/RepoIndexer.cs",
+      "startLine": 489,
+      "endLine": 489,
+      "code": "private static string GroupId(Module module, string prefix) =\u003E $\u0022group:{module.Name}:{JoinRoute(prefix, string.Empty)}\u0022;",
+      "codeHash": "CD74A995A009983A",
+      "guards": []
+    },
+    {
       "id": "M:Monday.Indexer.RepoIndexer.GroupOf(ExpressionSyntax,SemanticModel)",
       "kind": "Method",
       "name": "GroupOf",
       "parentId": "T:Monday.Indexer.RepoIndexer",
       "file": "src/Monday.Indexer/RepoIndexer.cs",
-      "startLine": 334,
-      "endLine": 361,
+      "startLine": 387,
+      "endLine": 414,
       "code": "private static (string Prefix, List\u003Cstring\u003E Guards) GroupOf(ExpressionSyntax receiver, SemanticModel model)\n    {\n        var chain = receiver;\n        if (receiver is IdentifierNameSyntax identifier\n            \u0026\u0026 model.GetSymbolInfo(identifier).Symbol is ILocalSymbol local\n            \u0026\u0026 local.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() is VariableDeclaratorSyntax { Initializer.Value: { } init })\n        {\n            chain = init;\n        }\n\n        var prefix = string.Empty;\n        var guards = new List\u003Cstring\u003E();\n        foreach (var call in chain.DescendantNodesAndSelf().OfType\u003CInvocationExpressionSyntax\u003E())\n        {\n            var name = MethodName(call);\n            if (name == \u0022MapGroup\u0022 \u0026\u0026 call.ArgumentList.Arguments.FirstOrDefault()?.Expression is LiteralExpressionSyntax { Token.Value: string groupPrefix })\n            {\n                prefix = groupPrefix;\n            }\n            else if (name is not null \u0026\u0026 GuardMethods.Contains(name))\n            {\n                guards.Add(GuardLabel(call, name, model));\n            }\n        }\n\n        guards.Reverse();\n        return (prefix, guards);\n    }",
       "codeHash": "B7E1DE677E154417",
       "guards": []
@@ -2973,8 +3005,8 @@
       "name": "GuardCalls",
       "parentId": "T:Monday.Indexer.RepoIndexer",
       "file": "src/Monday.Indexer/RepoIndexer.cs",
-      "startLine": 363,
-      "endLine": 382,
+      "startLine": 416,
+      "endLine": 435,
       "code": "private static IEnumerable\u003CInvocationExpressionSyntax\u003E GuardCalls(ExpressionSyntax receiver, InvocationExpressionSyntax mapCall, SemanticModel model)\n    {\n        var chain = receiver;\n        if (receiver is IdentifierNameSyntax identifier\n            \u0026\u0026 model.GetSymbolInfo(identifier).Symbol is ILocalSymbol local\n            \u0026\u0026 local.DeclaringSyntaxReferences.FirstOrDefault()?.GetSyntax() is VariableDeclaratorSyntax { Initializer.Value: { } init })\n        {\n            chain = init;\n        }\n\n        var calls = chain.DescendantNodesAndSelf().OfType\u003CInvocationExpressionSyntax\u003E().ToList();\n        SyntaxNode current = mapCall;\n        while (current.Parent is MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax outer } access \u0026\u0026 access.Expression == current)\n        {\n            calls.Add(outer);\n            current = outer;\n        }\n\n        return calls.Where(c =\u003E MethodName(c) is { } n \u0026\u0026 GuardMethods.Contains(n));\n    }",
       "codeHash": "2CB8227CE30483A9",
       "guards": []
@@ -2985,8 +3017,8 @@
       "name": "GuardLabel",
       "parentId": "T:Monday.Indexer.RepoIndexer",
       "file": "src/Monday.Indexer/RepoIndexer.cs",
-      "startLine": 401,
-      "endLine": 412,
+      "startLine": 454,
+      "endLine": 465,
       "code": "private static string GuardLabel(InvocationExpressionSyntax call, string name, SemanticModel model)\n    {\n        var argument = call.ArgumentList.Arguments.FirstOrDefault()?.Expression;\n        if (argument is null)\n        {\n            return name;\n        }\n\n        return model.GetConstantValue(argument) is { HasValue: true, Value: string value }\n            ? $\u0022{name}:{value}\u0022\n            : argument is MemberAccessExpressionSyntax m ? $\u0022{name}:{m.Name.Identifier.Text}\u0022 : name;\n    }",
       "codeHash": "1500EBFC8373C2DD",
       "guards": []
@@ -3009,8 +3041,8 @@
       "name": "IdOf",
       "parentId": "T:Monday.Indexer.RepoIndexer",
       "file": "src/Monday.Indexer/RepoIndexer.cs",
-      "startLine": 434,
-      "endLine": 435,
+      "startLine": 511,
+      "endLine": 512,
       "code": "private static string? IdOf(ISymbol? symbol) =\u003E\n        symbol is null || symbol.Locations.All(l =\u003E !l.IsInSource) ? null : symbol.OriginalDefinition.GetDocumentationCommentId();",
       "codeHash": "6A1E1714A139909B",
       "guards": []
@@ -3021,8 +3053,8 @@
       "name": "Ignored",
       "parentId": "T:Monday.Indexer.RepoIndexer",
       "file": "src/Monday.Indexer/RepoIndexer.cs",
-      "startLine": 90,
-      "endLine": 93,
+      "startLine": 92,
+      "endLine": 95,
       "code": "private List\u003Cstring\u003E Ignored() =\u003E\n        File.Exists(Path.Combine(root, \u0022.monday\u0022, \u0022ignore\u0022))\n            ? File.ReadAllLines(Path.Combine(root, \u0022.monday\u0022, \u0022ignore\u0022)).Select(l =\u003E l.Trim().TrimEnd(\u0027/\u0027)).Where(l =\u003E l.Length \u003E 0 \u0026\u0026 !l.StartsWith(\u0027#\u0027)).ToList()\n            : [];",
       "codeHash": "877465093CA38E12",
       "guards": []
@@ -3033,8 +3065,8 @@
       "name": "ImplicitUsings",
       "parentId": "T:Monday.Indexer.RepoIndexer",
       "file": "src/Monday.Indexer/RepoIndexer.cs",
-      "startLine": 461,
-      "endLine": 478,
+      "startLine": 538,
+      "endLine": 555,
       "code": "private static SyntaxTree ImplicitUsings() =\u003E CSharpSyntaxTree.ParseText(\u0022\u0022\u0022\n        global using System;\n        global using System.Collections.Generic;\n        global using System.IO;\n        global using System.Linq;\n        global using System.Net.Http;\n        global using System.Net.Http.Json;\n        global using System.Threading;\n        global using System.Threading.Tasks;\n        global using Microsoft.AspNetCore.Builder;\n        global using Microsoft.AspNetCore.Hosting;\n        global using Microsoft.AspNetCore.Http;\n        global using Microsoft.AspNetCore.Routing;\n        global using Microsoft.Extensions.Configuration;\n        global using Microsoft.Extensions.DependencyInjection;\n        global using Microsoft.Extensions.Hosting;\n        global using Microsoft.Extensions.Logging;\n        \u0022\u0022\u0022, path: \u0022monday-implicit-usings.g.cs\u0022);",
       "codeHash": "642DA41A1ED489DD",
       "guards": []
@@ -3045,10 +3077,10 @@
       "name": "Index",
       "parentId": "T:Monday.Indexer.RepoIndexer",
       "file": "src/Monday.Indexer/RepoIndexer.cs",
-      "startLine": 42,
-      "endLine": 83,
-      "code": "public GraphFile Index(string commit)\n    {\n        Add(new CodeNode { Id = AppId, Kind = NodeKind.App, Name = appName });\n\n        var modules = FindModules();\n        var trees = new List\u003C(SyntaxTree Tree, Module Module)\u003E();\n        foreach (var module in modules)\n        {\n            Add(new CodeNode { Id = module.Id, Kind = NodeKind.Module, Name = module.Name, ParentId = AppId, File = Rel(module.ProjectFile) });\n            foreach (var file in SourceFiles(module.Dir))\n            {\n                trees.Add((CSharpSyntaxTree.ParseText(File.ReadAllText(file), path: file), module));\n            }\n        }\n\n        var compilation = CSharpCompilation.Create(\n            \u0022monday-index\u0022,\n            trees.Select(t =\u003E t.Tree).Append(ImplicitUsings()),\n            References(),\n            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, nullableContextOptions: NullableContextOptions.Enable));\n\n        // Pass 1: nodes. Pass 2: edges (needs every node to exist first).\n        foreach (var (tree, module) in trees)\n        {\n            CollectNodes(tree, compilation.GetSemanticModel(tree), module);\n        }\n\n        foreach (var (tree, module) in trees)\n        {\n            CollectEdges(tree, compilation.GetSemanticModel(tree), module);\n        }\n\n        var nodes = _nodes.Values.OrderBy(n =\u003E n.Kind).ThenBy(n =\u003E n.Id, StringComparer.Ordinal).ToList();\n        var edges = _edges.Where(e =\u003E e.From != e.To).OrderBy(e =\u003E e.From, StringComparer.Ordinal).ThenBy(e =\u003E e.To, StringComparer.Ordinal).ToList();\n        var findings = ScanEndpointsAndPipeline();\n        foreach (var (tree, module) in trees)\n        {\n            findings.AddRange(ScanCode(tree, compilation.GetSemanticModel(tree), module));\n        }\n\n        return new GraphFile(commit, nodes, edges, findings.OrderByDescending(f =\u003E f.Severity).ThenBy(f =\u003E f.NodeId, StringComparer.Ordinal).ToList());\n    }",
-      "codeHash": "A84704CE784F0C09",
+      "startLine": 44,
+      "endLine": 85,
+      "code": "public GraphFile Index(string commit)\n    {\n        Add(new CodeNode { Id = AppId, Kind = NodeKind.App, Name = appName });\n\n        var modules = _modules = FindModules();\n        var trees = new List\u003C(SyntaxTree Tree, Module Module)\u003E();\n        foreach (var module in modules)\n        {\n            Add(new CodeNode { Id = module.Id, Kind = NodeKind.Module, Name = module.Name, ParentId = AppId, File = Rel(module.ProjectFile) });\n            foreach (var file in SourceFiles(module.Dir))\n            {\n                trees.Add((CSharpSyntaxTree.ParseText(File.ReadAllText(file), path: file), module));\n            }\n        }\n\n        var compilation = CSharpCompilation.Create(\n            \u0022monday-index\u0022,\n            trees.Select(t =\u003E t.Tree).Append(ImplicitUsings()),\n            References(),\n            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, nullableContextOptions: NullableContextOptions.Enable));\n\n        // Pass 1: nodes. Pass 2: edges (needs every node to exist first).\n        foreach (var (tree, module) in trees)\n        {\n            CollectNodes(tree, compilation.GetSemanticModel(tree), module);\n        }\n\n        foreach (var (tree, module) in trees)\n        {\n            CollectEdges(tree, compilation.GetSemanticModel(tree), module);\n        }\n\n        var nodes = _nodes.Values.OrderBy(n =\u003E n.Kind).ThenBy(n =\u003E n.Id, StringComparer.Ordinal).ToList();\n        var edges = _edges.Where(e =\u003E e.From != e.To).OrderBy(e =\u003E e.From, StringComparer.Ordinal).ThenBy(e =\u003E e.To, StringComparer.Ordinal).ToList();\n        var findings = ScanEndpointsAndPipeline();\n        foreach (var (tree, module) in trees)\n        {\n            findings.AddRange(ScanCode(tree, compilation.GetSemanticModel(tree), module));\n        }\n\n        return new GraphFile(commit, nodes, edges, findings.OrderByDescending(f =\u003E f.Severity).ThenBy(f =\u003E f.NodeId, StringComparer.Ordinal).ToList());\n    }",
+      "codeHash": "2BB5FABC5FB81384",
       "guards": []
     },
     {
@@ -3081,8 +3113,8 @@
       "name": "IsIgnored",
       "parentId": "T:Monday.Indexer.RepoIndexer",
       "file": "src/Monday.Indexer/RepoIndexer.cs",
-      "startLine": 95,
-      "endLine": 99,
+      "startLine": 97,
+      "endLine": 101,
       "code": "private bool IsIgnored(string path)\n    {\n        var rel = Rel(path);\n        return Ignored().Any(prefix =\u003E rel.StartsWith(prefix \u002B \u0022/\u0022, StringComparison.Ordinal));\n    }",
       "codeHash": "24571292C17FE969",
       "guards": []
@@ -3093,8 +3125,8 @@
       "name": "IsManagedAssembly",
       "parentId": "T:Monday.Indexer.RepoIndexer",
       "file": "src/Monday.Indexer/RepoIndexer.cs",
-      "startLine": 500,
-      "endLine": 511,
+      "startLine": 577,
+      "endLine": 588,
       "code": "private static bool IsManagedAssembly(string path)\n    {\n        try\n        {\n            System.Reflection.AssemblyName.GetAssemblyName(path);\n            return true;\n        }\n        catch (BadImageFormatException)\n        {\n            return false;\n        }\n    }",
       "codeHash": "6E604DCF2E2B0099",
       "guards": []
@@ -3105,8 +3137,8 @@
       "name": "IsSkipped",
       "parentId": "T:Monday.Indexer.RepoIndexer",
       "file": "src/Monday.Indexer/RepoIndexer.cs",
-      "startLine": 115,
-      "endLine": 116,
+      "startLine": 117,
+      "endLine": 118,
       "code": "private static bool IsSkipped(string path) =\u003E\n        path.Split(Path.DirectorySeparatorChar).Any(part =\u003E SkippedDirs.Contains(part, StringComparer.OrdinalIgnoreCase));",
       "codeHash": "FA89D91B03859681",
       "guards": []
@@ -3117,8 +3149,8 @@
       "name": "JoinRoute",
       "parentId": "T:Monday.Indexer.RepoIndexer",
       "file": "src/Monday.Indexer/RepoIndexer.cs",
-      "startLine": 422,
-      "endLine": 426,
+      "startLine": 475,
+      "endLine": 479,
       "code": "private static string JoinRoute(string prefix, string template)\n    {\n        var joined = $\u0022/{prefix.Trim(\u0027/\u0027)}/{template.Trim(\u0027/\u0027)}\u0022.Replace(\u0022//\u0022, \u0022/\u0022, StringComparison.Ordinal);\n        return joined.Length \u003E 1 ? joined.TrimEnd(\u0027/\u0027) : joined;\n    }",
       "codeHash": "723757E154467C69",
       "guards": []
@@ -3129,8 +3161,8 @@
       "name": "LinkCalls",
       "parentId": "T:Monday.Indexer.RepoIndexer",
       "file": "src/Monday.Indexer/RepoIndexer.cs",
-      "startLine": 256,
-      "endLine": 268,
+      "startLine": 293,
+      "endLine": 305,
       "code": "private void LinkCalls(string from, SyntaxNode body, SemanticModel model, bool isTest)\n    {\n        foreach (var call in body.DescendantNodes().Where(n =\u003E n is InvocationExpressionSyntax or ObjectCreationExpressionSyntax or ImplicitObjectCreationExpressionSyntax))\n        {\n            if (model.GetSymbolInfo(call).Symbol is not IMethodSymbol target || TargetId(target) is not { } to)\n            {\n                continue;\n            }\n\n            var kind = isTest \u0026\u0026 _nodes[to].Kind != NodeKind.Test ? EdgeKind.Covers : EdgeKind.Calls;\n            _edges.Add(new CodeEdge(from, to, kind));\n        }\n    }",
       "codeHash": "8C2ABA3A79D72865",
       "guards": []
@@ -3141,10 +3173,10 @@
       "name": "LinkEndpointHandler",
       "parentId": "T:Monday.Indexer.RepoIndexer",
       "file": "src/Monday.Indexer/RepoIndexer.cs",
-      "startLine": 293,
-      "endLine": 326,
-      "code": "private void LinkEndpointHandler(InvocationExpressionSyntax invocation, SemanticModel model)\n    {\n        if (invocation.Expression is not MemberAccessExpressionSyntax access || !MapVerbs.Contains(access.Name.Identifier.Text)\n            || invocation.ArgumentList.Arguments.Count \u003C 2\n            || invocation.ArgumentList.Arguments[0].Expression is not LiteralExpressionSyntax { Token.Value: string template })\n        {\n            return;\n        }\n\n        var (prefix, _) = GroupOf(access.Expression, model);\n        var endpointId = EndpointId($\u0022{access.Name.Identifier.Text[\u0022Map\u0022.Length..].ToUpperInvariant()} {JoinRoute(prefix, template)}\u0022);\n        // Guards written in this repo (like RequireReporterKey) run on every request: link them so the path shows them.\n        foreach (var guardCall in GuardCalls(access.Expression, invocation, model))\n        {\n            if (model.GetSymbolInfo(guardCall).Symbol is IMethodSymbol guard \u0026\u0026 TargetId(guard) is { } guardId)\n            {\n                _edges.Add(new CodeEdge(endpointId, guardId, EdgeKind.Calls));\n            }\n        }\n\n        var handler = invocation.ArgumentList.Arguments[1].Expression;\n        if (handler is LambdaExpressionSyntax lambda)\n        {\n            LinkCalls(endpointId, lambda, model, isTest: false);\n            return;\n        }\n\n        var symbolInfo = model.GetSymbolInfo(handler);\n        var target = symbolInfo.Symbol as IMethodSymbol ?? symbolInfo.CandidateSymbols.OfType\u003CIMethodSymbol\u003E().FirstOrDefault();\n        if (target is not null \u0026\u0026 TargetId(target) is { } to)\n        {\n            _edges.Add(new CodeEdge(endpointId, to, EdgeKind.HandledBy));\n        }\n    }",
-      "codeHash": "48809F3C3FB562C5",
+      "startLine": 330,
+      "endLine": 379,
+      "code": "private void LinkEndpointHandler(InvocationExpressionSyntax invocation, SemanticModel model)\n    {\n        if (invocation.Expression is not MemberAccessExpressionSyntax access || !MapVerbs.Contains(access.Name.Identifier.Text)\n            || invocation.ArgumentList.Arguments.Count \u003C 2\n            || invocation.ArgumentList.Arguments[0].Expression is not LiteralExpressionSyntax { Token.Value: string template })\n        {\n            return;\n        }\n\n        var (prefix, _) = GroupOf(access.Expression, model);\n        var endpointId = EndpointId($\u0022{access.Name.Identifier.Text[\u0022Map\u0022.Length..].ToUpperInvariant()} {JoinRoute(prefix, template)}\u0022);\n        // Guards written in this repo (like RequireReporterKey) run on every request: link them so the path shows them.\n        var groupNode = prefix.Length \u003E 0 \u0026\u0026 _nodes.TryGetValue(GroupId(ModuleOfId(endpointId), prefix), out var g) ? g : null;\n        var chained = new HashSet\u003CInvocationExpressionSyntax\u003E(ChainedGuardCalls(invocation));\n        foreach (var guardCall in GuardCalls(access.Expression, invocation, model))\n        {\n            if (model.GetSymbolInfo(guardCall).Symbol is IMethodSymbol guard \u0026\u0026 TargetId(guard) is { } guardId)\n            {\n                _edges.Add(new CodeEdge(groupNode is not null \u0026\u0026 !chained.Contains(guardCall) ? groupNode.Id : endpointId, guardId, EdgeKind.Calls));\n            }\n        }\n\n        // The request\u0027s way in: pipeline \u2192 group \u2192 endpoint (or pipeline \u2192 endpoint when it has no group).\n        if (_nodes.TryGetValue(endpointId, out var endpointNode) \u0026\u0026 ModuleOf(endpointNode) is { } moduleId \u0026\u0026 _lastMiddleware.TryGetValue(moduleId, out var last))\n        {\n            if (groupNode is not null)\n            {\n                _edges.Add(new CodeEdge(last, groupNode.Id, EdgeKind.Next));\n                _edges.Add(new CodeEdge(groupNode.Id, endpointId, EdgeKind.Next));\n            }\n            else\n            {\n                _edges.Add(new CodeEdge(last, endpointId, EdgeKind.Next));\n            }\n        }\n\n        var handler = invocation.ArgumentList.Arguments[1].Expression;\n        if (handler is LambdaExpressionSyntax lambda)\n        {\n            LinkCalls(endpointId, lambda, model, isTest: false);\n            return;\n        }\n\n        var symbolInfo = model.GetSymbolInfo(handler);\n        var target = symbolInfo.Symbol as IMethodSymbol ?? symbolInfo.CandidateSymbols.OfType\u003CIMethodSymbol\u003E().FirstOrDefault();\n        if (target is not null \u0026\u0026 TargetId(target) is { } to)\n        {\n            _edges.Add(new CodeEdge(endpointId, to, EdgeKind.HandledBy));\n        }\n    }",
+      "codeHash": "F542AF2FADC00306",
       "guards": []
     },
     {
@@ -3153,8 +3185,8 @@
       "name": "LinkTypeDependencies",
       "parentId": "T:Monday.Indexer.RepoIndexer",
       "file": "src/Monday.Indexer/RepoIndexer.cs",
-      "startLine": 270,
-      "endLine": 290,
+      "startLine": 307,
+      "endLine": 327,
       "code": "private void LinkTypeDependencies(string typeId, INamedTypeSymbol symbol)\n    {\n        foreach (var iface in symbol.AllInterfaces)\n        {\n            if (IdOf(iface) is { } ifaceId \u0026\u0026 _nodes.ContainsKey(ifaceId))\n            {\n                _edges.Add(new CodeEdge(typeId, ifaceId, EdgeKind.Implements));\n            }\n        }\n\n        var dependencies = symbol.Constructors.SelectMany(c =\u003E c.Parameters).Select(p =\u003E p.Type)\n            .Concat(symbol.GetMembers().OfType\u003CIFieldSymbol\u003E().Select(f =\u003E f.Type));\n        foreach (var dependency in dependencies)\n        {\n            var named = dependency as INamedTypeSymbol;\n            if (named is not null \u0026\u0026 IdOf(named.OriginalDefinition) is { } depId \u0026\u0026 depId != typeId \u0026\u0026 _nodes.ContainsKey(depId))\n            {\n                _edges.Add(new CodeEdge(typeId, depId, EdgeKind.DependsOn));\n            }\n        }\n    }",
       "codeHash": "993BC746F397EEB4",
       "guards": []
@@ -3165,8 +3197,8 @@
       "name": "Located",
       "parentId": "T:Monday.Indexer.RepoIndexer",
       "file": "src/Monday.Indexer/RepoIndexer.cs",
-      "startLine": 444,
-      "endLine": 456,
+      "startLine": 521,
+      "endLine": 533,
       "code": "private CodeNode Located(CodeNode node, SyntaxNode syntax, string file, bool withCode)\n    {\n        var span = syntax.GetLocation().GetLineSpan();\n        var code = withCode ? syntax.ToString() : null;\n        return node with\n        {\n            File = Rel(file),\n            StartLine = span.StartLinePosition.Line \u002B 1,\n            EndLine = span.EndLinePosition.Line \u002B 1,\n            Code = code,\n            CodeHash = code is null ? null : CodeNode.HashCode(code),\n        };\n    }",
       "codeHash": "B98116295E377B68",
       "guards": []
@@ -3177,10 +3209,22 @@
       "name": "MethodName",
       "parentId": "T:Monday.Indexer.RepoIndexer",
       "file": "src/Monday.Indexer/RepoIndexer.cs",
-      "startLine": 414,
-      "endLine": 420,
+      "startLine": 467,
+      "endLine": 473,
       "code": "private static string? MethodName(InvocationExpressionSyntax call) =\u003E call.Expression switch\n    {\n        MemberAccessExpressionSyntax m =\u003E m.Name.Identifier.Text,\n        IdentifierNameSyntax i =\u003E i.Identifier.Text,\n        GenericNameSyntax g =\u003E g.Identifier.Text,\n        _ =\u003E null,\n    };",
       "codeHash": "CC60E562DBF9F769",
+      "guards": []
+    },
+    {
+      "id": "M:Monday.Indexer.RepoIndexer.MiddlewareId(Monday.Indexer.RepoIndexer.Module,System.String)",
+      "kind": "Method",
+      "name": "MiddlewareId",
+      "parentId": "T:Monday.Indexer.RepoIndexer",
+      "file": "src/Monday.Indexer/RepoIndexer.cs",
+      "startLine": 487,
+      "endLine": 487,
+      "code": "private static string MiddlewareId(Module module, string step) =\u003E $\u0022middleware:{module.Name}:{step}\u0022;",
+      "codeHash": "039287DF54FD8A3E",
       "guards": []
     },
     {
@@ -3196,15 +3240,39 @@
       "guards": []
     },
     {
+      "id": "M:Monday.Indexer.RepoIndexer.ModuleOfId(System.String)",
+      "kind": "Method",
+      "name": "ModuleOfId",
+      "parentId": "T:Monday.Indexer.RepoIndexer",
+      "file": "src/Monday.Indexer/RepoIndexer.cs",
+      "startLine": 491,
+      "endLine": 492,
+      "code": "private Module ModuleOfId(string nodeId) =\u003E\n        _modules.First(m =\u003E m.Id == (ModuleOf(_nodes[nodeId]) ?? string.Empty));",
+      "codeHash": "F51F53CF497695DE",
+      "guards": []
+    },
+    {
       "id": "M:Monday.Indexer.RepoIndexer.ParentFor(System.String,Monday.Indexer.RepoIndexer.Module)",
       "kind": "Method",
       "name": "ParentFor",
       "parentId": "T:Monday.Indexer.RepoIndexer",
       "file": "src/Monday.Indexer/RepoIndexer.cs",
-      "startLine": 121,
-      "endLine": 136,
+      "startLine": 123,
+      "endLine": 138,
       "code": "private string ParentFor(string file, Module module)\n    {\n        var relative = Path.GetRelativePath(module.Dir, file).Split(Path.DirectorySeparatorChar);\n        if (relative.Length \u003C 2)\n        {\n            return module.Id;\n        }\n\n        var featureId = $\u0022feature:{module.Name}/{relative[0]}\u0022;\n        if (!_nodes.ContainsKey(featureId))\n        {\n            Add(new CodeNode { Id = featureId, Kind = NodeKind.Feature, Name = relative[0], ParentId = module.Id, File = Rel(Path.Combine(module.Dir, relative[0])) });\n        }\n\n        return featureId;\n    }",
       "codeHash": "D07070C7C57A3E84",
+      "guards": []
+    },
+    {
+      "id": "M:Monday.Indexer.RepoIndexer.PipelineId(Monday.Indexer.RepoIndexer.Module)",
+      "kind": "Method",
+      "name": "PipelineId",
+      "parentId": "T:Monday.Indexer.RepoIndexer",
+      "file": "src/Monday.Indexer/RepoIndexer.cs",
+      "startLine": 485,
+      "endLine": 485,
+      "code": "private static string PipelineId(Module module) =\u003E $\u0022pipeline:{module.Name}\u0022;",
+      "codeHash": "B0B39A936C9E1908",
       "guards": []
     },
     {
@@ -3213,8 +3281,8 @@
       "name": "References",
       "parentId": "T:Monday.Indexer.RepoIndexer",
       "file": "src/Monday.Indexer/RepoIndexer.cs",
-      "startLine": 481,
-      "endLine": 498,
+      "startLine": 558,
+      "endLine": 575,
       "code": "private static IEnumerable\u003CMetadataReference\u003E References()\n    {\n        var netcore = Path.GetDirectoryName(typeof(object).Assembly.Location)!;\n        var version = new DirectoryInfo(netcore).Name;\n        var shared = Directory.GetParent(netcore)!.Parent!.FullName;\n        var aspnet = Path.Combine(shared, \u0022Microsoft.AspNetCore.App\u0022, version);\n        if (!Directory.Exists(aspnet))\n        {\n            aspnet = Directory.EnumerateDirectories(Path.Combine(shared, \u0022Microsoft.AspNetCore.App\u0022)).OrderDescending().FirstOrDefault() ?? string.Empty;\n        }\n\n        return new[] { netcore, aspnet }\n            .Where(Directory.Exists)\n            .SelectMany(d =\u003E Directory.EnumerateFiles(d, \u0022*.dll\u0022))\n            .Where(IsManagedAssembly)\n            .GroupBy(Path.GetFileName)\n            .Select(g =\u003E MetadataReference.CreateFromFile(g.First()));\n    }",
       "codeHash": "817F7C7CE1ABCD1C",
       "guards": []
@@ -3225,8 +3293,8 @@
       "name": "Rel",
       "parentId": "T:Monday.Indexer.RepoIndexer",
       "file": "src/Monday.Indexer/RepoIndexer.cs",
-      "startLine": 118,
-      "endLine": 118,
+      "startLine": 120,
+      "endLine": 120,
       "code": "private string Rel(string path) =\u003E Path.GetRelativePath(root, path).Replace(\u0027\\\\\u0027, \u0027/\u0027);",
       "codeHash": "571A3EC1157F1049",
       "guards": []
@@ -3309,8 +3377,8 @@
       "name": "SourceFiles",
       "parentId": "T:Monday.Indexer.RepoIndexer",
       "file": "src/Monday.Indexer/RepoIndexer.cs",
-      "startLine": 112,
-      "endLine": 113,
+      "startLine": 114,
+      "endLine": 115,
       "code": "private static IEnumerable\u003Cstring\u003E SourceFiles(string dir) =\u003E\n        Directory.EnumerateFiles(dir, \u0022*.cs\u0022, SearchOption.AllDirectories).Where(f =\u003E !IsSkipped(f));",
       "codeHash": "72110631908BEF1A",
       "guards": []
@@ -3321,8 +3389,8 @@
       "name": "StartupId",
       "parentId": "T:Monday.Indexer.RepoIndexer",
       "file": "src/Monday.Indexer/RepoIndexer.cs",
-      "startLine": 432,
-      "endLine": 432,
+      "startLine": 509,
+      "endLine": 509,
       "code": "private static string StartupId(Module module) =\u003E $\u0022startup:{module.Name}\u0022;",
       "codeHash": "3ACD6BF9657C5C84",
       "guards": []
@@ -3333,8 +3401,8 @@
       "name": "TargetId",
       "parentId": "T:Monday.Indexer.RepoIndexer",
       "file": "src/Monday.Indexer/RepoIndexer.cs",
-      "startLine": 438,
-      "endLine": 442,
+      "startLine": 515,
+      "endLine": 519,
       "code": "private string? TargetId(IMethodSymbol target)\n    {\n        var declared = target.ReducedFrom ?? target;\n        return IdOf(declared) is { } id \u0026\u0026 _nodes.ContainsKey(id) ? id : null;\n    }",
       "codeHash": "89C77834270D928B",
       "guards": []
@@ -3578,7 +3646,7 @@
       "id": "endpoint:DELETE /projects/{id:guid}/keys/{keyId:guid}",
       "kind": "Endpoint",
       "name": "DELETE /projects/{id:guid}/keys/{keyId:guid}",
-      "parentId": "T:Monday.Api.Endpoints.ProjectEndpoints",
+      "parentId": "group:Monday.Api:/projects",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
       "startLine": 52,
       "endLine": 52,
@@ -3604,7 +3672,7 @@
       "id": "endpoint:GET /projects",
       "kind": "Endpoint",
       "name": "GET /projects",
-      "parentId": "T:Monday.Api.Endpoints.ProjectEndpoints",
+      "parentId": "group:Monday.Api:/projects",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
       "startLine": 44,
       "endLine": 44,
@@ -3617,7 +3685,7 @@
       "id": "endpoint:GET /projects/{id:guid}/activity",
       "kind": "Endpoint",
       "name": "GET /projects/{id:guid}/activity",
-      "parentId": "T:Monday.Api.Endpoints.ProjectEndpoints",
+      "parentId": "group:Monday.Api:/projects",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
       "startLine": 58,
       "endLine": 58,
@@ -3630,7 +3698,7 @@
       "id": "endpoint:GET /projects/{id:guid}/decisions",
       "kind": "Endpoint",
       "name": "GET /projects/{id:guid}/decisions",
-      "parentId": "T:Monday.Api.Endpoints.ProjectEndpoints",
+      "parentId": "group:Monday.Api:/projects",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
       "startLine": 60,
       "endLine": 60,
@@ -3643,7 +3711,7 @@
       "id": "endpoint:GET /projects/{id:guid}/graph",
       "kind": "Endpoint",
       "name": "GET /projects/{id:guid}/graph",
-      "parentId": "T:Monday.Api.Endpoints.ProjectEndpoints",
+      "parentId": "group:Monday.Api:/projects",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
       "startLine": 56,
       "endLine": 56,
@@ -3656,7 +3724,7 @@
       "id": "endpoint:GET /projects/{id:guid}/graph/node",
       "kind": "Endpoint",
       "name": "GET /projects/{id:guid}/graph/node",
-      "parentId": "T:Monday.Api.Endpoints.ProjectEndpoints",
+      "parentId": "group:Monday.Api:/projects",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
       "startLine": 57,
       "endLine": 57,
@@ -3669,7 +3737,7 @@
       "id": "endpoint:GET /projects/{id:guid}/keys",
       "kind": "Endpoint",
       "name": "GET /projects/{id:guid}/keys",
-      "parentId": "T:Monday.Api.Endpoints.ProjectEndpoints",
+      "parentId": "group:Monday.Api:/projects",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
       "startLine": 49,
       "endLine": 49,
@@ -3682,7 +3750,7 @@
       "id": "endpoint:POST /ingest/activity",
       "kind": "Endpoint",
       "name": "POST /ingest/activity",
-      "parentId": "T:Monday.Api.Endpoints.IngestEndpoints",
+      "parentId": "group:Monday.Api:/ingest",
       "file": "src/Monday.Api/Endpoints/IngestEndpoints.cs",
       "startLine": 26,
       "endLine": 26,
@@ -3697,7 +3765,7 @@
       "id": "endpoint:POST /ingest/decisions",
       "kind": "Endpoint",
       "name": "POST /ingest/decisions",
-      "parentId": "T:Monday.Api.Endpoints.IngestEndpoints",
+      "parentId": "group:Monday.Api:/ingest",
       "file": "src/Monday.Api/Endpoints/IngestEndpoints.cs",
       "startLine": 27,
       "endLine": 27,
@@ -3712,7 +3780,7 @@
       "id": "endpoint:POST /ingest/explanations",
       "kind": "Endpoint",
       "name": "POST /ingest/explanations",
-      "parentId": "T:Monday.Api.Endpoints.IngestEndpoints",
+      "parentId": "group:Monday.Api:/ingest",
       "file": "src/Monday.Api/Endpoints/IngestEndpoints.cs",
       "startLine": 25,
       "endLine": 25,
@@ -3727,7 +3795,7 @@
       "id": "endpoint:POST /ingest/graph",
       "kind": "Endpoint",
       "name": "POST /ingest/graph",
-      "parentId": "T:Monday.Api.Endpoints.IngestEndpoints",
+      "parentId": "group:Monday.Api:/ingest",
       "file": "src/Monday.Api/Endpoints/IngestEndpoints.cs",
       "startLine": 24,
       "endLine": 24,
@@ -3742,7 +3810,7 @@
       "id": "endpoint:POST /projects",
       "kind": "Endpoint",
       "name": "POST /projects",
-      "parentId": "T:Monday.Api.Endpoints.ProjectEndpoints",
+      "parentId": "group:Monday.Api:/projects",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
       "startLine": 45,
       "endLine": 45,
@@ -3755,7 +3823,7 @@
       "id": "endpoint:POST /projects/{id:guid}/decisions/{decisionId:guid}/approve",
       "kind": "Endpoint",
       "name": "POST /projects/{id:guid}/decisions/{decisionId:guid}/approve",
-      "parentId": "T:Monday.Api.Endpoints.ProjectEndpoints",
+      "parentId": "group:Monday.Api:/projects",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
       "startLine": 61,
       "endLine": 61,
@@ -3768,7 +3836,7 @@
       "id": "endpoint:POST /projects/{id:guid}/decisions/{decisionId:guid}/reject",
       "kind": "Endpoint",
       "name": "POST /projects/{id:guid}/decisions/{decisionId:guid}/reject",
-      "parentId": "T:Monday.Api.Endpoints.ProjectEndpoints",
+      "parentId": "group:Monday.Api:/projects",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
       "startLine": 62,
       "endLine": 62,
@@ -3781,7 +3849,7 @@
       "id": "endpoint:POST /projects/{id:guid}/environments",
       "kind": "Endpoint",
       "name": "POST /projects/{id:guid}/environments",
-      "parentId": "T:Monday.Api.Endpoints.ProjectEndpoints",
+      "parentId": "group:Monday.Api:/projects",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
       "startLine": 46,
       "endLine": 46,
@@ -3794,7 +3862,7 @@
       "id": "endpoint:POST /projects/{id:guid}/environments/{environmentId:guid}/keys",
       "kind": "Endpoint",
       "name": "POST /projects/{id:guid}/environments/{environmentId:guid}/keys",
-      "parentId": "T:Monday.Api.Endpoints.ProjectEndpoints",
+      "parentId": "group:Monday.Api:/projects",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
       "startLine": 50,
       "endLine": 50,
@@ -3807,7 +3875,7 @@
       "id": "endpoint:POST /projects/{id:guid}/keys/{keyId:guid}/rotate",
       "kind": "Endpoint",
       "name": "POST /projects/{id:guid}/keys/{keyId:guid}/rotate",
-      "parentId": "T:Monday.Api.Endpoints.ProjectEndpoints",
+      "parentId": "group:Monday.Api:/projects",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
       "startLine": 51,
       "endLine": 51,
@@ -3820,7 +3888,7 @@
       "id": "endpoint:PUT /projects/{id:guid}/environments/{environmentId:guid}/kind",
       "kind": "Endpoint",
       "name": "PUT /projects/{id:guid}/environments/{environmentId:guid}/kind",
-      "parentId": "T:Monday.Api.Endpoints.ProjectEndpoints",
+      "parentId": "group:Monday.Api:/projects",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
       "startLine": 47,
       "endLine": 47,
@@ -3833,7 +3901,7 @@
       "id": "endpoint:PUT /projects/{id:guid}/members/{member}",
       "kind": "Endpoint",
       "name": "PUT /projects/{id:guid}/members/{member}",
-      "parentId": "T:Monday.Api.Endpoints.ProjectEndpoints",
+      "parentId": "group:Monday.Api:/projects",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
       "startLine": 54,
       "endLine": 54,
@@ -4009,6 +4077,98 @@
       "code": "public static void FindingsAreSortedWorstFirstAndMustPointAtANode()\n    {\n        var app = new CodeNode { Id = \u0022app\u0022, Kind = NodeKind.App, Name = \u0022Monday\u0022 };\n        var graph = CodeGraphSnapshot.Create(ProjectId.New(), \u0022c\u0022, Now, [app], [],\n            [Finding(\u0022app\u0022, Severity.Low, \u0022a\u0022), Finding(\u0022app\u0022, Severity.High, \u0022b\u0022)]);\n\n        Assert.Equal(Severity.High, graph.Findings[0].Severity);\n        Assert.Throws\u003CDomainException\u003E(() =\u003E CodeGraphSnapshot.Create(ProjectId.New(), \u0022c\u0022, Now, [app], [], [Finding(\u0022ghost\u0022, Severity.High, \u0022x\u0022)]), \u0022graph.finding_unknown_node\u0022);\n    }",
       "codeHash": "6B7CEB55A0624BFA",
       "guards": []
+    },
+    {
+      "id": "middleware:Monday.Api:UseAuthentication",
+      "kind": "Middleware",
+      "name": "UseAuthentication",
+      "parentId": "pipeline:Monday.Api",
+      "file": "src/Monday.Api/Program.cs",
+      "startLine": 46,
+      "endLine": 46,
+      "code": "app.UseAuthentication()",
+      "guards": []
+    },
+    {
+      "id": "middleware:Monday.Api:UseAuthorization",
+      "kind": "Middleware",
+      "name": "UseAuthorization",
+      "parentId": "pipeline:Monday.Api",
+      "file": "src/Monday.Api/Program.cs",
+      "startLine": 47,
+      "endLine": 47,
+      "code": "app.UseAuthorization()",
+      "guards": []
+    },
+    {
+      "id": "middleware:Monday.Api:UseExceptionHandler",
+      "kind": "Middleware",
+      "name": "UseExceptionHandler",
+      "parentId": "pipeline:Monday.Api",
+      "file": "src/Monday.Api/Program.cs",
+      "startLine": 39,
+      "endLine": 39,
+      "code": "app.UseExceptionHandler()",
+      "guards": []
+    },
+    {
+      "id": "middleware:Monday.Api:UseHsts",
+      "kind": "Middleware",
+      "name": "UseHsts",
+      "parentId": "pipeline:Monday.Api",
+      "file": "src/Monday.Api/Program.cs",
+      "startLine": 42,
+      "endLine": 42,
+      "code": "app.UseHsts()",
+      "guards": []
+    },
+    {
+      "id": "middleware:Monday.Api:UseHttpsRedirection",
+      "kind": "Middleware",
+      "name": "UseHttpsRedirection",
+      "parentId": "pipeline:Monday.Api",
+      "file": "src/Monday.Api/Program.cs",
+      "startLine": 45,
+      "endLine": 45,
+      "code": "app.UseHttpsRedirection()",
+      "guards": []
+    },
+    {
+      "id": "middleware:Monday.Api:UseRateLimiter",
+      "kind": "Middleware",
+      "name": "UseRateLimiter",
+      "parentId": "pipeline:Monday.Api",
+      "file": "src/Monday.Api/Program.cs",
+      "startLine": 48,
+      "endLine": 48,
+      "code": "app.UseRateLimiter()",
+      "guards": []
+    },
+    {
+      "id": "group:Monday.Api:/ingest",
+      "kind": "RouteGroup",
+      "name": "/ingest",
+      "parentId": "T:Monday.Api.Endpoints.IngestEndpoints",
+      "file": "src/Monday.Api/Endpoints/IngestEndpoints.cs",
+      "startLine": 24,
+      "route": "/ingest",
+      "guards": [
+        "RequireReporterKey",
+        "RequireRateLimiting:ingest",
+        "DisableAntiforgery"
+      ]
+    },
+    {
+      "id": "group:Monday.Api:/projects",
+      "kind": "RouteGroup",
+      "name": "/projects",
+      "parentId": "T:Monday.Api.Endpoints.ProjectEndpoints",
+      "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
+      "startLine": 44,
+      "route": "/projects",
+      "guards": [
+        "RequireAuthorization"
+      ]
     }
   ],
   "edges": [
@@ -5319,6 +5479,16 @@
     },
     {
       "from": "M:Monday.Indexer.RepoIndexer.CollectNodes(SyntaxTree,SemanticModel,Monday.Indexer.RepoIndexer.Module)",
+      "to": "M:Monday.Indexer.RepoIndexer.MiddlewareId(Monday.Indexer.RepoIndexer.Module,System.String)",
+      "kind": "Calls"
+    },
+    {
+      "from": "M:Monday.Indexer.RepoIndexer.CollectNodes(SyntaxTree,SemanticModel,Monday.Indexer.RepoIndexer.Module)",
+      "to": "M:Monday.Indexer.RepoIndexer.PipelineId(Monday.Indexer.RepoIndexer.Module)",
+      "kind": "Calls"
+    },
+    {
+      "from": "M:Monday.Indexer.RepoIndexer.CollectNodes(SyntaxTree,SemanticModel,Monday.Indexer.RepoIndexer.Module)",
       "to": "M:Monday.Indexer.RepoIndexer.StartupId(Monday.Indexer.RepoIndexer.Module)",
       "kind": "Calls"
     },
@@ -5329,12 +5499,22 @@
     },
     {
       "from": "M:Monday.Indexer.RepoIndexer.Endpoint(InvocationExpressionSyntax,SemanticModel,Monday.Indexer.RepoIndexer.Module,System.String)",
+      "to": "M:Monday.Indexer.RepoIndexer.Add(Monday.Domain.CodeGraph.CodeNode)",
+      "kind": "Calls"
+    },
+    {
+      "from": "M:Monday.Indexer.RepoIndexer.Endpoint(InvocationExpressionSyntax,SemanticModel,Monday.Indexer.RepoIndexer.Module,System.String)",
       "to": "M:Monday.Indexer.RepoIndexer.ChainedGuards(InvocationExpressionSyntax,SemanticModel)",
       "kind": "Calls"
     },
     {
       "from": "M:Monday.Indexer.RepoIndexer.Endpoint(InvocationExpressionSyntax,SemanticModel,Monday.Indexer.RepoIndexer.Module,System.String)",
       "to": "M:Monday.Indexer.RepoIndexer.EndpointId(System.String)",
+      "kind": "Calls"
+    },
+    {
+      "from": "M:Monday.Indexer.RepoIndexer.Endpoint(InvocationExpressionSyntax,SemanticModel,Monday.Indexer.RepoIndexer.Module,System.String)",
+      "to": "M:Monday.Indexer.RepoIndexer.GroupId(Monday.Indexer.RepoIndexer.Module,System.String)",
       "kind": "Calls"
     },
     {
@@ -5360,6 +5540,11 @@
     {
       "from": "M:Monday.Indexer.RepoIndexer.FindModules",
       "to": "M:Monday.Indexer.RepoIndexer.IsSkipped(System.String)",
+      "kind": "Calls"
+    },
+    {
+      "from": "M:Monday.Indexer.RepoIndexer.GroupId(Monday.Indexer.RepoIndexer.Module,System.String)",
+      "to": "M:Monday.Indexer.RepoIndexer.JoinRoute(System.String,System.String)",
       "kind": "Calls"
     },
     {
@@ -5419,12 +5604,32 @@
     },
     {
       "from": "M:Monday.Indexer.RepoIndexer.LinkEndpointHandler(InvocationExpressionSyntax,SemanticModel)",
+      "to": "M:Monday.Indexer.RepoIndexer.ChainedGuardCalls(InvocationExpressionSyntax)",
+      "kind": "Calls"
+    },
+    {
+      "from": "M:Monday.Indexer.RepoIndexer.LinkEndpointHandler(InvocationExpressionSyntax,SemanticModel)",
       "to": "M:Monday.Indexer.RepoIndexer.EndpointId(System.String)",
       "kind": "Calls"
     },
     {
       "from": "M:Monday.Indexer.RepoIndexer.LinkEndpointHandler(InvocationExpressionSyntax,SemanticModel)",
+      "to": "M:Monday.Indexer.RepoIndexer.GroupId(Monday.Indexer.RepoIndexer.Module,System.String)",
+      "kind": "Calls"
+    },
+    {
+      "from": "M:Monday.Indexer.RepoIndexer.LinkEndpointHandler(InvocationExpressionSyntax,SemanticModel)",
       "to": "M:Monday.Indexer.RepoIndexer.JoinRoute(System.String,System.String)",
+      "kind": "Calls"
+    },
+    {
+      "from": "M:Monday.Indexer.RepoIndexer.LinkEndpointHandler(InvocationExpressionSyntax,SemanticModel)",
+      "to": "M:Monday.Indexer.RepoIndexer.ModuleOf(Monday.Domain.CodeGraph.CodeNode)",
+      "kind": "Calls"
+    },
+    {
+      "from": "M:Monday.Indexer.RepoIndexer.LinkEndpointHandler(InvocationExpressionSyntax,SemanticModel)",
+      "to": "M:Monday.Indexer.RepoIndexer.ModuleOfId(System.String)",
       "kind": "Calls"
     },
     {
@@ -5435,6 +5640,11 @@
     {
       "from": "M:Monday.Indexer.RepoIndexer.Located(Monday.Domain.CodeGraph.CodeNode,SyntaxNode,System.String,System.Boolean)",
       "to": "M:Monday.Indexer.RepoIndexer.Rel(System.String)",
+      "kind": "Calls"
+    },
+    {
+      "from": "M:Monday.Indexer.RepoIndexer.ModuleOfId(System.String)",
+      "to": "M:Monday.Indexer.RepoIndexer.ModuleOf(Monday.Domain.CodeGraph.CodeNode)",
       "kind": "Calls"
     },
     {
@@ -5943,19 +6153,9 @@
       "kind": "HandledBy"
     },
     {
-      "from": "endpoint:POST /ingest/activity",
-      "to": "M:Monday.Api.Security.ReporterKey.RequireReporterKey(Microsoft.AspNetCore.Routing.RouteGroupBuilder)",
-      "kind": "Calls"
-    },
-    {
       "from": "endpoint:POST /ingest/decisions",
       "to": "M:Monday.Api.Endpoints.IngestEndpoints.ProposeDecision(Monday.Application.Decisions.DecisionProposal,Microsoft.AspNetCore.Http.HttpContext,Monday.Application.Decisions.DecisionService)",
       "kind": "HandledBy"
-    },
-    {
-      "from": "endpoint:POST /ingest/decisions",
-      "to": "M:Monday.Api.Security.ReporterKey.RequireReporterKey(Microsoft.AspNetCore.Routing.RouteGroupBuilder)",
-      "kind": "Calls"
     },
     {
       "from": "endpoint:POST /ingest/explanations",
@@ -5963,19 +6163,9 @@
       "kind": "HandledBy"
     },
     {
-      "from": "endpoint:POST /ingest/explanations",
-      "to": "M:Monday.Api.Security.ReporterKey.RequireReporterKey(Microsoft.AspNetCore.Routing.RouteGroupBuilder)",
-      "kind": "Calls"
-    },
-    {
       "from": "endpoint:POST /ingest/graph",
       "to": "M:Monday.Api.Endpoints.IngestEndpoints.IngestGraph(Monday.Application.CodeGraph.GraphUpload,Microsoft.AspNetCore.Http.HttpContext,Monday.Application.CodeGraph.GraphService)",
       "kind": "HandledBy"
-    },
-    {
-      "from": "endpoint:POST /ingest/graph",
-      "to": "M:Monday.Api.Security.ReporterKey.RequireReporterKey(Microsoft.AspNetCore.Routing.RouteGroupBuilder)",
-      "kind": "Calls"
     },
     {
       "from": "endpoint:POST /projects",
@@ -6016,6 +6206,146 @@
       "from": "endpoint:PUT /projects/{id:guid}/members/{member}",
       "to": "M:Monday.Api.Endpoints.ProjectEndpoints.SetMember(System.Guid,System.String,Monday.Api.Endpoints.SetMemberRequest,System.Security.Claims.ClaimsPrincipal,Monday.Application.Projects.ProjectService,System.Threading.CancellationToken)",
       "kind": "HandledBy"
+    },
+    {
+      "from": "group:Monday.Api:/ingest",
+      "to": "M:Monday.Api.Security.ReporterKey.RequireReporterKey(Microsoft.AspNetCore.Routing.RouteGroupBuilder)",
+      "kind": "Calls"
+    },
+    {
+      "from": "group:Monday.Api:/ingest",
+      "to": "endpoint:POST /ingest/activity",
+      "kind": "Next"
+    },
+    {
+      "from": "group:Monday.Api:/ingest",
+      "to": "endpoint:POST /ingest/decisions",
+      "kind": "Next"
+    },
+    {
+      "from": "group:Monday.Api:/ingest",
+      "to": "endpoint:POST /ingest/explanations",
+      "kind": "Next"
+    },
+    {
+      "from": "group:Monday.Api:/ingest",
+      "to": "endpoint:POST /ingest/graph",
+      "kind": "Next"
+    },
+    {
+      "from": "group:Monday.Api:/projects",
+      "to": "endpoint:DELETE /projects/{id:guid}/keys/{keyId:guid}",
+      "kind": "Next"
+    },
+    {
+      "from": "group:Monday.Api:/projects",
+      "to": "endpoint:GET /projects",
+      "kind": "Next"
+    },
+    {
+      "from": "group:Monday.Api:/projects",
+      "to": "endpoint:GET /projects/{id:guid}/activity",
+      "kind": "Next"
+    },
+    {
+      "from": "group:Monday.Api:/projects",
+      "to": "endpoint:GET /projects/{id:guid}/decisions",
+      "kind": "Next"
+    },
+    {
+      "from": "group:Monday.Api:/projects",
+      "to": "endpoint:GET /projects/{id:guid}/graph",
+      "kind": "Next"
+    },
+    {
+      "from": "group:Monday.Api:/projects",
+      "to": "endpoint:GET /projects/{id:guid}/graph/node",
+      "kind": "Next"
+    },
+    {
+      "from": "group:Monday.Api:/projects",
+      "to": "endpoint:GET /projects/{id:guid}/keys",
+      "kind": "Next"
+    },
+    {
+      "from": "group:Monday.Api:/projects",
+      "to": "endpoint:POST /projects",
+      "kind": "Next"
+    },
+    {
+      "from": "group:Monday.Api:/projects",
+      "to": "endpoint:POST /projects/{id:guid}/decisions/{decisionId:guid}/approve",
+      "kind": "Next"
+    },
+    {
+      "from": "group:Monday.Api:/projects",
+      "to": "endpoint:POST /projects/{id:guid}/decisions/{decisionId:guid}/reject",
+      "kind": "Next"
+    },
+    {
+      "from": "group:Monday.Api:/projects",
+      "to": "endpoint:POST /projects/{id:guid}/environments",
+      "kind": "Next"
+    },
+    {
+      "from": "group:Monday.Api:/projects",
+      "to": "endpoint:POST /projects/{id:guid}/environments/{environmentId:guid}/keys",
+      "kind": "Next"
+    },
+    {
+      "from": "group:Monday.Api:/projects",
+      "to": "endpoint:POST /projects/{id:guid}/keys/{keyId:guid}/rotate",
+      "kind": "Next"
+    },
+    {
+      "from": "group:Monday.Api:/projects",
+      "to": "endpoint:PUT /projects/{id:guid}/environments/{environmentId:guid}/kind",
+      "kind": "Next"
+    },
+    {
+      "from": "group:Monday.Api:/projects",
+      "to": "endpoint:PUT /projects/{id:guid}/members/{member}",
+      "kind": "Next"
+    },
+    {
+      "from": "middleware:Monday.Api:UseAuthentication",
+      "to": "middleware:Monday.Api:UseAuthorization",
+      "kind": "Next"
+    },
+    {
+      "from": "middleware:Monday.Api:UseAuthorization",
+      "to": "middleware:Monday.Api:UseRateLimiter",
+      "kind": "Next"
+    },
+    {
+      "from": "middleware:Monday.Api:UseExceptionHandler",
+      "to": "middleware:Monday.Api:UseHsts",
+      "kind": "Next"
+    },
+    {
+      "from": "middleware:Monday.Api:UseHsts",
+      "to": "middleware:Monday.Api:UseHttpsRedirection",
+      "kind": "Next"
+    },
+    {
+      "from": "middleware:Monday.Api:UseHttpsRedirection",
+      "to": "middleware:Monday.Api:UseAuthentication",
+      "kind": "Next"
+    },
+    {
+      "from": "middleware:Monday.Api:UseRateLimiter",
+      "to": "endpoint:GET /health",
+      "kind": "Next"
+    },
+    {
+      "from": "middleware:Monday.Api:UseRateLimiter",
+      "to": "group:Monday.Api:/ingest",
+      "kind": "Next"
+    },
+    {
+      "from": "middleware:Monday.Api:UseRateLimiter",
+      "to": "group:Monday.Api:/projects",
+      "kind": "Next"
     },
     {
       "from": "startup:Monday.Api",
