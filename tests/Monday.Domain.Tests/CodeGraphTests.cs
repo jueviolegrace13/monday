@@ -58,3 +58,23 @@ internal static class CodeGraphTests
         Assert.Throws<DomainException>(() => ActivityEvent.Record(Project, "s1", Now, ActivityKind.Edit, new string('x', 300)), "activity.summary_required");
     }
 }
+
+internal static class SecurityFindingTests
+{
+    private static readonly DateTimeOffset Now = new(2026, 10, 15, 12, 0, 0, TimeSpan.Zero);
+
+    private static SecurityFinding Finding(string node, Severity severity, string rule) => new()
+    {
+        Rule = rule, Severity = severity, NodeId = node, Title = "t", Why = "w", Fix = "f",
+    };
+
+    public static void FindingsAreSortedWorstFirstAndMustPointAtANode()
+    {
+        var app = new CodeNode { Id = "app", Kind = NodeKind.App, Name = "Monday" };
+        var graph = CodeGraphSnapshot.Create(ProjectId.New(), "c", Now, [app], [],
+            [Finding("app", Severity.Low, "a"), Finding("app", Severity.High, "b")]);
+
+        Assert.Equal(Severity.High, graph.Findings[0].Severity);
+        Assert.Throws<DomainException>(() => CodeGraphSnapshot.Create(ProjectId.New(), "c", Now, [app], [], [Finding("ghost", Severity.High, "x")]), "graph.finding_unknown_node");
+    }
+}

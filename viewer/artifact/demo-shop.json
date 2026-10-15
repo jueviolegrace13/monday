@@ -1,0 +1,271 @@
+{
+  "commit": "sample",
+  "nodes": [
+    {
+      "id": "app",
+      "kind": "App",
+      "name": "Demo shop",
+      "guards": []
+    },
+    {
+      "id": "module:Shop.Api",
+      "kind": "Module",
+      "name": "Shop.Api",
+      "parentId": "app",
+      "file": "Shop.Api/Shop.Api.csproj",
+      "guards": []
+    },
+    {
+      "id": "feature:Shop.Api/Data",
+      "kind": "Feature",
+      "name": "Data",
+      "parentId": "module:Shop.Api",
+      "file": "Shop.Api/Data",
+      "guards": []
+    },
+    {
+      "id": "T:Shop.Api.Data.Repo",
+      "kind": "Type",
+      "name": "Repo",
+      "parentId": "feature:Shop.Api/Data",
+      "file": "Shop.Api/Data/Repo.cs",
+      "startLine": 3,
+      "endLine": 13,
+      "guards": []
+    },
+    {
+      "id": "T:Shop.Api.Data.SqlCommand",
+      "kind": "Type",
+      "name": "SqlCommand",
+      "parentId": "feature:Shop.Api/Data",
+      "file": "Shop.Api/Data/Repo.cs",
+      "startLine": 14,
+      "endLine": 14,
+      "guards": []
+    },
+    {
+      "id": "M:Shop.Api.Data.Repo.Find(System.String)",
+      "kind": "Method",
+      "name": "Find",
+      "parentId": "T:Shop.Api.Data.Repo",
+      "file": "Shop.Api/Data/Repo.cs",
+      "startLine": 7,
+      "endLine": 12,
+      "code": "public object Find(string id)\n    {\n        var cmd = new SqlCommand(\u0022SELECT * FROM orders WHERE id = \u0027\u0022 \u002B id \u002B \u0022\u0027\u0022);\n        var h = MD5.HashData(System.Text.Encoding.UTF8.GetBytes(id));\n        return cmd;\n    }",
+      "codeHash": "06AA6CEEB2B0802E",
+      "guards": []
+    },
+    {
+      "id": "startup:Shop.Api",
+      "kind": "Method",
+      "name": "Startup",
+      "parentId": "module:Shop.Api",
+      "file": "Shop.Api/Program.cs",
+      "startLine": 2,
+      "endLine": 10,
+      "code": "var builder = WebApplication.CreateBuilder(args);\nbuilder.Services.AddCors(o =\u003E o.AddDefaultPolicy(p =\u003E p.AllowAnyOrigin().AllowAnyHeader()));\nvar app = builder.Build();\napp.UseAuthorization();\napp.UseAuthentication();\napp.MapPost(\u0022/orders\u0022, (Repo r, string id) =\u003E r.Find(id));\napp.MapPost(\u0022/auth/login\u0022, (string u) =\u003E Results.Ok()).AllowAnonymous();\napp.MapGet(\u0022/orders/{id}\u0022, (Repo r, string id) =\u003E r.Find(id)).RequireAuthorization().RequireRateLimiting(\u0022fixed\u0022);\napp.Run();",
+      "codeHash": "6D595B460AFAA940",
+      "guards": [
+        "UseAuthorization",
+        "UseAuthentication"
+      ]
+    },
+    {
+      "id": "endpoint:GET /orders/{id}",
+      "kind": "Endpoint",
+      "name": "GET /orders/{id}",
+      "parentId": "module:Shop.Api",
+      "file": "Shop.Api/Program.cs",
+      "startLine": 9,
+      "endLine": 9,
+      "route": "GET /orders/{id}",
+      "guards": [
+        "RequireAuthorization",
+        "RequireRateLimiting:fixed"
+      ]
+    },
+    {
+      "id": "endpoint:POST /auth/login",
+      "kind": "Endpoint",
+      "name": "POST /auth/login",
+      "parentId": "module:Shop.Api",
+      "file": "Shop.Api/Program.cs",
+      "startLine": 8,
+      "endLine": 8,
+      "route": "POST /auth/login",
+      "guards": [
+        "AllowAnonymous"
+      ]
+    },
+    {
+      "id": "endpoint:POST /orders",
+      "kind": "Endpoint",
+      "name": "POST /orders",
+      "parentId": "module:Shop.Api",
+      "file": "Shop.Api/Program.cs",
+      "startLine": 7,
+      "endLine": 7,
+      "route": "POST /orders",
+      "guards": []
+    }
+  ],
+  "edges": [
+    {
+      "from": "endpoint:GET /orders/{id}",
+      "to": "M:Shop.Api.Data.Repo.Find(System.String)",
+      "kind": "Calls"
+    },
+    {
+      "from": "endpoint:POST /orders",
+      "to": "M:Shop.Api.Data.Repo.Find(System.String)",
+      "kind": "Calls"
+    },
+    {
+      "from": "startup:Shop.Api",
+      "to": "M:Shop.Api.Data.Repo.Find(System.String)",
+      "kind": "Calls"
+    }
+  ],
+  "findings": [
+    {
+      "rule": "sql-built-from-strings",
+      "severity": "High",
+      "nodeId": "M:Shop.Api.Data.Repo.Find(System.String)",
+      "title": "SqlCommand runs SQL built from strings",
+      "why": "If any part comes from a request, an attacker can change the query (SQL injection).",
+      "fix": "Use command parameters (@name) instead of putting values into the SQL text.",
+      "file": "Shop.Api/Data/Repo.cs",
+      "line": 9
+    },
+    {
+      "rule": "hardcoded-secret",
+      "severity": "High",
+      "nodeId": "T:Shop.Api.Data.Repo",
+      "title": "\u0027ConnectionString\u0027 holds a value written in the code",
+      "why": "Anyone with the code (or a leaked copy) gets the secret, and it can\u0027t be rotated without a release.",
+      "fix": "Read it from configuration or a secret store; rotate the exposed value.",
+      "file": "Shop.Api/Data/Repo.cs",
+      "line": 5
+    },
+    {
+      "rule": "hardcoded-secret",
+      "severity": "High",
+      "nodeId": "T:Shop.Api.Data.Repo",
+      "title": "\u0027apiKey\u0027 holds a value written in the code",
+      "why": "Anyone with the code (or a leaked copy) gets the secret, and it can\u0027t be rotated without a release.",
+      "fix": "Read it from configuration or a secret store; rotate the exposed value.",
+      "file": "Shop.Api/Data/Repo.cs",
+      "line": 6
+    },
+    {
+      "rule": "write-without-auth",
+      "severity": "High",
+      "nodeId": "endpoint:POST /orders",
+      "title": "POST /orders changes data without sign-in",
+      "why": "Anyone who can reach the API can call it. Writes are the first thing an attacker tries.",
+      "fix": "Add .RequireAuthorization() (or the project\u0027s key guard) to the endpoint or its group.",
+      "file": "Shop.Api/Program.cs",
+      "line": 7
+    },
+    {
+      "rule": "no-https-redirect",
+      "severity": "High",
+      "nodeId": "startup:Shop.Api",
+      "title": "Requests over plain HTTP are not redirected to HTTPS",
+      "why": "Keys, cookies and data can travel unencrypted and be read on the way.",
+      "fix": "Add app.UseHttpsRedirection() early in Program.cs.",
+      "file": "Shop.Api/Program.cs",
+      "line": 2
+    },
+    {
+      "rule": "authorization-before-authentication",
+      "severity": "High",
+      "nodeId": "startup:Shop.Api",
+      "title": "Authorization runs before authentication",
+      "why": "Policies are checked before the user is known, so they can fail open or always deny.",
+      "fix": "Call app.UseAuthentication() before app.UseAuthorization().",
+      "file": "Shop.Api/Program.cs",
+      "line": 2
+    },
+    {
+      "rule": "rate-limiter-not-in-pipeline",
+      "severity": "High",
+      "nodeId": "startup:Shop.Api",
+      "title": "Endpoints ask for rate limits but the limiter isn\u0027t in the pipeline",
+      "why": "The limits are silently not applied.",
+      "fix": "Add app.UseRateLimiter() after routing and authentication.",
+      "file": "Shop.Api/Program.cs",
+      "line": 2
+    },
+    {
+      "rule": "weak-hash",
+      "severity": "Medium",
+      "nodeId": "M:Shop.Api.Data.Repo.Find(System.String)",
+      "title": "MD5 is used",
+      "why": "MD5 is broken for security uses: collisions can be forged.",
+      "fix": "Use SHA256 or better; for passwords use a password hasher (PBKDF2, bcrypt, Argon2).",
+      "file": "Shop.Api/Data/Repo.cs",
+      "line": 10
+    },
+    {
+      "rule": "public-without-rate-limit",
+      "severity": "Medium",
+      "nodeId": "endpoint:POST /auth/login",
+      "title": "POST /auth/login is public and has no rate limit",
+      "why": "A public route without a limit can be flooded to slow the app down or to run up hosting costs.",
+      "fix": "Add .RequireRateLimiting(\u0022\u003Cpolicy\u003E\u0022) with a policy partitioned by client.",
+      "file": "Shop.Api/Program.cs",
+      "line": 8
+    },
+    {
+      "rule": "credential-route-without-rate-limit",
+      "severity": "Medium",
+      "nodeId": "endpoint:POST /auth/login",
+      "title": "POST /auth/login looks like a sign-in or token route but has no rate limit",
+      "why": "Without a limit, passwords and codes can be guessed by brute force.",
+      "fix": "Rate-limit by user and by IP, and lock out after repeated failures.",
+      "file": "Shop.Api/Program.cs",
+      "line": 8
+    },
+    {
+      "rule": "public-without-rate-limit",
+      "severity": "Medium",
+      "nodeId": "endpoint:POST /orders",
+      "title": "POST /orders is public and has no rate limit",
+      "why": "A public route without a limit can be flooded to slow the app down or to run up hosting costs.",
+      "fix": "Add .RequireRateLimiting(\u0022\u003Cpolicy\u003E\u0022) with a policy partitioned by client.",
+      "file": "Shop.Api/Program.cs",
+      "line": 7
+    },
+    {
+      "rule": "no-hsts",
+      "severity": "Medium",
+      "nodeId": "startup:Shop.Api",
+      "title": "Browsers aren\u0027t told to insist on HTTPS (no HSTS)",
+      "why": "A first visit over HTTP can be intercepted and downgraded.",
+      "fix": "Add app.UseHsts() outside Development.",
+      "file": "Shop.Api/Program.cs",
+      "line": 2
+    },
+    {
+      "rule": "cors-any-origin",
+      "severity": "Medium",
+      "nodeId": "startup:Shop.Api",
+      "title": "CORS allows any site",
+      "why": "Any website can call this API from a visitor\u0027s browser.",
+      "fix": "List the exact origins that need access with WithOrigins(...).",
+      "file": "Shop.Api/Program.cs",
+      "line": 3
+    },
+    {
+      "rule": "no-exception-handler",
+      "severity": "Low",
+      "nodeId": "startup:Shop.Api",
+      "title": "No central exception handler",
+      "why": "Unhandled errors can leak stack traces and internal names to callers.",
+      "fix": "Add app.UseExceptionHandler() with problem details.",
+      "file": "Shop.Api/Program.cs",
+      "line": 2
+    }
+  ]
+}

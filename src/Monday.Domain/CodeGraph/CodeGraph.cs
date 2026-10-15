@@ -79,14 +79,49 @@ public sealed record CodeNode
 
 public sealed record CodeEdge(string From, string To, EdgeKind Kind);
 
+public enum Severity
+{
+    Low,
+    Medium,
+    High,
+}
+
+/// <summary>
+/// A place where a threat could come from, found by reading the code: what the risk is, why it
+/// matters, and how to fix it. Attached to the graph node it lives on, so the graph can show it.
+/// </summary>
+public sealed record SecurityFinding
+{
+    /// <summary>Stable rule id, e.g. "write-without-auth".</summary>
+    public required string Rule { get; init; }
+
+    public required Severity Severity { get; init; }
+
+    public required string NodeId { get; init; }
+
+    /// <summary>One line: what is wrong.</summary>
+    public required string Title { get; init; }
+
+    /// <summary>Why it matters, in plain words.</summary>
+    public required string Why { get; init; }
+
+    /// <summary>What to change.</summary>
+    public required string Fix { get; init; }
+
+    public string? File { get; init; }
+
+    public int? Line { get; init; }
+}
+
 /// <summary>
 /// The whole code graph of one project at one commit, as produced by the indexer in CI.
 /// A snapshot is immutable: a new commit means a new snapshot, so replay can show the code as it was.
 /// </summary>
 public sealed class CodeGraphSnapshot
 {
-    private CodeGraphSnapshot(ProjectId projectId, string commit, DateTimeOffset indexedAt, IReadOnlyList<CodeNode> nodes, IReadOnlyList<CodeEdge> edges)
+    private CodeGraphSnapshot(ProjectId projectId, string commit, DateTimeOffset indexedAt, IReadOnlyList<CodeNode> nodes, IReadOnlyList<CodeEdge> edges, IReadOnlyList<SecurityFinding> findings)
     {
+        Findings = findings;
         ProjectId = projectId;
         Commit = commit;
         IndexedAt = indexedAt;
@@ -104,8 +139,11 @@ public sealed class CodeGraphSnapshot
 
     public IReadOnlyList<CodeEdge> Edges { get; }
 
+    /// <summary>Security findings at this commit, worst first.</summary>
+    public IReadOnlyList<SecurityFinding> Findings { get; }
+
     /// <summary>Validates and builds a snapshot: ids unique, every edge and parent points at a node in the graph.</summary>
-    public static CodeGraphSnapshot Create(ProjectId projectId, string commit, DateTimeOffset indexedAt, IReadOnlyList<CodeNode> nodes, IReadOnlyList<CodeEdge> edges)
+    public static CodeGraphSnapshot Create(ProjectId projectId, string commit, DateTimeOffset indexedAt, IReadOnlyList<CodeNode> nodes, IReadOnlyList<CodeEdge> edges, IReadOnlyList<SecurityFinding>? findings = null)
     {
         ArgumentNullException.ThrowIfNull(nodes);
         ArgumentNullException.ThrowIfNull(edges);
@@ -129,7 +167,15 @@ public sealed class CodeGraphSnapshot
             Guard.That(ids.Contains(edge.From) && ids.Contains(edge.To), "graph.dangling_edge", $"Edge {edge.From} -> {edge.To} points outside the graph.");
         }
 
-        return new CodeGraphSnapshot(projectId, commit, indexedAt, nodes, edges.Distinct().ToList());
+        var checkedFindings = (findings ?? []).ToList();
+        foreach (var finding in checkedFindings)
+        {
+            Guard.That(ids.Contains(finding.NodeId), "graph.finding_unknown_node", $"Finding '{finding.Rule}' points at unknown node '{finding.NodeId}'.");
+            Guard.NotBlank(finding.Title, "graph.finding_title_required", "Every finding needs a title", 200);
+        }
+
+        var ordered = checkedFindings.OrderByDescending(f => f.Severity).ThenBy(f => f.Rule, StringComparer.Ordinal).ToList();
+        return new CodeGraphSnapshot(projectId, commit, indexedAt, nodes, edges.Distinct().ToList(), ordered);
     }
 
     public CodeNode? Find(string id) => Nodes.FirstOrDefault(n => n.Id == id);

@@ -7,14 +7,14 @@ using Monday.Domain.CodeGraph;
 namespace Monday.Indexer;
 
 /// <summary>The file the indexer writes and CI uploads: the same shape Monday's ingest endpoint takes.</summary>
-internal sealed record GraphFile(string Commit, IReadOnlyList<CodeNode> Nodes, IReadOnlyList<CodeEdge> Edges);
+internal sealed record GraphFile(string Commit, IReadOnlyList<CodeNode> Nodes, IReadOnlyList<CodeEdge> Edges, IReadOnlyList<SecurityFinding> Findings);
 
 /// <summary>
 /// Builds the code graph of a C# repo with Roslyn: modules (projects), features (top folders),
 /// types, methods, minimal-API endpoints with their guards, and the edges between them.
 /// All files go into one compilation so calls across projects resolve.
 /// </summary>
-internal sealed class RepoIndexer(string root, string appName)
+internal sealed partial class RepoIndexer(string root, string appName)
 {
     private const string AppId = "app";
 
@@ -73,7 +73,13 @@ internal sealed class RepoIndexer(string root, string appName)
 
         var nodes = _nodes.Values.OrderBy(n => n.Kind).ThenBy(n => n.Id, StringComparer.Ordinal).ToList();
         var edges = _edges.Where(e => e.From != e.To).OrderBy(e => e.From, StringComparer.Ordinal).ThenBy(e => e.To, StringComparer.Ordinal).ToList();
-        return new GraphFile(commit, nodes, edges);
+        var findings = ScanEndpointsAndPipeline();
+        foreach (var (tree, module) in trees)
+        {
+            findings.AddRange(ScanCode(tree, compilation.GetSemanticModel(tree), module));
+        }
+
+        return new GraphFile(commit, nodes, edges, findings.OrderByDescending(f => f.Severity).ThenBy(f => f.NodeId, StringComparer.Ordinal).ToList());
     }
 
     // ---------- modules and files ----------

@@ -1,0 +1,10 @@
+using Shop.Api.Data;
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddCors(o => o.AddDefaultPolicy(p => p.AllowAnyOrigin().AllowAnyHeader()));
+var app = builder.Build();
+app.UseAuthorization();
+app.UseAuthentication();
+app.MapPost("/orders", (Repo r, string id) => r.Find(id));
+app.MapPost("/auth/login", (string u) => Results.Ok()).AllowAnonymous();
+app.MapGet("/orders/{id}", (Repo r, string id) => r.Find(id)).RequireAuthorization().RequireRateLimiting("fixed");
+app.Run();

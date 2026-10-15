@@ -35,7 +35,8 @@ h1 b { color: var(--brand); text-shadow: 0 0 12px rgba(60, 240, 168, .55); }
 .tm { display: grid; gap: 1px; padding: 5px 12px 6px; border: 1px solid var(--line); background: rgba(8, 18, 28, .6); clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px); min-width: 74px; }
 .tm span { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
 .tm strong { font-family: var(--mono); font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; }
-.tm.env strong { color: var(--brand); font-size: 13px; letter-spacing: .08em; }
+.tm.env select { font: 600 13px var(--mono); letter-spacing: .04em; color: var(--brand); background: transparent; border: 0; padding: 0; cursor: pointer; max-width: 210px; }
+.tm.env select option { background: var(--void); color: var(--fg); }
 #status strong { display: flex; align-items: center; gap: 7px; font-size: 13px; letter-spacing: .06em; }
 #status .dot { width: 8px; height: 8px; background: var(--faint); transform: rotate(45deg); }
 #status.live strong { color: var(--brand); }
@@ -165,6 +166,32 @@ ol.path .pw { color: var(--muted); font-size: 12px; margin-top: 2px; }
 .answer p, .answer ul, .answer ol { margin: 0 0 8px; } .answer ul, .answer ol { padding-left: 18px; }
 .ro { font-family: var(--mono); font-size: 10.5px; color: var(--muted); margin: 8px 0 0; letter-spacing: .04em; }
 
+/* Threats */
+#threats { display: flex; flex-direction: column; gap: 6px; }
+.th { text-align: left; background: rgba(10, 20, 32, .55); border: 1px solid var(--line); border-left: 3px solid var(--sev); padding: 8px 10px; cursor: pointer; display: grid; gap: 3px; }
+.th:hover { background: var(--glass-hi); }
+.th .t { font-size: 13.5px; font-weight: 500; }
+.th .w { font-size: 12.5px; color: var(--muted); line-height: 1.45; }
+.th .f { font-size: 12.5px; line-height: 1.45; } .th .f b { color: var(--brand); font-weight: 600; }
+.th .loc { font: 10.5px var(--mono); color: var(--muted); word-break: break-all; }
+.sev { display: inline-block; font: 600 9.5px var(--mono); letter-spacing: .12em; text-transform: uppercase; padding: 0 5px; margin-right: 6px; border: 1px solid var(--sev); color: var(--sev); }
+.sevbar { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+.sevbar span { font: 12px var(--mono); padding: 3px 8px; border: 1px solid var(--sev); color: var(--sev); }
+/* Coverage */
+.meter { height: 6px; background: var(--line); margin: 4px 0 10px; }
+.meter i { display: block; height: 100%; background: var(--ok); }
+table.cov { width: 100%; border-collapse: collapse; font: 12px var(--mono); margin-bottom: 10px; font-variant-numeric: tabular-nums; }
+table.cov td { padding: 4px 0; border-bottom: 1px solid var(--line); }
+table.cov td:last-child { text-align: right; }
+.covtag { font: 600 9.5px var(--mono); letter-spacing: .1em; text-transform: uppercase; padding: 0 5px; border: 1px solid; margin-right: 6px; }
+/* Live */
+#liveTag { position: absolute; right: 36px; bottom: 18px; z-index: 4; font: 600 11px var(--mono); letter-spacing: .16em; color: var(--amber); border: 1px solid var(--amber); background: var(--amber-soft); padding: 3px 8px; }
+#liveList { display: flex; flex-direction: column; gap: 2px; font: 11.5px var(--mono); max-height: 26vh; overflow-y: auto; }
+.lr { display: grid; grid-template-columns: 58px 38px 1fr 48px; gap: 6px; padding: 3px 0; border-bottom: 1px solid var(--line); cursor: pointer; text-align: left; background: none; border-left: 0; border-right: 0; border-top: 0; }
+.lr span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lr .ok { color: var(--ok); } .lr .bad { color: var(--bad); } .lr .q { color: var(--muted); text-align: right; }
+.tm.live strong { color: var(--amber); }
+
 body.wide main { grid-template-columns: 1fr; }
 body.wide aside { display: none; }
 @media (max-width: 900px) {
@@ -186,11 +213,16 @@ body.wide aside { display: none; }
 <header>
   <div class="brand"><h1><b>Monday</b> Graph</h1><span class="ver" id="ver">// CODE · ACTIVITY · SECURITY</span></div>
   <div class="telemetry">
-    <div class="tm env"><span>Project</span><strong id="tmProject">Monday</strong></div>
+    <label class="tm env" for="projectPick"><span>Project</span><select id="projectPick" aria-label="Project"><option value="">Monday</option><option value="demo">Demo shop (planted flaws)</option></select></label>
     <div class="tm"><span>Nodes</span><strong id="tmNodes">0</strong></div>
     <div class="tm"><span>Links</span><strong id="tmEdges">0</strong></div>
     <div class="tm"><span>Endpoints</span><strong id="tmEndpoints">0</strong></div>
-    <div class="tm"><span>Tests</span><strong id="tmTests">0</strong></div>
+    <div class="tm"><span>Threats</span><strong id="tmThreats">0</strong></div>
+    <div class="tm"><span>Covered</span><strong id="tmCoverage">—</strong></div>
+    <div class="tm live" id="tmInflightBox" hidden><span>In flight</span><strong id="tmInflight">0</strong></div>
+    <div class="tm live" id="tmRpsBox" hidden><span>Req/s</span><strong id="tmRps">0</strong></div>
+    <div class="tm live" id="tmP95Box" hidden><span>p95 ms</span><strong id="tmP95">0</strong></div>
+    <div class="tm live" id="tmErrBox" hidden><span>Errors</span><strong id="tmErr">0%</strong></div>
     <button class="btn ghost" id="panelToggle" type="button" aria-pressed="false">Hide panel</button>
     <div class="tm" id="status"><span>Signal</span><strong><i class="dot"></i><span id="statusText">Loading</span></strong></div>
   </div>
@@ -203,7 +235,9 @@ body.wide aside { display: none; }
       <div id="readout">FIELD <b id="roProject">MONDAY</b> · COMMIT <b id="roCommit">—</b><br><span id="roLine">LOADING GRAPH</span></div>
       <div class="seg" role="group" aria-label="Lens">
         <button type="button" id="lensStructure" aria-pressed="true">Structure</button>
-        <button type="button" id="lensSecurity" aria-pressed="false">Security</button>
+        <button type="button" id="lensSecurity" aria-pressed="false">Threats</button>
+        <button type="button" id="lensCoverage" aria-pressed="false">Coverage</button>
+        <button type="button" id="lensLive" aria-pressed="false">Live</button>
       </div>
       <div class="chips" id="kinds" role="group" aria-label="Show node kinds"></div>
       <input id="search" type="search" placeholder="Find a method, type, route…" autocomplete="off" aria-label="Find in graph">
@@ -211,6 +245,7 @@ body.wide aside { display: none; }
     <div id="results" hidden></div>
     <div id="lensNote" hidden></div>
     <div id="legend"></div>
+    <div id="liveTag" hidden>SIMULATED TRAFFIC</div>
   </div>
   <aside>
     <section class="sec" id="secActivity">
@@ -226,6 +261,20 @@ body.wide aside { display: none; }
     <section class="sec" id="secInspect">
       <button class="label" type="button" aria-expanded="true">Inspector<span class="chev">▾</span></button>
       <div class="sec-b" id="inspect"><p class="empty">Click a node to see its code, what it does, who calls it, and the tests and endpoints that reach it.</p></div>
+    </section>
+    <section class="sec" id="secThreats" data-collapsed="true">
+      <button class="label" type="button" aria-expanded="false">Threats <span class="count" id="thCount"></span><span class="chev">▾</span></button>
+      <div class="sec-b"><div class="sevbar" id="sevbar"></div><div id="threats"><p class="empty">No findings in this commit.</p></div>
+      <p class="ro">Found by reading the code at this commit. Package vulnerabilities and live attack signals come with the collector.</p></div>
+    </section>
+    <section class="sec" id="secCoverage" data-collapsed="true">
+      <button class="label" type="button" aria-expanded="false">Coverage <span class="count" id="covCount"></span><span class="chev">▾</span></button>
+      <div class="sec-b" id="coverage"></div>
+    </section>
+    <section class="sec" id="secLive" data-collapsed="true">
+      <button class="label" type="button" aria-expanded="false">Live requests<span class="chev">▾</span></button>
+      <div class="sec-b"><div id="liveList"><p class="empty">Turn on the Live lens to watch requests move through the graph.</p></div>
+      <p class="ro">Simulated until the Monday agent is installed and the collector is deployed. Real traffic replaces it with the same view.</p></div>
     </section>
     <section class="sec" id="secPath">
       <button class="label" type="button" aria-expanded="true">Request path<span class="chev">▾</span></button>
@@ -278,10 +327,16 @@ let network, nodesDS, edgesDS;
 let lens = "structure", shown = new Set(["App", "Module", "Feature", "Type", "Endpoint"]);
 let selected = null, lit = new Set(), events = [], selectedEvent = null;
 let db = null, sample = null;
+let findings = [], findingsByNode = new Map(), cov = new Map();
+const SEV_RANK = { High: 3, Medium: 2, Low: 1 };
+const sevColor = sev => sev === "High" ? css("--bad") : sev === "Medium" ? css("--amber") : "#f7e46a";
+const worstAt = id => (findingsByNode.get(id) || []).reduce((w, f) => !w || SEV_RANK[f.severity] > SEV_RANK[w] ? f.severity : w, null);
+const COV_COLOR = { direct: "#3cf0a8", indirect: "#3ee6ff", none: "#ff5f8a" };
+const COV_LABEL = { direct: "Tested directly", indirect: "Reached by a test", none: "No test reaches it" };
 
 // ---------- load graph ----------
 async function loadGraph() {
-  const res = await fetch("graph.json");
+  const res = await fetch(PROJECT.file);
   if (!res.ok) throw new Error("graph.json " + res.status);
   G = await res.json();
   G.nodes.forEach(n => { byId.set(n.id, n); out.set(n.id, []); inn.set(n.id, []); });
@@ -290,11 +345,16 @@ async function loadGraph() {
   $("tmNodes").textContent = G.nodes.length;
   $("tmEdges").textContent = G.edges.length;
   $("tmEndpoints").textContent = count("Endpoint");
-  $("tmTests").textContent = count("Test");
+  $("tmTests") && ($("tmTests").textContent = count("Test"));
   const app = G.nodes.find(n => n.kind === "App");
-  if (app) { $("tmProject").textContent = app.name; $("roProject").textContent = app.name.toUpperCase(); }
+  if (app) { $("roProject").textContent = app.name.toUpperCase(); }
   $("roCommit").textContent = G.commit;
   $("roLine").textContent = `${count("Module")} MODULES · ${count("Method")} METHODS · ${count("Endpoint")} ENDPOINTS`;
+  findings = G.findings || [];
+  findings.forEach(f => { if (!findingsByNode.has(f.nodeId)) findingsByNode.set(f.nodeId, []); findingsByNode.get(f.nodeId).push(f); });
+  computeCoverage();
+  renderThreats();
+  renderCoverage();
   buildKinds();
   buildLegend();
   draw();
@@ -321,8 +381,15 @@ function buildLegend() {
 function nodeStyle(n) {
   let c = KCOLOR(n.kind), dim = false, glow = n.kind === "App" || n.kind === "Module";
   if (lens === "security") {
-    if (n.kind === "Endpoint") { c = isGuarded(n) ? css("--ok") : css("--bad"); glow = true; }
-    else if (!(n.kind === "Method" && n.guards && n.guards.length)) dim = true;
+    const worst = worstAt(n.id);
+    if (worst) { c = sevColor(worst); glow = true; }
+    else if (n.kind === "Endpoint") { c = isGuarded(n) ? css("--ok") : css("--bad"); }
+    else if (n.kind !== "App" && n.kind !== "Module") dim = true;
+  } else if (lens === "coverage") {
+    const st = cov.get(n.id);
+    if (st) { c = COV_COLOR[st]; glow = st === "none"; } else if (n.kind !== "App" && n.kind !== "Module") dim = true;
+  } else if (lens === "live") {
+    if (n.kind !== "Endpoint" && n.kind !== "App" && n.kind !== "Module" && !liveNodes.has(n.id)) dim = true;
   }
   if (lit.size && !lit.has(n.id)) dim = true;
   if (lit.has(n.id)) glow = true;
@@ -389,19 +456,89 @@ const applyVisibility = restyle;
 
 function setLens(next) {
   lens = next;
-  $("lensStructure").setAttribute("aria-pressed", next === "structure");
-  $("lensSecurity").setAttribute("aria-pressed", next === "security");
-  const eps = G.nodes.filter(n => n.kind === "Endpoint");
-  const open = eps.filter(n => !isGuarded(n));
+  ["Structure", "Security", "Coverage", "Live"].forEach(k => $("lens" + k).setAttribute("aria-pressed", next === k.toLowerCase()));
+  const note = $("lensNote");
+  note.hidden = next === "structure";
   if (next === "security") {
-    shown.add("Endpoint");
-    document.querySelector('.chip[data-kind="Endpoint"]')?.setAttribute("aria-pressed", "true");
-    $("lensNote").hidden = false;
-    $("lensNote").innerHTML = `<b>${eps.length - open.length} guarded</b> · <em>${open.length} open</em>${open.length ? ": " + open.map(n => esc(n.route)).join(", ") : ""}`;
-  } else {
-    $("lensNote").hidden = true;
+    const c = sevCounts();
+    note.innerHTML = findings.length ? `<em>${c.High} high</em> · ${c.Medium} medium · ${c.Low} low — red, amber and yellow nodes are where a threat could come from`
+      : `<b>No findings</b> in this commit · endpoints shown green when guarded`;
+    showKinds(["Endpoint", "Method", "Type"]);
+    openSec("secThreats");
+  } else if (next === "coverage") {
+    const c = covSummary();
+    note.innerHTML = `<b>${c.pct}% of methods reached by tests</b> · <em>${c.none} untested</em> shown red`;
+    showKinds(["Method", "Endpoint"]);
+    openSec("secCoverage");
+  } else if (next === "live") {
+    note.innerHTML = `Requests move from the endpoint through its guards to the handler · red flashes are requests stopped by a guard`;
+    showKinds(["Endpoint"]);
+    openSec("secLive");
   }
+  next === "live" ? startLive() : stopLive();
   restyle();
+}
+function showKinds(kinds) {
+  kinds.forEach(k => { shown.add(k); document.querySelector(`.chip[data-kind="${k}"]`)?.setAttribute("aria-pressed", "true"); });
+}
+
+// ---------- threats ----------
+function sevCounts() { const c = { High: 0, Medium: 0, Low: 0 }; findings.forEach(f => c[f.severity]++); return c; }
+function renderThreats() {
+  const c = sevCounts();
+  $("tmThreats").textContent = findings.length ? `${c.High}·${c.Medium}·${c.Low}` : "0";
+  $("thCount").textContent = findings.length || "";
+  $("sevbar").innerHTML = ["High", "Medium", "Low"].map(k => `<span style="--sev:${sevColor(k)}">${c[k]} ${k.toLowerCase()}</span>`).join("");
+  if (!findings.length) return;
+  $("threats").innerHTML = findings.map(f => threatCard(f)).join("");
+}
+function threatCard(f) {
+  const n = byId.get(f.nodeId);
+  return `<button type="button" class="th" data-go="${esc(f.nodeId)}" style="--sev:${sevColor(f.severity)}">
+    <span class="t"><span class="sev">${esc(f.severity)}</span>${esc(f.title)}</span>
+    <span class="w">${esc(f.why)}</span>
+    <span class="f"><b>Fix:</b> ${esc(f.fix)}</span>
+    <span class="loc">${esc(f.file ? f.file + (f.line ? ":" + f.line : "") : "")}${n ? " · " + esc(n.kind === "Endpoint" ? n.route : n.name) : ""} · ${esc(f.rule)}</span></button>`;
+}
+
+// ---------- coverage (static: which product methods a test reaches through calls) ----------
+function computeCoverage() {
+  const tests = G.nodes.filter(n => n.kind === "Test");
+  const direct = new Set(), reach = new Set();
+  tests.forEach(t => (out.get(t.id) || []).forEach(e => { if (e.kind === "Covers") direct.add(e.to); }));
+  const queue = [...direct]; queue.forEach(id => reach.add(id));
+  while (queue.length) {
+    const id = queue.shift();
+    for (const e of out.get(id) || []) if (e.kind === "Calls" && !reach.has(e.to)) { reach.add(e.to); queue.push(e.to); }
+  }
+  G.nodes.forEach(n => {
+    if (n.kind === "Method" && !n.id.startsWith("startup:") && !isTestModule(n)) cov.set(n.id, direct.has(n.id) ? "direct" : reach.has(n.id) ? "indirect" : "none");
+    if (n.kind === "Endpoint") {
+      const handled = (out.get(n.id) || []).filter(e => e.kind === "HandledBy" || e.kind === "Calls").map(e => e.to);
+      cov.set(n.id, handled.some(h => direct.has(h)) ? "direct" : handled.some(h => reach.has(h)) ? "indirect" : "none");
+    }
+  });
+}
+function isTestModule(n) { const m = moduleOf(n); return m && /\.Tests$/.test(m.name); }
+function covSummary(filter = () => true) {
+  const items = [...cov.entries()].filter(([id]) => byId.get(id).kind === "Method" && filter(byId.get(id)));
+  const reached = items.filter(([, s]) => s !== "none").length;
+  return { total: items.length, reached, none: items.length - reached, pct: items.length ? Math.round(reached / items.length * 100) : 0 };
+}
+function renderCoverage() {
+  const all = covSummary();
+  $("tmCoverage").textContent = all.total ? all.pct + "%" : "—";
+  $("covCount").textContent = all.total ? all.pct + "%" : "";
+  const modules = G.nodes.filter(n => n.kind === "Module" && !/\.Tests$/.test(n.name));
+  const rows = modules.map(m => ({ m, c: covSummary(n => moduleOf(n)?.id === m.id) })).filter(r => r.c.total)
+    .map(r => `<tr><td>${esc(shortName(r.m))}</td><td>${r.c.reached}/${r.c.total} · ${r.c.pct}%</td></tr>`).join("");
+  const untestedEndpoints = G.nodes.filter(n => n.kind === "Endpoint" && cov.get(n.id) === "none");
+  $("coverage").innerHTML = `<div class="meter" aria-hidden="true"><i style="width:${all.pct}%"></i></div>
+    <p class="note" style="margin-bottom:10px">${all.reached} of ${all.total} methods are reached by a test; ${all.none} are not.</p>
+    <table class="cov">${rows}</table>
+    ${relList("Endpoints no test reaches", untestedEndpoints)}
+    ${relList("Untested methods", [...cov.entries()].filter(([id, st]) => st === "none" && byId.get(id).kind === "Method").map(([id]) => byId.get(id)))}
+    <p class="ro">Reached means a test calls it, directly or through other methods, in the code. Line-by-line coverage from test runs arrives with CI reporting.</p>`;
 }
 
 // ---------- selection and inspector ----------
@@ -448,6 +585,13 @@ function renderInspector(n) {
   } else if (n.kind === "Endpoint") {
     h += `<div class="sub">Guards</div><div class="guards"><span class="guard open">None found</span></div>`;
   }
+  const nf = findingsByNode.get(n.id) || [];
+  if (nf.length) h += `<div class="sub">Threats · ${nf.length}</div><div style="display:flex;flex-direction:column;gap:6px">${nf.map(threatCard).join("")}</div>`;
+  if (cov.has(n.id)) { const st = cov.get(n.id); h += `<div class="sub">Coverage</div><span class="covtag" style="color:${COV_COLOR[st]};border-color:${COV_COLOR[st]}">${st}</span><span class="note">${COV_LABEL[st]}</span>`; }
+  if (["App", "Module", "Feature", "Type"].includes(n.kind)) {
+    h += `<div class="sub">What it does</div><div class="explain none" id="explain">Ask for a summary of this ${n.kind.toLowerCase()} and how its parts work together.</div>
+      <div class="row" style="margin:8px 0 0"><button class="btn ghost" type="button" id="groupBtn">Explain this ${n.kind.toLowerCase()}</button></div>`;
+  }
   if (n.code) {
     h += `<div class="sub">What it does</div><div class="explain none" id="explain">Looking for an explanation…</div>
       <div class="row" style="margin:8px 0 0"><button class="btn ghost" type="button" id="explainBtn" hidden>Explain with Claude</button></div>`;
@@ -466,6 +610,7 @@ function renderInspector(n) {
   h += relList("Used by", related(n.id, "DependsOn", "in"));
   $("inspect").innerHTML = h;
   openSec("secInspect");
+  if ($("groupBtn")) { if (!sample) $("groupBtn").hidden = true; else $("groupBtn").onclick = () => explainGroup(n); loadGroupExplanation(n); }
   if (n.code) {
     const cb = $("codeBlock"); cb.textContent = n.code;
     if (window.hljs) { try { hljs.highlightElement(cb); } catch (_) {} }
@@ -510,6 +655,39 @@ ${n.code.slice(0, 6000)}
     box.className = "explain none"; box.textContent = e && e.code === "rate_limited" ? "Claude is busy; try again in a minute." : "Couldn't get an explanation right now.";
     btn.disabled = false;
   }
+}
+
+// A group's explanation is keyed by the hashes of the code inside it, so it goes stale when that code changes.
+function descendants(id) { const outList = []; const walk = i => children(i).forEach(c => { outList.push(c); walk(c.id); }); walk(id); return outList; }
+function groupKey(n) {
+  const hashes = descendants(n.id).map(d => d.codeHash || d.id).sort().join("|");
+  let h = 2166136261; for (const ch of n.id + hashes) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); }
+  return "group-" + (h >>> 0).toString(16);
+}
+async function loadGroupExplanation(n) {
+  if (!db) return;
+  try { const snap = await db.collection("explanations").doc(groupKey(n)).get(); if (snap.exists && selected === n.id) { const b = $("explain"); b.className = "explain"; b.innerHTML = md(snap.data().text); } } catch (_) {}
+}
+async function explainGroup(n) {
+  const box = $("explain"), btn = $("groupBtn"); btn.disabled = true; box.className = "explain"; box.textContent = "Reading the parts…";
+  const parts = descendants(n.id);
+  const outline = parts.filter(p => p.kind !== "Method" || parts.length < 60).slice(0, 120).map(p => `${p.kind}: ${p.kind === "Endpoint" ? p.route : p.name}`).join("\n");
+  const code = parts.filter(p => p.code).slice(0, 14).map(p => `// ${p.name} (${p.file})\n${p.code.slice(0, 900)}`).join("\n\n");
+  const threats = parts.flatMap(p => findingsByNode.get(p.id) || []).map(f => `${f.severity}: ${f.title}`).join("\n") || "none";
+  const prompt = `You explain a part of a codebase to its owner, an experienced .NET developer, inside a code-graph viewer.
+Explain the ${n.kind.toLowerCase()} "${n.name}": what it is for, its main parts and how a typical request or call flows through them, and anything the owner should watch. Use at most 6 short sentences or a short list. No preamble.
+Parts:
+${outline}
+Security findings inside it:
+${threats}
+Sample code:
+${code}`;
+  try {
+    const r = await sample(prompt, { modelTier: "default", onText: ({ text }) => { if (selected === n.id) box.innerHTML = md(text); } });
+    if (selected === n.id) box.innerHTML = md(r.text);
+    try { await db?.collection("explanations").doc(groupKey(n)).set({ nodeId: n.id, text: r.text, at: new Date().toISOString(), by: "viewer" }); } catch (_) {}
+  } catch (e) { box.className = "explain none"; box.textContent = "Couldn't get an explanation right now."; }
+  finally { btn.disabled = false; }
 }
 
 // ---------- request path ----------
@@ -561,6 +739,117 @@ async function tracePath(ep, steps) {
     await sleep(380);
   }
   lis.forEach(l => l.classList.remove("on"));
+}
+
+// ---------- live monitor (simulated until the collector is deployed) ----------
+// Each request walks the same chain the Request path shows: endpoint → middleware → guards → handler → calls.
+let liveNodes = new Set(), live = null;
+function chainFor(ep) {
+  const mod = moduleOf(ep), startup = mod && byId.get("startup:" + mod.name);
+  const chain = [ep.id];
+  if (startup) chain.push(startup.id);
+  related(ep.id, "Calls", "out").filter(m => (ep.guards || []).some(g => g.startsWith(m.name))).forEach(m => chain.push(m.id));
+  let cur = related(ep.id, "HandledBy", "out")[0] || related(ep.id, "Calls", "out").find(m => !chain.includes(m.id));
+  for (let d = 0; cur && d < 3; d++) { chain.push(cur.id); cur = related(cur.id, "Calls", "out").find(m => !chain.includes(m.id)); }
+  return chain;
+}
+function startLive() {
+  if (live) return;
+  const eps = G.nodes.filter(n => n.kind === "Endpoint");
+  if (!eps.length) return;
+  const chains = new Map(eps.map(e => [e.id, chainFor(e)]));
+  liveNodes = new Set([...chains.values()].flat());
+  const weight = e => e.route.startsWith("GET") ? 3 : e.route.includes("/ingest/") ? 4 : 1;
+  const bag = eps.flatMap(e => Array(weight(e)).fill(e));
+  const users = Array.from({ length: 12 }, () => "u·" + Math.floor(Math.random() * 65536).toString(16).padStart(4, "0"));
+  live = { reqs: [], done: [], seq: 0, chains, bag, users, timer: null, raf: null, lastSpawn: 0 };
+  ["tmInflightBox", "tmRpsBox", "tmP95Box", "tmErrBox"].forEach(id => $(id).hidden = false);
+  $("liveTag").hidden = false;
+  setStatus("run", "Live");
+  network.on("afterDrawing", drawLive);
+  const tick = now => {
+    if (!live) return;
+    const rate = 4 + 3 * Math.sin(now / 9000);               // gentle waves of traffic, 1–7 req/s
+    if (now - live.lastSpawn > 1000 / rate) { spawn(now); live.lastSpawn = now; }
+    advance(now);
+    network.redraw();
+    live.raf = requestAnimationFrame(tick);
+  };
+  live.raf = requestAnimationFrame(tick);
+  live.timer = setInterval(liveStats, 500);
+}
+function stopLive() {
+  if (!live) return;
+  cancelAnimationFrame(live.raf); clearInterval(live.timer);
+  network.off("afterDrawing", drawLive);
+  live = null; liveNodes = new Set();
+  ["tmInflightBox", "tmRpsBox", "tmP95Box", "tmErrBox"].forEach(id => $(id).hidden = true);
+  $("liveTag").hidden = true;
+  setStatus("live", "Live");
+  network.redraw();
+}
+function spawn(now) {
+  const ep = live.bag[Math.floor(Math.random() * live.bag.length)];
+  const chain = live.chains.get(ep.id);
+  const guarded = (ep.guards || []).some(g => /^(RequireAuthorization|RequireReporterKey)/.test(g));
+  const roll = Math.random();
+  // Where it stops: a guard rejects a few unauthenticated calls; a rare server error at the deepest step.
+  let stopAt = chain.length - 1, status = 200;
+  if (guarded && roll < .07) { stopAt = Math.min(2, chain.length - 1); status = ep.guards.some(g => g.startsWith("RequireReporterKey")) ? 401 : 403; }
+  else if (roll > .985) { status = 500; }
+  live.reqs.push({ id: ++live.seq, ep, chain, stopAt, status, start: now, hop: 0, hopStart: now, hopMs: 140 + Math.random() * 160, user: live.users[Math.floor(Math.random() * live.users.length)] });
+}
+function advance(now) {
+  for (const r of live.reqs) {
+    if (r.end) continue;
+    if (now - r.hopStart >= r.hopMs) {
+      if (r.hop >= r.stopAt) { r.end = now; r.ms = Math.round((now - r.start) / 6 + Math.random() * 40); finish(r); }
+      else { r.hop++; r.hopStart = now; r.hopMs = 120 + Math.random() * 200; }
+    }
+  }
+  live.reqs = live.reqs.filter(r => !r.end || now - r.end < 650);   // keep a short red/green flash after finishing
+}
+function finish(r) {
+  live.done.unshift({ at: new Date(), route: r.ep.route, id: r.ep.id, status: r.status, ms: r.ms, user: r.user, t: performance.now() });
+  live.done.length = Math.min(live.done.length, 400);
+}
+function drawLive(ctx) {
+  if (!live) return;
+  const ids = new Set(); live.reqs.forEach(r => r.chain.forEach(i => ids.add(i)));
+  const pos = network.getPositions([...ids]);
+  const now = performance.now(), amber = css("--amber"), bad = css("--bad"), ok = css("--ok");
+  const counts = new Map();
+  for (const r of live.reqs) {
+    if (!r.end) counts.set(r.ep.id, (counts.get(r.ep.id) || 0) + 1);
+    if (reduceMotion) continue;
+    const a = pos[r.chain[r.hop]], b = pos[r.chain[Math.min(r.hop + 1, r.stopAt)]];
+    if (!a || !b) continue;
+    const t = r.end ? 1 : Math.min(1, (now - r.hopStart) / r.hopMs);
+    const x = a.x + (b.x - a.x) * t, y = a.y + (b.y - a.y) * t;
+    const failed = r.status >= 400, color = r.end ? (failed ? bad : ok) : amber;
+    const radius = r.end ? 4 + (now - r.end) / 60 : 4;
+    ctx.globalAlpha = r.end ? Math.max(0, 1 - (now - r.end) / 650) : 1;
+    ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); ctx.fillStyle = color; ctx.shadowColor = color; ctx.shadowBlur = 12; ctx.fill();
+    ctx.shadowBlur = 0; ctx.globalAlpha = 1;
+  }
+  ctx.font = "600 11px JetBrains Mono, monospace"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  for (const [id, n] of counts) {
+    const p = network.getPositions([id])[id]; if (!p) continue;
+    const bx = p.x + 16, by = p.y - 16;
+    ctx.beginPath(); ctx.arc(bx, by, 9, 0, Math.PI * 2); ctx.fillStyle = amber; ctx.fill();
+    ctx.fillStyle = "#04070b"; ctx.fillText(String(n), bx, by + .5);
+  }
+}
+function liveStats() {
+  if (!live) return;
+  const now = performance.now();
+  const inflight = live.reqs.filter(r => !r.end).length;
+  const recent = live.done.filter(d => now - d.t < 5000);
+  const lat = live.done.slice(0, 200).map(d => d.ms).sort((a, b) => a - b);
+  const p95 = lat.length ? lat[Math.min(lat.length - 1, Math.floor(lat.length * .95))] : 0;
+  const errs = recent.length ? Math.round(recent.filter(d => d.status >= 400).length / recent.length * 100) : 0;
+  $("tmInflight").textContent = inflight; $("tmRps").textContent = (recent.length / 5).toFixed(1); $("tmP95").textContent = p95; $("tmErr").textContent = errs + "%";
+  $("liveList").innerHTML = live.done.slice(0, 40).map(d => `<button type="button" class="lr" data-go="${esc(d.id)}" title="${esc(d.user)}"><span>${d.at.toLocaleTimeString([], { hour12: false })}</span><span class="${d.status >= 400 ? "bad" : "ok"}">${d.status}</span><span>${esc(d.route)}</span><span class="q">${d.ms}ms</span></button>`).join("");
 }
 
 // ---------- activity ----------
@@ -628,6 +917,12 @@ const TOOLS = [
   { name: "endpoints", description: "Every endpoint with its route and guards, plus the app's middleware pipeline.",
     inputSchema: { type: "object", properties: {} },
     execute: () => ({ pipeline: G.nodes.filter(n => n.id.startsWith("startup:") && n.guards?.length).map(n => ({ module: n.parentId, middleware: n.guards })), endpoints: G.nodes.filter(n => n.kind === "Endpoint").map(n => ({ route: n.route, guards: n.guards, guarded: isGuarded(n) })) }) },
+  { name: "threats", description: "Security findings in this commit (worst first): rule, severity, node, why and fix.",
+    inputSchema: { type: "object", properties: {} },
+    execute: () => findings.map(f => ({ ...f, node: byId.get(f.nodeId) ? brief(byId.get(f.nodeId)) : null })) },
+  { name: "coverage", description: "Which methods and endpoints tests reach (direct, indirect, none), with totals per module.",
+    inputSchema: { type: "object", properties: { status: { type: "string", enum: ["direct", "indirect", "none"] } } },
+    execute: ({ status }) => ({ summary: covSummary(), items: [...cov.entries()].filter(([, st]) => !status || st === status).slice(0, 80).map(([id, st]) => ({ ...brief(byId.get(id)), coverage: st })) }) },
   { name: "recent_activity", description: "Claude's recent work on this project, newest first.",
     inputSchema: { type: "object", properties: { limit: { type: "number" } } },
     execute: ({ limit = 20 }) => events.slice(0, Math.min(limit, 60)).map(e => ({ at: e.at, kind: e.kind, summary: e.summary, nodes: (e.nodes || []).slice(0, 8) })) },
@@ -636,7 +931,7 @@ $("askForm").addEventListener("submit", async e => {
   e.preventDefault();
   const q = $("askInput").value.trim(); if (!q || !sample) return;
   const box = $("answer"); box.hidden = false; box.textContent = "Looking through the graph…"; $("askBtn").disabled = true;
-  const system = `You are Monday, the monitor for the software project "${$("tmProject").textContent}" at commit ${G.commit}. Answer the owner's question using the tools, which read the project's code graph and Claude's activity log. Be specific: name methods, files and routes. Keep it short. You are read-only: you cannot change code, data or any environment; if asked to, say the change belongs in a Claude Code session on the repo, and never in production.`;
+  const system = `You are Monday, the monitor for the software project "${PROJECT.name}" at commit ${G.commit}. Answer the owner's question using the tools, which read the project's code graph and Claude's activity log. Be specific: name methods, files and routes. Keep it short. You are read-only: you cannot change code, data or any environment; if asked to, say the change belongs in a Claude Code session on the repo, and never in production.`;
   try {
     const r = await sample([{ role: "user", content: system + "\n\nQuestion: " + q }], { tools: TOOLS, onText: ({ text }) => { box.innerHTML = md(text); } });
     box.innerHTML = md(r.text);
@@ -652,21 +947,30 @@ function toggleSec(s) { const c = s.dataset.collapsed === "true"; s.dataset.coll
 document.querySelectorAll(".sec > .label").forEach(b => b.addEventListener("click", () => toggleSec(b.parentElement)));
 $("lensStructure").onclick = () => setLens("structure");
 $("lensSecurity").onclick = () => setLens("security");
+$("lensCoverage").onclick = () => setLens("coverage");
+$("lensLive").onclick = () => setLens("live");
 $("panelToggle").onclick = () => {
   const wide = document.body.classList.toggle("wide");
   $("panelToggle").setAttribute("aria-pressed", wide); $("panelToggle").textContent = wide ? "Show panel" : "Hide panel";
   setTimeout(() => network && network.redraw(), 50);
 };
-try { const h = location.hash.slice(1); if (h === "security") lens = "security"; } catch (_) {}
+// Projects this viewer can show. The demo is a sample API with planted flaws, to see the Threats lens at work.
+const PROJECTS = { "": { file: "graph.json", name: "Monday", live: true }, demo: { file: "demo-shop.json", name: "Demo shop", live: false } };
+let startLens = "structure", PROJECT = PROJECTS[""];
+try { if (location.hash.slice(1).split("-")[0] === "demo") { PROJECT = PROJECTS.demo; startLens = "security"; } } catch (_) {}
+$("projectPick").value = PROJECT === PROJECTS.demo ? "demo" : "";
+$("projectPick").addEventListener("change", e => { try { location.hash = e.target.value || "monday"; location.reload(); } catch (_) {} });
+try { const h = location.hash.slice(1); if (["security", "threats", "coverage", "live"].includes(h)) startLens = h === "threats" ? "security" : h; } catch (_) {}
 
 // ---------- boot ----------
 (async () => {
-  try { await loadGraph(); if (lens === "security") setLens("security"); }
+  try { await loadGraph(); if (startLens !== "structure") setLens(startLens); }
   catch (e) { setStatus("", "No graph"); $("roLine").textContent = "GRAPH FILE COULD NOT BE LOADED"; return; }
   if (!window.claude || !window.claude.use) { $("askForm").hidden = true; return; }
   claude.use("sample").then(s => { sample = s; if (!s) { $("askForm").hidden = true; } });
   db = await claude.use("db");
   if (!db) return;
+  if (!PROJECT.live) { $("activity").innerHTML = `<p class="empty">The demo has no working sessions. Switch to Monday to see Claude's activity.</p>`; return; }
   db.collection("activity").orderBy("at", "desc").limit(300).onSnapshot(snap => {
     events = snap.docs.map(d => d.data()); renderActivity();
   }, () => {});

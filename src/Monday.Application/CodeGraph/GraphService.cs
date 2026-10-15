@@ -7,11 +7,12 @@ using Monday.Domain.Projects;
 
 namespace Monday.Application.CodeGraph;
 
-public sealed record GraphUpload(string Commit, IReadOnlyList<CodeNode> Nodes, IReadOnlyList<CodeEdge> Edges);
+public sealed record GraphUpload(string Commit, IReadOnlyList<CodeNode> Nodes, IReadOnlyList<CodeEdge> Edges, IReadOnlyList<SecurityFinding>? Findings = null);
 
 public sealed record ExplanationUpload(string NodeId, string CodeHash, string Text);
 
-public sealed record GraphView(string Commit, DateTimeOffset IndexedAt, IReadOnlyList<CodeNode> Nodes, IReadOnlyList<CodeEdge> Edges);
+/// <summary>The graph as one person may see it. Findings carry exploitable detail, so people without code access get counts only.</summary>
+public sealed record GraphView(string Commit, DateTimeOffset IndexedAt, IReadOnlyList<CodeNode> Nodes, IReadOnlyList<CodeEdge> Edges, IReadOnlyList<SecurityFinding> Findings, IReadOnlyDictionary<Severity, int> FindingCounts);
 
 public sealed record NodeDetail(
     CodeNode Node,
@@ -30,7 +31,7 @@ public sealed class GraphService(IGraphStore graphs, ProjectService projects, IC
     {
         ArgumentNullException.ThrowIfNull(reporter);
         ArgumentNullException.ThrowIfNull(upload);
-        var snapshot = CodeGraphSnapshot.Create(reporter.Project.Id, upload.Commit, clock.Now, upload.Nodes, upload.Edges);
+        var snapshot = CodeGraphSnapshot.Create(reporter.Project.Id, upload.Commit, clock.Now, upload.Nodes, upload.Edges, upload.Findings);
         await graphs.SaveAsync(snapshot, ct).ConfigureAwait(false);
         return snapshot.Nodes.Count;
     }
@@ -61,10 +62,10 @@ public sealed class GraphService(IGraphStore graphs, ProjectService projects, IC
             return null;
         }
 
-        var nodes = project.Can(user, Permission.ViewCode)
-            ? snapshot.Nodes
-            : snapshot.Nodes.Select(WithoutSource).ToList();
-        return new GraphView(snapshot.Commit, snapshot.IndexedAt, nodes, snapshot.Edges);
+        var canSeeCode = project.Can(user, Permission.ViewCode);
+        var nodes = canSeeCode ? snapshot.Nodes : snapshot.Nodes.Select(WithoutSource).ToList();
+        var counts = Enum.GetValues<Severity>().ToDictionary(s => s, s => snapshot.Findings.Count(f => f.Severity == s));
+        return new GraphView(snapshot.Commit, snapshot.IndexedAt, nodes, snapshot.Edges, canSeeCode ? snapshot.Findings : [], counts);
     }
 
     public async Task<NodeDetail> GetNodeAsync(ProjectId id, string nodeId, UserId user, CancellationToken ct)
