@@ -6,3 +6,12 @@ services:
     plan: free
     healthCheckPath: /health
     autoDeploy: true
+    envVars:
+      - key: ConnectionStrings__Monday   # Neon connection string (free tier)
+        sync: false
+      - key: Monday__Agent__Self         # Monday watches its own traffic
+        value: "true"
+      - key: Monday__Agent__ApiKey       # issued for Monday's own project after the first deploy
+        sync: false
+      - key: Monday__Agent__UserHashKey
+        sync: false

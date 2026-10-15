@@ -7,7 +7,7 @@ using Monday.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddMonday();
+builder.Services.AddMonday(builder.Configuration);
 
 // Monday watches itself: its own agent records every request it serves (never bodies, queries,
 // headers or IPs). Locally it reports in-process; deployed, set Monday:Agent:Self=true and its key.
@@ -45,6 +45,7 @@ builder.WebHost.ConfigureKestrel(o => o.Limits.MaxRequestBodySize = 8 * 1024 * 1
 
 var app = builder.Build();
 
+await app.Services.MigrateMondayAsync();
 await DevBootstrap.RunAsync(app);
 
 app.UseMondayAgent();

@@ -95,6 +95,16 @@ public sealed class Decision : AggregateRoot<DecisionId>
         return decision;
     }
 
+    /// <summary>Rebuilds a stored decision (persistence only). Raises no events.</summary>
+    public static Decision Restore(
+        DecisionId id, ProjectId projectId, DecisionArea area, string title, string context, IReadOnlyList<DecisionOption> options,
+        string recommendedKey, DecisionId? supersedes, DateTimeOffset proposedAt, DecisionStatus status, string? chosenKey,
+        UserId? resolvedBy, DateTimeOffset? resolvedAt, string? note) =>
+        new(id, projectId, area, title, context, options, recommendedKey, supersedes, proposedAt)
+        {
+            Status = status, ChosenKey = chosenKey, ResolvedBy = resolvedBy, ResolvedAt = resolvedAt, Note = note,
+        };
+
     public void Approve(string optionKey, Project project, UserId by, DateTimeOffset now, string? note = null)
     {
         Resolve(project, by);

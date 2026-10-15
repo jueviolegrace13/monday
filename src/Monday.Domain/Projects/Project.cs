@@ -87,6 +87,26 @@ public sealed class Project : AggregateRoot<ProjectId>
         return project;
     }
 
+    /// <summary>Rebuilds a stored project (persistence only). Raises no events.</summary>
+    public static Project Restore(
+        ProjectId id, string name, DateTimeOffset createdAt, string userHashKey,
+        IEnumerable<(EnvironmentId Id, string Name, EnvironmentKind Kind)> environments,
+        IEnumerable<ApiKey> apiKeys, IEnumerable<Membership> members)
+    {
+        ArgumentNullException.ThrowIfNull(environments);
+        ArgumentNullException.ThrowIfNull(apiKeys);
+        ArgumentNullException.ThrowIfNull(members);
+        var project = new Project(id, name, createdAt) { UserHashKey = userHashKey };
+        project._environments.AddRange(environments.Select(e => new ProjectEnvironment(e.Id, e.Name, e.Kind)));
+        project._apiKeys.AddRange(apiKeys);
+        foreach (var m in members)
+        {
+            project._members[m.UserId] = m.Role;
+        }
+
+        return project;
+    }
+
     public Role? RoleOf(UserId user) => _members.TryGetValue(user, out var role) ? role : null;
 
     public bool Can(UserId user, Permission permission) =>

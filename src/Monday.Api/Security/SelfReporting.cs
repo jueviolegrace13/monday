@@ -30,7 +30,7 @@ public sealed class SelfTraceSink(IServiceScopeFactory scopes, IOptions<MondayAg
 /// </summary>
 public static partial class DevBootstrap
 {
-    [LoggerMessage(Level = LogLevel.Information, Message = "Development: project Monday {ProjectId} created for {Owner}; Monday reports its own traffic to it.")]
+    [LoggerMessage(Level = LogLevel.Information, Message = "Development: project Monday {ProjectId} ready for {Owner}; Monday reports its own traffic to it.")]
     private static partial void LogBootstrapped(ILogger logger, Guid projectId, string owner);
 
     public static async Task RunAsync(WebApplication app)
@@ -45,7 +45,8 @@ public static partial class DevBootstrap
         await using var scope = app.Services.CreateAsyncScope();
         var projects = scope.ServiceProvider.GetRequiredService<ProjectService>();
         var user = new UserId(owner);
-        var project = await projects.CreateAsync("Monday", user, CancellationToken.None);
+        var project = (await projects.ListAsync(user, CancellationToken.None)).FirstOrDefault(p => p.Name == "Monday")
+            ?? await projects.CreateAsync("Monday", user, CancellationToken.None);
         var key = await projects.IssueKeyAsync(new Domain.Projects.ProjectId(project.Id), new Domain.Projects.EnvironmentId(project.Environments[0].Id), user, CancellationToken.None);
         var hashKey = await projects.RevealUserHashKeyAsync(new Domain.Projects.ProjectId(project.Id), user, CancellationToken.None);
 
