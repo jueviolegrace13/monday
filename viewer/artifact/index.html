@@ -377,24 +377,56 @@ function buildLegend() {
     .map(([k, s]) => `<span><i style="border-color:${s.color};${s.dashes ? "border-top-style:dashed" : ""}"></i>${k === "HandledBy" ? "Handled by" : k === "DependsOn" ? "Depends on" : k === "Next" ? "Request flow" : k}</span>`).join("");
 }
 
-// ---------- tidy neighbourhoods: a fixed radial tree, so every module keeps its own area ----------
-// Each node gets a slice of the circle sized by how much it contains; children sit further out inside
-// their parent's slice. Positions never change, so opening and closing things doesn't reshuffle the map.
+// ---------- tidy neighbourhoods: nested rings that make room for what's open ----------
+// Every open thing arranges its children in a ring around itself, and each child takes as much of the
+// ring as its own label or open contents need. Rings grow when something inside opens, so nodes and
+// labels never pile up. The order is fixed, so the same map always comes out the same way.
+const LABEL_PX = 6.8, GAP = 16;
 function layoutTree() {
   const rank = id => KINDS.indexOf(byId.get(id).kind);
   kids.forEach(list => list.sort((a, b) => rank(a) - rank(b) || byId.get(a).name.localeCompare(byId.get(b).name)));
   const weigh = id => { const c = kids.get(id); const w = c.length ? c.reduce((s, k) => s + weigh(k), 0) : 1; leafCount.set(id, w); return w; };
-  const roots = G.nodes.filter(n => !n.parentId || !byId.has(n.parentId)).map(n => n.id);
-  roots.forEach(weigh);
-  const R = [0, 430, 780, 1080, 1340, 1560, 1760];
-  const place = (id, a0, a1, d) => {
-    const a = (a0 + a1) / 2, r = R[Math.min(d, R.length - 1)];
-    POS.set(id, { x: Math.cos(a) * r, y: Math.sin(a) * r });
-    const c = kids.get(id), ws = c.map(k => Math.sqrt(leafCount.get(k))), sum = ws.reduce((s, w) => s + w, 0) || 1;
-    let cur = a0;
-    c.forEach((k, i) => { const span = (a1 - a0) * ws[i] / sum; place(k, cur, cur + span, d + 1); cur += span; });
+  G.nodes.filter(n => !n.parentId || !byId.has(n.parentId)).forEach(n => weigh(n.id));
+}
+function footprint(id) {
+  const n = byId.get(id), label = displayName(n) + (isContainer(n) && !expanded.has(id) ? "  +000" : "");
+  return Math.max((SIZE[n.kind] || 5) + 14, Math.min(120, label.length * LABEL_PX / 2) + 6);
+}
+function layout() {
+  POS = new Map();
+  const R = new Map(), ring = new Map();
+  const openKids = id => expanded.has(id) ? (kids.get(id) || []) : [];
+  const size = id => {
+    const c = openKids(id);
+    if (!c.length) { R.set(id, footprint(id)); return R.get(id); }
+    const rs = c.map(size), own = footprint(id) * .6;
+    const need = rs.reduce((t, r) => t + 2 * (r + GAP), 0) / (2 * Math.PI);
+    const rho = Math.max(need, own + Math.max(...rs) + GAP, 70);
+    ring.set(id, rho);
+    R.set(id, rho + Math.max(...rs) + GAP);
+    return R.get(id);
   };
-  roots.forEach((id, i) => place(id, -Math.PI / 2 + i * 0.001, Math.PI * 1.5, 0));
+  const place = (id, x, y, start) => {
+    POS.set(id, { x, y });
+    const c = openKids(id); if (!c.length) return;
+    const total = c.reduce((t, k) => t + R.get(k) + GAP, 0);
+    let a = start;
+    c.forEach(k => {
+      const span = (R.get(k) + GAP) / total * Math.PI * 2, mid = a + span / 2;
+      place(k, x + Math.cos(mid) * ring.get(id), y + Math.sin(mid) * ring.get(id), mid + Math.PI);  // grandchildren open away from the parent
+      a += span;
+    });
+  };
+  const roots = G.nodes.filter(n => !n.parentId || !byId.has(n.parentId)).map(n => n.id);
+  roots.forEach((id, i) => { size(id); place(id, i * 4000, 0, -Math.PI / 2); });
+  // Things shown only because of a focus or a highlight (their ring is closed) sit in a small ring of
+  // their own beside the closed ring that holds them, instead of on top of it.
+  const extras = new Map();
+  forced.forEach(id => { if (POS.has(id) || !byId.has(id)) return; let rep = byId.get(id).parentId; while (rep && !POS.has(rep)) rep = byId.get(rep)?.parentId; if (!rep) return; if (!extras.has(rep)) extras.set(rep, []); extras.get(rep).push(id); });
+  extras.forEach((list, rep) => {
+    const base = POS.get(rep), r0 = (R.get(rep) || footprint(rep)) + 50 + list.length * 6;
+    list.forEach((id, i) => { const a = -Math.PI / 2 + i / list.length * Math.PI * 2; POS.set(id, { x: base.x + Math.cos(a) * r0, y: base.y + Math.sin(a) * r0 }); });
+  });
 }
 
 // ---------- what's on screen ----------
@@ -420,6 +452,17 @@ function computeForced() {
 }
 
 const shortName = n => n.kind === "Module" ? n.name.replace(/^Monday\./, "") : n.kind === "Endpoint" || n.kind === "RouteGroup" ? (n.route || n.name) : n.kind === "Middleware" ? n.name.replace(/^Use/, "") : n.name;
+// What a node is called on the map: short enough to read. An endpoint inside a route group drops the
+// group's prefix ("PUT /{id}/members/{member}" under /projects) and route constraints like ":guid".
+function displayName(n) {
+  if (n.kind === "Endpoint") {
+    const p = byId.get(n.parentId), [verb, ...rest] = (n.route || n.name).split(" ");
+    let path = rest.join(" ").replace(/:[a-z]+(\([^)]*\))?}/gi, "}");
+    if (p && p.kind === "RouteGroup" && p.route && path.startsWith(p.route)) path = path.slice(p.route.length) || "/";
+    return `${verb} ${path}`;
+  }
+  return shortName(n);
+}
 const isGuarded = n => (n.guards || []).some(g => AUTH_GUARDS.test(g)) && !(n.guards || []).includes("AllowAnonymous");
 function under(id) { const list = []; const walk = i => (kids.get(i) || []).forEach(k => { list.push(k); walk(k); }); walk(id); return list; }
 function worstUnder(id) { return [id, ...under(id)].map(worstAt).reduce((w, s) => s && (!w || SEV_RANK[s] > SEV_RANK[w]) ? s : w, null); }
@@ -449,9 +492,8 @@ function nodeStyle(n) {
   if (isLit || isSel || isFocus) { glow = true; dim = false; }
   const color = dim ? "#1a2a3c" : c;
   const size = (SIZE[n.kind] || 5) + (collapsed ? Math.min(14, Math.sqrt(leafCount.get(n.id) || 1) * 1.6) : 0) + (isFocus ? 4 : isLit ? 3 : 0);
-  const siblings = (kids.get(n.parentId) || []).length;
-  const showLabel = CONTAINERS.has(n.kind) || n.kind === "Endpoint" || n.kind === "Middleware" || isLit || isSel || isFocus || siblings <= 14 || (focusId && neighbours(focusId).has(n.id));
-  const label = showLabel ? shortName(n) + (collapsed ? `  +${(leafCount.get(n.id) || 0)}` : "") : undefined;
+  const showLabel = true;
+  const label = showLabel ? displayName(n) + (collapsed ? `  +${(leafCount.get(n.id) || 0)}` : "") : undefined;
   return {
     id: n.id, label, x: POS.get(n.id).x, y: POS.get(n.id).y, fixed: true,
     title: `${n.kind}: ${n.kind === "Endpoint" ? n.route : n.name}${collapsed ? " — click to open" : ""}`,
@@ -508,6 +550,7 @@ function draw() {
 
 function refresh() {
   computeForced();
+  layout();
   const nodes = G.nodes.filter(n => isVisible(n.id));
   const ids = new Set(nodes.map(n => n.id));
   nodesDS.remove([...shownNodes].filter(i => !ids.has(i)));
@@ -533,6 +576,7 @@ function toggleExpand(id) {
   selected = id;
   refresh();
   renderInspector(byId.get(id));
+  if (expanded.has(id)) network.fit({ nodes: [id, ...(kids.get(id) || [])], animation: reduceMotion ? false : { duration: 450, easingFunction: "easeInOutQuad" } });
 }
 function focusOn(id) {
   remember();
