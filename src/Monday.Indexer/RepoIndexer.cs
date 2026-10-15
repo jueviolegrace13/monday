@@ -87,7 +87,7 @@ internal sealed partial class RepoIndexer(string root, string appName)
     private sealed record Module(string Id, string Name, string Dir, string ProjectFile, bool IsTest);
 
     /// <summary>Repo-relative folders listed in .monday/ignore (one per line) are left out of the graph.</summary>
-    private IReadOnlyList<string> Ignored() =>
+    private List<string> Ignored() =>
         File.Exists(Path.Combine(root, ".monday", "ignore"))
             ? File.ReadAllLines(Path.Combine(root, ".monday", "ignore")).Select(l => l.Trim().TrimEnd('/')).Where(l => l.Length > 0 && !l.StartsWith('#')).ToList()
             : [];
