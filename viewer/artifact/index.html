@@ -1,0 +1,675 @@
+<title>Monday Graph</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<script src="https://unpkg.com/vis-network@9.1.6/standalone/umd/vis-network.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
+<style>
+/* Layout: Sunday Graph's control-room HUD, tuned for one codebase. Telemetry bar, the code graph on a
+   gridded field with lens and kind filters, and an inspector console at right. Single dark look, as Sunday. */
+:root {
+  --void: #04070b; --field: #060b12; --glass: rgba(8, 16, 26, .82); --glass-hi: rgba(18, 38, 52, .6);
+  --line: #16283a; --line-hi: #27486a; --fg: #dce9f5; --muted: #6f88a3; --faint: #34495f;
+  --brand: #3cf0a8; --brand-soft: rgba(60, 240, 168, .13); --amber: #ffb547; --amber-soft: rgba(255, 181, 71, .15);
+  --ok: #3cf0a8; --bad: #ff5f8a; --bad-soft: rgba(255, 95, 138, .14);
+  --k-app: #3ee6ff; --k-module: #b18cff; --k-feature: #4d9dff; --k-type: #7af0d0; --k-method: #8fa7c4; --k-endpoint: #ffb547; --k-test: #ff5f8a;
+  --display: "Chakra Petch", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+html, body { height: 100%; }
+body { background: var(--void); color: var(--fg); font-family: var(--display); font-size: 14px; display: flex; flex-direction: column; overflow: hidden; }
+::selection { background: var(--brand); color: var(--void); }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 1.5px solid var(--brand); outline-offset: 2px; }
+
+header { position: relative; display: flex; align-items: center; gap: 12px 22px; flex-wrap: wrap; padding-block: 12px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); border-bottom: 1px solid var(--line); background: linear-gradient(180deg, #08131c, var(--void)); }
+header::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px; background: linear-gradient(90deg, transparent, var(--brand) 30%, var(--brand) 70%, transparent); opacity: .5; }
+.brand { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+h1 { font-size: 20px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; margin: 0; }
+h1 b { color: var(--brand); text-shadow: 0 0 12px rgba(60, 240, 168, .55); }
+.ver { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: .08em; }
+.telemetry { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; flex: 1; justify-content: flex-end; }
+.tm { display: grid; gap: 1px; padding: 5px 12px 6px; border: 1px solid var(--line); background: rgba(8, 18, 28, .6); clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px); min-width: 74px; }
+.tm span { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.tm strong { font-family: var(--mono); font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.tm.env strong { color: var(--brand); font-size: 13px; letter-spacing: .08em; }
+#status strong { display: flex; align-items: center; gap: 7px; font-size: 13px; letter-spacing: .06em; }
+#status .dot { width: 8px; height: 8px; background: var(--faint); transform: rotate(45deg); }
+#status.live strong { color: var(--brand); }
+#status.live .dot { background: var(--brand); box-shadow: 0 0 10px var(--brand); animation: blink 1.6s steps(2, start) infinite; }
+#status.run strong { color: var(--amber); }
+#status.run .dot { background: var(--amber); box-shadow: 0 0 12px var(--amber); animation: blink .7s steps(2, start) infinite; }
+@keyframes blink { to { opacity: .25; } }
+
+main { flex: 1; display: grid; grid-template-columns: 1fr 420px; min-height: 0; }
+
+#field { position: relative; min-width: 0; min-height: 0; overflow: hidden;
+  background:
+    radial-gradient(ellipse at 50% 45%, rgba(30, 140, 120, .12), transparent 62%),
+    linear-gradient(rgba(60, 240, 168, .04) 1px, transparent 1px) 0 0 / 40px 40px,
+    linear-gradient(90deg, rgba(60, 240, 168, .04) 1px, transparent 1px) 0 0 / 40px 40px,
+    var(--field); }
+#field::after { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 2; box-shadow: inset 0 0 120px rgba(0, 0, 0, .75); }
+#graph { position: absolute; inset: 0; }
+.corner { position: absolute; width: 18px; height: 18px; border: 1.5px solid var(--brand); opacity: .6; z-index: 3; pointer-events: none; }
+.c-tl { top: 12px; left: 12px; border-right: 0; border-bottom: 0; } .c-tr { top: 12px; right: 12px; border-left: 0; border-bottom: 0; }
+.c-bl { bottom: 12px; left: 12px; border-right: 0; border-top: 0; } .c-br { bottom: 12px; right: 12px; border-left: 0; border-top: 0; }
+#hud { position: absolute; top: 18px; left: 36px; right: 36px; z-index: 4; display: flex; gap: 10px 16px; flex-wrap: wrap; align-items: flex-start; pointer-events: none; }
+#hud > * { pointer-events: auto; }
+#readout { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: .06em; line-height: 1.6; pointer-events: none !important; }
+#readout b { color: var(--brand); font-weight: 500; }
+.seg { display: inline-flex; border: 1px solid var(--line-hi); background: var(--glass); }
+.seg button { background: none; border: 0; padding: 5px 10px; font-size: 11px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--brand-soft); color: var(--brand); }
+.chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 8px; border: 1px solid var(--line-hi); background: var(--glass); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); cursor: pointer; }
+.chip i { width: 8px; height: 8px; display: inline-block; }
+.chip[aria-pressed="false"] { opacity: .45; }
+.chip[aria-pressed="false"] i { background: transparent !important; outline: 1px solid var(--faint); }
+#search { margin-left: auto; width: 220px; max-width: 100%; font: 12px var(--mono); color: var(--fg); background: var(--glass); border: 1px solid var(--line-hi); padding: 6px 10px; }
+#search::placeholder { color: var(--faint); }
+#results { position: absolute; top: 56px; right: 36px; z-index: 5; width: 320px; max-width: calc(100% - 72px); max-height: 45%; overflow-y: auto; background: var(--glass); border: 1px solid var(--line-hi); backdrop-filter: blur(8px); }
+#results button { display: block; width: 100%; text-align: left; background: none; border: 0; border-bottom: 1px solid var(--line); padding: 7px 10px; cursor: pointer; font: 12px var(--mono); }
+#results button:hover { background: var(--glass-hi); }
+#results small { display: block; color: var(--muted); font-size: 10.5px; letter-spacing: .06em; }
+#lensNote { position: absolute; left: 36px; bottom: 44px; z-index: 3; font-family: var(--mono); font-size: 11px; color: var(--muted); max-width: calc(100% - 72px); pointer-events: none; }
+#lensNote b { color: var(--ok); font-weight: 500; } #lensNote em { color: var(--bad); font-style: normal; }
+#legend { position: absolute; left: 36px; bottom: 18px; z-index: 3; display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); pointer-events: none; max-width: calc(100% - 72px); }
+#legend i { display: inline-block; width: 14px; height: 0; margin-right: 6px; vertical-align: 3px; border-top: 1.5px solid; }
+
+aside { border-left: 1px solid var(--line); background: linear-gradient(180deg, #07111b, var(--void)); display: flex; flex-direction: column; min-height: 0; min-width: 0; overflow-y: auto; }
+.sec { padding-block: 14px; padding-left: 18px; padding-right: max(18px, env(safe-area-inset-right, 0px)); border-bottom: 1px solid var(--line); min-width: 0; }
+.label { display: flex; align-items: center; gap: 8px; width: 100%; background: none; border: 0; padding: 0; cursor: pointer; text-align: left; font-family: var(--display); font-size: 11px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+.label::before { content: ""; width: 6px; height: 6px; background: var(--brand); box-shadow: 0 0 8px var(--brand); flex: none; }
+.label::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line-hi), transparent); }
+.label .chev { order: 1; font-family: var(--mono); color: var(--brand); transition: transform .2s; }
+.label .count { font-family: var(--mono); letter-spacing: .04em; color: var(--fg); }
+.sec[data-collapsed="true"] .chev { transform: rotate(-90deg); }
+.sec[data-collapsed="true"] .sec-b { display: none; }
+.sec[data-collapsed="true"] .label { margin-bottom: 0; }
+.empty, .note { color: var(--muted); font-size: 13px; line-height: 1.5; margin: 0; }
+
+/* Activity */
+#activity { display: flex; flex-direction: column; gap: 4px; max-height: 30vh; overflow-y: auto; }
+.ev { position: relative; text-align: left; background: rgba(10, 20, 32, .55); border: 1px solid var(--line); padding: 7px 10px 7px 14px; cursor: pointer; display: grid; gap: 2px; }
+.ev::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: var(--faint); }
+.ev:hover { border-color: var(--line-hi); background: var(--glass-hi); }
+.ev[aria-pressed="true"] { border-color: var(--amber); background: var(--amber-soft); }
+.ev[aria-pressed="true"]::before { background: var(--amber); box-shadow: 0 0 10px var(--amber); }
+.ev .s { font-size: 13px; line-height: 1.35; }
+.ev .m { font-family: var(--mono); font-size: 10.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.tag { display: inline-block; font-family: var(--mono); font-size: 9.5px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; padding: 0 5px; margin-right: 6px; border: 1px solid currentColor; color: var(--muted); }
+.tag.Edit, .tag.Commit { color: var(--brand); } .tag.Error { color: var(--bad); } .tag.TestRun, .tag.Build { color: var(--k-feature); }
+.tag.DecisionProposed, .tag.DecisionMade { color: var(--amber); } .tag.Read { color: var(--k-method); }
+.row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.btn { font-size: 11.5px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; padding: 6px 12px; border: 1px solid var(--brand); background: var(--brand-soft); color: var(--brand); cursor: pointer; clip-path: polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px); }
+.btn:hover { background: var(--brand); color: var(--void); }
+.btn.ghost { border-color: var(--line-hi); background: none; color: var(--muted); }
+.btn.ghost:hover { color: var(--fg); background: var(--glass-hi); }
+.btn:disabled { opacity: .45; cursor: default; }
+
+/* Inspector */
+#iName { font-size: 17px; font-weight: 600; margin: 0 0 4px; line-height: 1.3; word-break: break-word; }
+#iMeta { font-family: var(--mono); font-size: 11px; color: var(--muted); margin: 0 0 10px; word-break: break-all; }
+.kpill { display: inline-block; font-family: var(--mono); font-size: 10px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; padding: 0 6px; margin-right: 6px; border: 1px solid; }
+.sub { font-size: 10.5px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--muted); margin: 14px 0 6px; }
+.explain { margin: 0; padding: 10px 12px; border-left: 2px solid var(--brand); background: var(--brand-soft); font-size: 13.5px; line-height: 1.55; }
+.explain.none { border-left-color: var(--faint); background: rgba(10, 20, 32, .6); color: var(--muted); }
+.explain > :first-child { margin-top: 0; } .explain > :last-child { margin-bottom: 0; }
+.explain p, .explain ul { margin: 0 0 8px; } .explain ul { padding-left: 18px; }
+.explain code, .answer code { font-family: var(--mono); font-size: 11.5px; color: var(--amber); }
+pre.code { margin: 0; max-height: 34vh; overflow: auto; padding: 10px; background: var(--void); border: 1px solid var(--line); font: 11.5px/1.55 var(--mono); }
+pre.code code { font: inherit; white-space: pre; }
+.hljs-keyword, .hljs-built_in, .hljs-type { color: #b18cff; } .hljs-string { color: #ffb547; } .hljs-comment { color: #4d6580; font-style: italic; }
+.hljs-title, .hljs-title.function_ { color: #3ee6ff; } .hljs-number, .hljs-literal { color: #ff8f5a; } .hljs-attr, .hljs-meta { color: #7af0d0; }
+.rel { display: flex; flex-direction: column; gap: 2px; }
+.rel button { display: flex; gap: 8px; align-items: baseline; text-align: left; background: none; border: 0; border-left: 1px solid var(--line-hi); padding: 3px 0 3px 10px; cursor: pointer; font: 12px var(--mono); min-width: 0; }
+.rel button:hover { border-left-color: var(--brand); color: var(--brand); }
+.rel button span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rel button small { color: var(--muted); font-size: 10px; flex: none; }
+.guards { display: flex; flex-wrap: wrap; gap: 5px; }
+.guard { font: 11px var(--mono); padding: 2px 7px; border: 1px solid var(--ok); color: var(--ok); background: var(--brand-soft); }
+.guard.open { border-color: var(--bad); color: var(--bad); background: var(--bad-soft); }
+
+/* Request path */
+ol.path { list-style: none; margin: 0; padding: 0; position: relative; display: flex; flex-direction: column; gap: 2px; }
+ol.path::before { content: ""; position: absolute; left: 11px; top: 12px; bottom: 12px; width: 1px; background: linear-gradient(180deg, var(--brand), var(--amber)); opacity: .45; }
+ol.path li { position: relative; display: grid; grid-template-columns: 24px 1fr; gap: 10px; padding: 5px 4px 5px 0; }
+ol.path li[data-node] { cursor: pointer; }
+ol.path li[data-node]:hover .pn { color: var(--brand); }
+ol.path .pd { position: relative; z-index: 1; width: 23px; height: 23px; display: grid; place-items: center; font: 600 10px var(--mono); background: var(--void); border: 1px solid var(--line-hi); color: var(--muted); transform: rotate(45deg); }
+ol.path .pd em { transform: rotate(-45deg); font-style: normal; }
+ol.path li.mw .pd { border-color: var(--k-feature); color: var(--k-feature); }
+ol.path li.gd .pd { border-color: var(--ok); color: var(--ok); }
+ol.path li.hd .pd { border-color: var(--amber); color: var(--amber); }
+ol.path li.on .pd { background: var(--amber); color: var(--void); box-shadow: 0 0 12px var(--amber); }
+ol.path .pn { font: 12px var(--mono); word-break: break-all; }
+ol.path .pw { color: var(--muted); font-size: 12px; margin-top: 2px; }
+
+/* Decisions */
+#decisions { display: flex; flex-direction: column; gap: 6px; }
+.dec { border: 1px solid var(--line); padding: 8px 10px; background: rgba(10, 20, 32, .55); display: grid; gap: 3px; }
+.dec .t { font-size: 13.5px; font-weight: 500; }
+.dec .c { font-size: 12.5px; color: var(--muted); line-height: 1.45; }
+.dec .st { font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }
+.dec .st.Approved { color: var(--ok); } .dec .st.Proposed { color: var(--amber); } .dec .st.Rejected { color: var(--bad); }
+
+/* Ask Monday */
+#askForm { display: flex; gap: 6px; }
+#askInput { flex: 1; min-width: 0; font: 13px var(--display); color: var(--fg); background: var(--void); border: 1px solid var(--line-hi); padding: 7px 10px; }
+.answer { margin: 10px 0 0; padding: 10px 12px; border-left: 2px solid var(--k-app); background: rgba(62, 230, 255, .07); font-size: 13.5px; line-height: 1.55; }
+.answer > :first-child { margin-top: 0; } .answer > :last-child { margin-bottom: 0; }
+.answer p, .answer ul, .answer ol { margin: 0 0 8px; } .answer ul, .answer ol { padding-left: 18px; }
+.ro { font-family: var(--mono); font-size: 10.5px; color: var(--muted); margin: 8px 0 0; letter-spacing: .04em; }
+
+body.wide main { grid-template-columns: 1fr; }
+body.wide aside { display: none; }
+@media (max-width: 900px) {
+  body { overflow: auto; height: auto; }
+  main { grid-template-columns: 1fr; }
+  #field { height: 62vh; }
+  aside { border-left: none; border-top: 1px solid var(--line); overflow: visible; }
+  .sec { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  #hud { left: 28px; right: 28px; }
+  #search { margin-left: 0; width: 100%; }
+  #results { left: 28px; right: 28px; width: auto; max-width: none; top: auto; bottom: 72px; }
+  #readout, #lensNote { display: none; }
+  #panelToggle { display: none; }
+  #activity { max-height: none; }
+}
+@media (prefers-reduced-motion: reduce) { #status .dot { animation: none !important; } }
+</style>
+
+<header>
+  <div class="brand"><h1><b>Monday</b> Graph</h1><span class="ver" id="ver">// CODE · ACTIVITY · SECURITY</span></div>
+  <div class="telemetry">
+    <div class="tm env"><span>Project</span><strong id="tmProject">Monday</strong></div>
+    <div class="tm"><span>Nodes</span><strong id="tmNodes">0</strong></div>
+    <div class="tm"><span>Links</span><strong id="tmEdges">0</strong></div>
+    <div class="tm"><span>Endpoints</span><strong id="tmEndpoints">0</strong></div>
+    <div class="tm"><span>Tests</span><strong id="tmTests">0</strong></div>
+    <button class="btn ghost" id="panelToggle" type="button" aria-pressed="false">Hide panel</button>
+    <div class="tm" id="status"><span>Signal</span><strong><i class="dot"></i><span id="statusText">Loading</span></strong></div>
+  </div>
+</header>
+<main>
+  <div id="field">
+    <div id="graph" role="img" aria-label="Code graph of the selected project"></div>
+    <i class="corner c-tl"></i><i class="corner c-tr"></i><i class="corner c-bl"></i><i class="corner c-br"></i>
+    <div id="hud">
+      <div id="readout">FIELD <b id="roProject">MONDAY</b> · COMMIT <b id="roCommit">—</b><br><span id="roLine">LOADING GRAPH</span></div>
+      <div class="seg" role="group" aria-label="Lens">
+        <button type="button" id="lensStructure" aria-pressed="true">Structure</button>
+        <button type="button" id="lensSecurity" aria-pressed="false">Security</button>
+      </div>
+      <div class="chips" id="kinds" role="group" aria-label="Show node kinds"></div>
+      <input id="search" type="search" placeholder="Find a method, type, route…" autocomplete="off" aria-label="Find in graph">
+    </div>
+    <div id="results" hidden></div>
+    <div id="lensNote" hidden></div>
+    <div id="legend"></div>
+  </div>
+  <aside>
+    <section class="sec" id="secActivity">
+      <button class="label" type="button" aria-expanded="true">Activity <span class="count" id="actCount"></span><span class="chev">▾</span></button>
+      <div class="sec-b">
+        <div class="row">
+          <button class="btn" id="playBtn" type="button" disabled>Replay session</button>
+          <button class="btn ghost" id="clearBtn" type="button">Whole graph</button>
+        </div>
+        <div id="activity"><p class="empty">No activity yet. When Claude works on this project, each read, edit, test run and decision appears here and lights up its nodes.</p></div>
+      </div>
+    </section>
+    <section class="sec" id="secInspect">
+      <button class="label" type="button" aria-expanded="true">Inspector<span class="chev">▾</span></button>
+      <div class="sec-b" id="inspect"><p class="empty">Click a node to see its code, what it does, who calls it, and the tests and endpoints that reach it.</p></div>
+    </section>
+    <section class="sec" id="secPath">
+      <button class="label" type="button" aria-expanded="true">Request path<span class="chev">▾</span></button>
+      <div class="sec-b" id="path"><p class="empty">Pick an endpoint (amber) to see every layer a request passes before its handler runs.</p></div>
+    </section>
+    <section class="sec" id="secAsk">
+      <button class="label" type="button" aria-expanded="true">Ask Monday<span class="chev">▾</span></button>
+      <div class="sec-b">
+        <form id="askForm"><input id="askInput" type="text" placeholder="Which endpoints skip authorization?" autocomplete="off" aria-label="Ask Monday"><button class="btn" type="submit" id="askBtn">Ask</button></form>
+        <div id="answer" class="answer" hidden></div>
+        <p class="ro">Read-only: Monday answers from the graph and activity. Code changes happen in a Claude Code session on the repo.</p>
+      </div>
+    </section>
+    <section class="sec" id="secDecisions" data-collapsed="true">
+      <button class="label" type="button" aria-expanded="false">Decisions <span class="count" id="decCount"></span><span class="chev">▾</span></button>
+      <div class="sec-b"><div id="decisions"><p class="empty">Decisions Claude brings to the Owner appear here with their status.</p></div></div>
+    </section>
+    <section class="sec note" id="secAbout" data-collapsed="true">
+      <button class="label" type="button" aria-expanded="false">About<span class="chev">▾</span></button>
+      <div class="sec-b note">Monday reads the project's code with Roslyn on every push and draws it here: modules, features, types, methods and endpoints. Lines show calls, dependencies, test coverage and which method handles each endpoint. Production is read-only: Monday only watches it.</div>
+    </section>
+  </aside>
+</main>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const md = s => window.marked && window.DOMPurify ? DOMPurify.sanitize(marked.parse(String(s || ""))) : esc(s);
+const reduceMotion = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+const sleep = ms => new Promise(r => setTimeout(r, reduceMotion ? 0 : ms));
+
+const KINDS = ["App", "Module", "Feature", "Type", "Method", "Endpoint", "Test"];
+const KCOLOR = k => css("--k-" + k.toLowerCase());
+const SIZE = { App: 34, Module: 22, Feature: 15, Type: 8, Method: 4.5, Endpoint: 10, Test: 5 };
+const LABELLED = new Set(["App", "Module", "Feature", "Endpoint"]);
+const EDGE_STYLE = {
+  Contains: { color: "#1d3550", dashes: false, width: .6 },
+  Calls: { color: "#2f5f8a", dashes: false, width: .8 },
+  DependsOn: { color: "#5a4a8f", dashes: [2, 4], width: .7 },
+  Implements: { color: "#7af0d0", dashes: [6, 3], width: .8 },
+  Covers: { color: "#8f3a5a", dashes: [2, 3], width: .7 },
+  HandledBy: { color: "#ffb547", dashes: false, width: 1.4 },
+};
+const AUTH_GUARDS = /^(RequireAuthorization|RequireReporterKey)/;
+
+let G = null, byId = new Map(), out = new Map(), inn = new Map();
+let network, nodesDS, edgesDS;
+let lens = "structure", shown = new Set(["App", "Module", "Feature", "Type", "Endpoint"]);
+let selected = null, lit = new Set(), events = [], selectedEvent = null;
+let db = null, sample = null;
+
+// ---------- load graph ----------
+async function loadGraph() {
+  const res = await fetch("graph.json");
+  if (!res.ok) throw new Error("graph.json " + res.status);
+  G = await res.json();
+  G.nodes.forEach(n => { byId.set(n.id, n); out.set(n.id, []); inn.set(n.id, []); });
+  G.edges.forEach(e => { if (out.has(e.from) && inn.has(e.to)) { out.get(e.from).push(e); inn.get(e.to).push(e); } });
+  const count = k => G.nodes.filter(n => n.kind === k).length;
+  $("tmNodes").textContent = G.nodes.length;
+  $("tmEdges").textContent = G.edges.length;
+  $("tmEndpoints").textContent = count("Endpoint");
+  $("tmTests").textContent = count("Test");
+  const app = G.nodes.find(n => n.kind === "App");
+  if (app) { $("tmProject").textContent = app.name; $("roProject").textContent = app.name.toUpperCase(); }
+  $("roCommit").textContent = G.commit;
+  $("roLine").textContent = `${count("Module")} MODULES · ${count("Method")} METHODS · ${count("Endpoint")} ENDPOINTS`;
+  buildKinds();
+  buildLegend();
+  draw();
+}
+
+function buildKinds() {
+  $("kinds").innerHTML = KINDS.filter(k => k !== "App").map(k =>
+    `<button type="button" class="chip" data-kind="${k}" aria-pressed="${shown.has(k)}"><i style="background:${KCOLOR(k)}"></i>${k}s</button>`).join("");
+  $("kinds").addEventListener("click", e => {
+    const b = e.target.closest(".chip"); if (!b) return;
+    const k = b.dataset.kind;
+    shown.has(k) ? shown.delete(k) : shown.add(k);
+    b.setAttribute("aria-pressed", shown.has(k));
+    applyVisibility();
+  });
+}
+
+function buildLegend() {
+  $("legend").innerHTML = Object.entries(EDGE_STYLE).filter(([k]) => k !== "Contains")
+    .map(([k, s]) => `<span><i style="border-color:${s.color};${s.dashes ? "border-top-style:dashed" : ""}"></i>${k === "HandledBy" ? "Handled by" : k === "DependsOn" ? "Depends on" : k}</span>`).join("");
+}
+
+// ---------- draw ----------
+function nodeStyle(n) {
+  let c = KCOLOR(n.kind), dim = false, glow = n.kind === "App" || n.kind === "Module";
+  if (lens === "security") {
+    if (n.kind === "Endpoint") { c = isGuarded(n) ? css("--ok") : css("--bad"); glow = true; }
+    else if (!(n.kind === "Method" && n.guards && n.guards.length)) dim = true;
+  }
+  if (lit.size && !lit.has(n.id)) dim = true;
+  if (lit.has(n.id)) glow = true;
+  const color = dim ? "#1a2a3c" : c;
+  const big = SIZE[n.kind] || 5;
+  return {
+    id: n.id, label: LABELLED.has(n.kind) || lit.has(n.id) || selected === n.id ? shortName(n) : undefined,
+    title: `${n.kind}: ${n.name}`, shape: n.kind === "Endpoint" ? "diamond" : n.kind === "Type" ? "square" : "dot",
+    size: lit.has(n.id) ? big + 3 : big,
+    color: { background: lit.has(n.id) ? "#ffffff" : color, border: lit.has(n.id) ? css("--amber") : color, highlight: { background: "#ffffff", border: c }, hover: { background: "#ffffff", border: c } },
+    shadow: { enabled: glow && !dim, color: lit.has(n.id) ? css("--amber") : c, size: lit.has(n.id) ? 22 : 14, x: 0, y: 0 },
+    font: { size: n.kind === "App" ? 15 : n.kind === "Module" ? 13 : 11, color: dim ? "#3a4f66" : css("--fg"), face: n.kind === "Endpoint" || n.kind === "Method" || n.kind === "Test" || n.kind === "Type" ? "JetBrains Mono" : "Chakra Petch", strokeWidth: 4, strokeColor: css("--void") },
+    hidden: !visible(n),
+  };
+}
+const shortName = n => n.kind === "Module" ? n.name.replace(/^Monday\./, "") : n.kind === "Endpoint" ? n.route : n.name;
+const visible = n => n.kind === "App" || shown.has(n.kind) || lit.has(n.id) || selected === n.id;
+const isGuarded = n => (n.guards || []).some(g => AUTH_GUARDS.test(g)) && !(n.guards || []).includes("AllowAnonymous");
+
+function edgeList() {
+  const list = [];
+  G.nodes.forEach(n => { if (n.parentId) list.push({ id: "p:" + n.id, from: n.parentId, to: n.id, kind: "Contains" }); });
+  G.edges.forEach((e, i) => list.push({ id: "e" + i, from: e.from, to: e.to, kind: e.kind }));
+  return list;
+}
+function edgeStyle(e) {
+  const s = EDGE_STYLE[e.kind] || EDGE_STYLE.Calls;
+  const hot = lit.size && lit.has(e.from) && lit.has(e.to) && e.kind !== "Contains";
+  const faded = (lit.size && !hot) || (lens === "security" && e.kind !== "HandledBy" && e.kind !== "Calls");
+  return { id: e.id, from: e.from, to: e.to, dashes: s.dashes, width: hot ? 2.2 : s.width,
+    color: { color: hot ? css("--amber") : s.color, opacity: faded ? .12 : (e.kind === "Contains" ? .5 : .65) },
+    arrows: e.kind === "Contains" ? undefined : { to: { enabled: true, scaleFactor: .35 } } };
+}
+
+function draw() {
+  // Seed positions: modules on a ring, everything else near its parent, so physics settles fast.
+  const pos = new Map(); const modules = G.nodes.filter(n => n.kind === "Module");
+  pos.set("app", { x: 0, y: 0 });
+  modules.forEach((m, i) => { const a = i / modules.length * Math.PI * 2; pos.set(m.id, { x: Math.cos(a) * 520, y: Math.sin(a) * 520 }); });
+  const place = n => {
+    if (pos.has(n.id)) return pos.get(n.id);
+    const p = n.parentId && byId.has(n.parentId) ? place(byId.get(n.parentId)) : { x: 0, y: 0 };
+    const h = [...n.id].reduce((a, c) => (a * 31 + c.charCodeAt(0)) | 0, 7);
+    const r = n.kind === "Feature" ? 180 : 70;
+    const v = { x: p.x + Math.cos(h) * r, y: p.y + Math.sin(h) * r }; pos.set(n.id, v); return v;
+  };
+  nodesDS = new vis.DataSet(G.nodes.map(n => Object.assign(nodeStyle(n), place(n))));
+  edgesDS = new vis.DataSet(edgeList().map(edgeStyle));
+  network = new vis.Network($("graph"), { nodes: nodesDS, edges: edgesDS }, {
+    physics: { solver: "forceAtlas2Based", forceAtlas2Based: { gravitationalConstant: -46, centralGravity: .004, springLength: 70, springConstant: .06, damping: .5, avoidOverlap: .4 }, stabilization: { iterations: 260, fit: true } },
+    interaction: { hover: true, tooltipDelay: 150, hideEdgesOnDrag: true, multiselect: false },
+    edges: { smooth: { type: "continuous", roundness: .15 }, selectionWidth: 1.2 },
+  });
+  network.once("stabilizationIterationsDone", () => network.setOptions({ physics: { enabled: false } }));
+  network.on("click", p => { if (p.nodes[0]) select(p.nodes[0], { focus: false }); });
+  setStatus("live", "Live");
+}
+
+function restyle() {
+  nodesDS.update(G.nodes.map(nodeStyle));
+  edgesDS.update(edgeList().map(edgeStyle));
+}
+const applyVisibility = restyle;
+
+function setLens(next) {
+  lens = next;
+  $("lensStructure").setAttribute("aria-pressed", next === "structure");
+  $("lensSecurity").setAttribute("aria-pressed", next === "security");
+  const eps = G.nodes.filter(n => n.kind === "Endpoint");
+  const open = eps.filter(n => !isGuarded(n));
+  if (next === "security") {
+    shown.add("Endpoint");
+    document.querySelector('.chip[data-kind="Endpoint"]')?.setAttribute("aria-pressed", "true");
+    $("lensNote").hidden = false;
+    $("lensNote").innerHTML = `<b>${eps.length - open.length} guarded</b> · <em>${open.length} open</em>${open.length ? ": " + open.map(n => esc(n.route)).join(", ") : ""}`;
+  } else {
+    $("lensNote").hidden = true;
+  }
+  restyle();
+}
+
+// ---------- selection and inspector ----------
+const related = (id, kind, dir) => (dir === "out" ? out.get(id) : inn.get(id)).filter(e => e.kind === kind).map(e => byId.get(dir === "out" ? e.to : e.from)).filter(Boolean);
+function endpointsReaching(id) {
+  const seen = new Set([id]), queue = [id], found = [];
+  while (queue.length) {
+    const cur = queue.shift();
+    for (const e of inn.get(cur) || []) {
+      if (!(e.kind === "Calls" || e.kind === "HandledBy") || seen.has(e.from)) continue;
+      seen.add(e.from); const n = byId.get(e.from);
+      if (n && n.kind === "Endpoint") found.push(n); queue.push(e.from);
+    }
+  }
+  return found;
+}
+const children = id => G.nodes.filter(n => n.parentId === id);
+
+function select(id, { focus = true } = {}) {
+  const n = byId.get(id); if (!n) return;
+  selected = id;
+  if (!visible(n)) restyle(); else nodesDS.update(nodeStyle(n));
+  network.selectNodes([id]);
+  if (focus) network.focus(id, { scale: 1.1, animation: reduceMotion ? false : { duration: 500, easingFunction: "easeInOutQuad" } });
+  renderInspector(n);
+  if (n.kind === "Endpoint") renderPath(n);
+  $("results").hidden = true;
+}
+
+function relList(title, nodes) {
+  if (!nodes.length) return "";
+  const items = nodes.slice(0, 40).map(m => `<button type="button" data-go="${esc(m.id)}"><span>${esc(m.kind === "Endpoint" ? m.route : m.name)}</span><small>${esc(parentName(m))}</small></button>`).join("");
+  return `<div class="sub">${title} · ${nodes.length}</div><div class="rel">${items}</div>`;
+}
+const parentName = m => { const p = byId.get(m.parentId); return p ? (p.kind === "Module" ? shortName(p) : p.name) : ""; };
+
+function renderInspector(n) {
+  const loc = n.file ? `${n.file}${n.startLine ? ":" + n.startLine + "–" + n.endLine : ""}` : "";
+  const kc = KCOLOR(n.kind);
+  let h = `<p id="iName">${esc(n.kind === "Endpoint" ? n.route : n.name)}</p>
+    <p id="iMeta"><span class="kpill" style="color:${kc};border-color:${kc}">${n.kind}</span>${esc(loc || n.id)}</p>`;
+  if (n.guards && n.guards.length) {
+    h += `<div class="sub">${n.kind === "Endpoint" ? "Guards" : "Request pipeline"}</div><div class="guards">${n.guards.map(g => `<span class="guard${/AllowAnonymous|Disable/.test(g) ? " open" : ""}">${esc(g)}</span>`).join("")}</div>`;
+  } else if (n.kind === "Endpoint") {
+    h += `<div class="sub">Guards</div><div class="guards"><span class="guard open">None found</span></div>`;
+  }
+  if (n.code) {
+    h += `<div class="sub">What it does</div><div class="explain none" id="explain">Looking for an explanation…</div>
+      <div class="row" style="margin:8px 0 0"><button class="btn ghost" type="button" id="explainBtn" hidden>Explain with Claude</button></div>`;
+    h += `<div class="sub">Code</div><pre class="code"><code class="language-csharp" id="codeBlock"></code></pre>`;
+  }
+  if (["App", "Module", "Feature", "Type"].includes(n.kind)) h += relList("Contains", children(n.id));
+  h += relList("Handled by", related(n.id, "HandledBy", "out"));
+  h += relList("Called by", related(n.id, "Calls", "in"));
+  h += relList("Calls", related(n.id, "Calls", "out"));
+  h += relList("Tests that cover it", related(n.id, "Covers", "in"));
+  h += relList("Covers", related(n.id, "Covers", "out"));
+  if (n.kind === "Method") h += relList("Endpoints that reach it", endpointsReaching(n.id));
+  h += relList("Implements", related(n.id, "Implements", "out"));
+  h += relList("Implemented by", related(n.id, "Implements", "in"));
+  h += relList("Depends on", related(n.id, "DependsOn", "out"));
+  h += relList("Used by", related(n.id, "DependsOn", "in"));
+  $("inspect").innerHTML = h;
+  openSec("secInspect");
+  if (n.code) {
+    const cb = $("codeBlock"); cb.textContent = n.code;
+    if (window.hljs) { try { hljs.highlightElement(cb); } catch (_) {} }
+    loadExplanation(n);
+  }
+}
+
+// Explanations are cached in the shared store by code hash, so they go stale when the code changes.
+async function loadExplanation(n) {
+  const box = $("explain"), btn = $("explainBtn");
+  if (!db) { box.textContent = "Explanations need the shared store, which is not available in this view."; return; }
+  try {
+    const snap = await db.collection("explanations").doc(n.codeHash).get();
+    if (selected !== n.id) return;
+    if (snap.exists) { box.className = "explain"; box.innerHTML = md(snap.data().text); return; }
+  } catch (_) { /* fall through to offer */ }
+  box.textContent = "No explanation written for this version of the code yet.";
+  if (sample) { btn.hidden = false; btn.onclick = () => explain(n); }
+}
+
+async function explain(n) {
+  const box = $("explain"), btn = $("explainBtn");
+  btn.disabled = true; box.className = "explain"; box.textContent = "Thinking…";
+  const callers = related(n.id, "Calls", "in").map(m => m.name).slice(0, 8).join(", ") || "none in the repo";
+  const eps = endpointsReaching(n.id).map(m => m.route).slice(0, 6).join(", ") || "none";
+  const prompt = `You explain C# code to the project owner, an experienced .NET developer, inside a code-graph viewer.
+Write 2 to 4 short sentences in plain English: what this ${n.kind.toLowerCase()} does, the rule or behaviour that matters, and anything risky. No preamble, no headings, no restating the name.
+Name: ${n.name}
+File: ${n.file}
+Called by: ${callers}
+Reached from endpoints: ${eps}
+Code:
+\`\`\`csharp
+${n.code.slice(0, 6000)}
+\`\`\``;
+  try {
+    const r = await sample(prompt, { modelTier: "quick", onText: ({ text }) => { if (selected === n.id) box.innerHTML = md(text); } });
+    if (selected === n.id) box.innerHTML = md(r.text);
+    btn.hidden = true;
+    try { await db.collection("explanations").doc(n.codeHash).set({ nodeId: n.id, codeHash: n.codeHash, text: r.text, at: new Date().toISOString(), by: "viewer" }); } catch (_) { /* read-only viewers keep it for this view */ }
+  } catch (e) {
+    box.className = "explain none"; box.textContent = e && e.code === "rate_limited" ? "Claude is busy; try again in a minute." : "Couldn't get an explanation right now.";
+    btn.disabled = false;
+  }
+}
+
+// ---------- request path ----------
+function moduleOf(n) { let cur = n; while (cur && cur.kind !== "Module") cur = byId.get(cur.parentId); return cur; }
+function renderPath(ep) {
+  const mod = moduleOf(ep);
+  const startup = mod && byId.get("startup:" + mod.name);
+  const steps = [];
+  steps.push({ cls: "mw", mark: "→", name: "Request arrives", why: ep.route });
+  (startup?.guards || []).forEach(g => steps.push({ cls: "mw", mark: "M", name: g, why: "Middleware, in the order Program.cs adds it", node: startup.id }));
+  (ep.guards || []).forEach(g => {
+    const m = related(ep.id, "Calls", "out").find(x => g.startsWith(x.name));
+    steps.push({ cls: "gd", mark: "G", name: g, why: m ? `Runs ${m.name} on every request` : guardWhy(g), node: m?.id });
+  });
+  const handler = related(ep.id, "HandledBy", "out")[0];
+  if (handler) {
+    steps.push({ cls: "hd", mark: "H", name: handler.name, why: "Handler: " + parentName(handler), node: handler.id });
+    const seen = new Set([handler.id]);
+    const walk = (id, depth) => {
+      if (depth > 2) return;
+      related(id, "Calls", "out").forEach(c => {
+        if (seen.has(c.id)) return; seen.add(c.id);
+        steps.push({ cls: "", mark: String(depth + 1), name: c.name, why: parentName(c), node: c.id });
+        walk(c.id, depth + 1);
+      });
+    };
+    walk(handler.id, 0);
+  } else {
+    steps.push({ cls: "hd", mark: "H", name: "Inline handler", why: "A lambda in the route; its calls are linked to the endpoint itself" });
+    related(ep.id, "Calls", "out").filter(c => !(ep.guards || []).some(g => g.startsWith(c.name))).forEach(c => steps.push({ cls: "", mark: "1", name: c.name, why: parentName(c), node: c.id }));
+  }
+  $("path").innerHTML = `<div class="row"><button class="btn" type="button" id="tracePath">Trace this path</button></div>
+    <ol class="path">${steps.map((s, i) => `<li class="${s.cls}" data-i="${i}" ${s.node ? `data-node="${esc(s.node)}"` : ""}><span class="pd"><em>${esc(s.mark)}</em></span><div><div class="pn">${esc(s.name)}</div><div class="pw">${esc(s.why || "")}</div></div></li>`).join("")}</ol>
+    <p class="ro">From the code. Live traces of real requests arrive with the traffic collector.</p>`;
+  $("path").querySelectorAll("li[data-node]").forEach(li => li.addEventListener("click", () => select(li.dataset.node)));
+  $("tracePath").onclick = () => tracePath(ep, steps);
+  openSec("secPath");
+}
+const guardWhy = g => g.startsWith("RequireAuthorization") ? "Signed-in person required; role checked per project"
+  : g.startsWith("RequireRateLimiting") ? "Token bucket per API key" : g.startsWith("AllowAnonymous") ? "Open to anyone"
+  : g.startsWith("DisableAntiforgery") ? "No browser form posts here; API-key callers only" : "Endpoint guard";
+
+async function tracePath(ep, steps) {
+  lit = new Set([ep.id]); restyle();
+  const lis = [...$("path").querySelectorAll("li")];
+  for (let i = 0; i < steps.length; i++) {
+    lis.forEach(l => l.classList.remove("on")); lis[i]?.classList.add("on");
+    if (steps[i].node) { lit.add(steps[i].node); restyle(); }
+    await sleep(380);
+  }
+  lis.forEach(l => l.classList.remove("on"));
+}
+
+// ---------- activity ----------
+function renderActivity() {
+  $("actCount").textContent = events.length ? events.length : "";
+  $("playBtn").disabled = !events.length;
+  if (!events.length) return;
+  $("activity").innerHTML = events.map((e, i) => {
+    const t = new Date(e.at);
+    const when = isNaN(t) ? "" : t.toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+    return `<button type="button" class="ev" data-i="${i}" aria-pressed="${selectedEvent === i}"><span class="s"><span class="tag ${esc(e.kind)}">${esc(e.kind)}</span>${esc(e.summary)}</span><span class="m">${esc(when)} · ${(e.nodes || []).length} nodes · ${esc(e.session || "")}</span></button>`;
+  }).join("");
+}
+$("activity").addEventListener("click", e => {
+  const b = e.target.closest(".ev"); if (!b) return;
+  showEvent(+b.dataset.i);
+});
+function showEvent(i) {
+  selectedEvent = i; const ev = events[i];
+  lit = new Set((ev.nodes || []).filter(id => byId.has(id)));
+  renderActivity(); restyle();
+  const first = (ev.nodes || []).find(id => byId.has(id));
+  if (first) select(first, { focus: true });
+}
+$("playBtn").onclick = async () => {
+  setStatus("run", "Replaying");
+  const order = events.map((_, i) => i).reverse();
+  for (const i of order) { showEvent(i); await sleep(1100); }
+  setStatus("live", "Live");
+};
+$("clearBtn").onclick = () => {
+  lit = new Set(); selectedEvent = null; selected = null; renderActivity(); restyle();
+  network.unselectAll(); network.fit({ animation: reduceMotion ? false : { duration: 500 } });
+};
+
+// ---------- decisions ----------
+function renderDecisions(list) {
+  $("decCount").textContent = list.length || "";
+  if (!list.length) return;
+  $("decisions").innerHTML = list.map(d => {
+    const chosen = (d.options || []).find(o => o.key === d.chosenKey);
+    return `<div class="dec"><span class="st ${esc(d.status)}">${esc(d.status)} · ${esc(d.area || "")}</span><span class="t">${esc(d.title)}</span><span class="c">${esc(chosen ? chosen.title : d.context || "")}</span></div>`;
+  }).join("");
+}
+
+// ---------- search ----------
+$("search").addEventListener("input", () => {
+  const q = $("search").value.trim().toLowerCase();
+  if (q.length < 2) { $("results").hidden = true; return; }
+  const hits = G.nodes.filter(n => (n.route || n.name).toLowerCase().includes(q) || n.id.toLowerCase().includes(q)).slice(0, 30);
+  $("results").innerHTML = hits.length ? hits.map(n => `<button type="button" data-go="${esc(n.id)}">${esc(n.kind === "Endpoint" ? n.route : n.name)}<small>${n.kind} · ${esc(parentName(n))}</small></button>`).join("") : `<p class="empty" style="padding:8px 10px">Nothing matches.</p>`;
+  $("results").hidden = false;
+});
+document.addEventListener("click", e => { const g = e.target.closest("[data-go]"); if (g) select(g.dataset.go); });
+
+// ---------- ask Monday (read-only tools over the graph) ----------
+const brief = n => ({ id: n.id, kind: n.kind, name: n.kind === "Endpoint" ? n.route : n.name, file: n.file, guards: n.guards });
+const TOOLS = [
+  { name: "find_nodes", description: "Search the code graph by name, route or kind. Returns up to 25 nodes.",
+    inputSchema: { type: "object", properties: { query: { type: "string" }, kind: { type: "string", enum: KINDS } } },
+    execute: ({ query = "", kind }) => G.nodes.filter(n => (!kind || n.kind === kind) && ((n.route || n.name) + n.id).toLowerCase().includes(query.toLowerCase())).slice(0, 25).map(brief) },
+  { name: "node_detail", description: "One node with its code (trimmed), guards, callers, callees, covering tests and endpoints that reach it.",
+    inputSchema: { type: "object", properties: { id: { type: "string" } }, required: ["id"] },
+    execute: ({ id }) => { const n = byId.get(id); if (!n) throw new Error("No node with that id"); return { ...brief(n), code: (n.code || "").slice(0, 3000), calledBy: related(id, "Calls", "in").map(brief), calls: related(id, "Calls", "out").map(brief), tests: related(id, "Covers", "in").map(brief), endpoints: endpointsReaching(id).map(brief), handledBy: related(id, "HandledBy", "out").map(brief) }; } },
+  { name: "endpoints", description: "Every endpoint with its route and guards, plus the app's middleware pipeline.",
+    inputSchema: { type: "object", properties: {} },
+    execute: () => ({ pipeline: G.nodes.filter(n => n.id.startsWith("startup:") && n.guards?.length).map(n => ({ module: n.parentId, middleware: n.guards })), endpoints: G.nodes.filter(n => n.kind === "Endpoint").map(n => ({ route: n.route, guards: n.guards, guarded: isGuarded(n) })) }) },
+  { name: "recent_activity", description: "Claude's recent work on this project, newest first.",
+    inputSchema: { type: "object", properties: { limit: { type: "number" } } },
+    execute: ({ limit = 20 }) => events.slice(0, Math.min(limit, 60)).map(e => ({ at: e.at, kind: e.kind, summary: e.summary, nodes: (e.nodes || []).slice(0, 8) })) },
+];
+$("askForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const q = $("askInput").value.trim(); if (!q || !sample) return;
+  const box = $("answer"); box.hidden = false; box.textContent = "Looking through the graph…"; $("askBtn").disabled = true;
+  const system = `You are Monday, the monitor for the software project "${$("tmProject").textContent}" at commit ${G.commit}. Answer the owner's question using the tools, which read the project's code graph and Claude's activity log. Be specific: name methods, files and routes. Keep it short. You are read-only: you cannot change code, data or any environment; if asked to, say the change belongs in a Claude Code session on the repo, and never in production.`;
+  try {
+    const r = await sample([{ role: "user", content: system + "\n\nQuestion: " + q }], { tools: TOOLS, onText: ({ text }) => { box.innerHTML = md(text); } });
+    box.innerHTML = md(r.text);
+  } catch (err) {
+    box.textContent = err && err.code === "rate_limited" ? "Claude is busy; try again in a minute." : "Couldn't answer right now. Try again.";
+  } finally { $("askBtn").disabled = false; }
+});
+
+// ---------- chrome ----------
+function setStatus(cls, text) { $("status").className = "tm " + cls; $("statusText").textContent = text; }
+function openSec(id) { const s = $(id); if (s.dataset.collapsed === "true") toggleSec(s); }
+function toggleSec(s) { const c = s.dataset.collapsed === "true"; s.dataset.collapsed = c ? "false" : "true"; s.querySelector(".label").setAttribute("aria-expanded", c); }
+document.querySelectorAll(".sec > .label").forEach(b => b.addEventListener("click", () => toggleSec(b.parentElement)));
+$("lensStructure").onclick = () => setLens("structure");
+$("lensSecurity").onclick = () => setLens("security");
+$("panelToggle").onclick = () => {
+  const wide = document.body.classList.toggle("wide");
+  $("panelToggle").setAttribute("aria-pressed", wide); $("panelToggle").textContent = wide ? "Show panel" : "Hide panel";
+  setTimeout(() => network && network.redraw(), 50);
+};
+try { const h = location.hash.slice(1); if (h === "security") lens = "security"; } catch (_) {}
+
+// ---------- boot ----------
+(async () => {
+  try { await loadGraph(); if (lens === "security") setLens("security"); }
+  catch (e) { setStatus("", "No graph"); $("roLine").textContent = "GRAPH FILE COULD NOT BE LOADED"; return; }
+  if (!window.claude || !window.claude.use) { $("askForm").hidden = true; return; }
+  claude.use("sample").then(s => { sample = s; if (!s) { $("askForm").hidden = true; } });
+  db = await claude.use("db");
+  if (!db) return;
+  db.collection("activity").orderBy("at", "desc").limit(300).onSnapshot(snap => {
+    events = snap.docs.map(d => d.data()); renderActivity();
+  }, () => {});
+  db.collection("decisions").orderBy("proposedAt").onSnapshot(snap => renderDecisions(snap.docs.map(d => d.data())), () => {});
+})();
+</script>
