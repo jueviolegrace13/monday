@@ -1,0 +1,42 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      MONDAY_URL: ${{ secrets.MONDAY_URL }}
+      MONDAY_KEY: ${{ secrets.MONDAY_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Build
+        run: dotnet build --configuration Release
+
+      - name: Domain tests
+        run: dotnet run --project tests/Monday.Domain.Tests --configuration Release --no-build
+
+      - name: Index code graph
+        run: dotnet run --project src/Monday.Indexer --configuration Release --no-build -- --root . --name Monday --commit "${GITHUB_SHA::12}"
+
+      # Sends the graph to Monday when this repo is connected (secrets set). Monday only receives;
+      # it never acts back on the repo or any environment.
+      - name: Upload graph to Monday
+        if: github.ref == 'refs/heads/main' && env.MONDAY_URL != ''
+        run: dotnet run --project src/Monday.Indexer --configuration Release --no-build -- --root . --name Monday --commit "${GITHUB_SHA::12}" --upload "$MONDAY_URL"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: monday-graph
+          path: .monday/graph.json

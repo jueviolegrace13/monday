@@ -1,0 +1,8 @@
+# Render blueprint — free tier only (approved 2026-10-15). Connect this repo in Render to deploy.
+services:
+  - type: web
+    name: monday
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    autoDeploy: true

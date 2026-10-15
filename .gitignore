@@ -1,0 +1,10 @@
+bin/
+obj/
+node_modules/
+.angular/
+dist/
+*.user
+.vs/
+.idea/
+.env
+appsettings.*.local.json

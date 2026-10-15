@@ -1,0 +1,5 @@
+**/bin
+**/obj
+.git
+.monday
+node_modules

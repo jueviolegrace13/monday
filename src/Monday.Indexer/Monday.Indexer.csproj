@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>monday-index</AssemblyName>
+    <RootNamespace>Monday.Indexer</RootNamespace>
+    <!-- Roslyn: from NuGet in CI; from the installed SDK when NuGet is unreachable (UseSdkRoslyn=true). -->
+    <SdkRoslynDir>$(NetCoreRoot)sdk/$(NETCoreSdkVersion)/Roslyn/bincore/</SdkRoslynDir>
+    <UseSdkRoslyn Condition="'$(UseSdkRoslyn)' == ''">false</UseSdkRoslyn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Monday.Domain\Monday.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(UseSdkRoslyn)' == 'true'">
+    <Reference Include="Microsoft.CodeAnalysis" HintPath="$(SdkRoslynDir)Microsoft.CodeAnalysis.dll" />
+    <Reference Include="Microsoft.CodeAnalysis.CSharp" HintPath="$(SdkRoslynDir)Microsoft.CodeAnalysis.CSharp.dll" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(UseSdkRoslyn)' != 'true'">
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.0.0" />
+  </ItemGroup>
+
+</Project>
