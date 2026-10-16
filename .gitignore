@@ -8,3 +8,6 @@ dist/
 .idea/
 .env
 appsettings.*.local.json
+
+# Playwright screenshots from the design loop (regenerated, not committed)
+design/screenshots/

@@ -46,6 +46,14 @@ dotnet run --project src/Monday.Indexer -- --root .     # writes .monday/graph.j
 Offline (no NuGet), build the indexer against the SDK's own Roslyn:
 `dotnet build src/Monday.Indexer -p:UseSdkRoslyn=true`.
 
+## Design
+
+Read `design/TASTE.md` before any UI work. It is not optional.
+All values come from `design/tokens.css`. Never invent a hex, a px or a duration.
+To check a screen, use the Playwright MCP (`.mcp.json`) or `/design-loop`, on local or development
+URLs only — never production. Impeccable (`/impeccable audit`, `/impeccable polish`, …) must also stay
+inside `tokens.css` and must not change layout unless asked.
+
 ## Monday watches itself
 
 While it is being built, Monday is its own first project. After each working session, re-run the
