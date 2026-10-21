@@ -11,7 +11,7 @@ namespace Monday.Domain.Tests;
 /// <summary>The two streaming adapters, against canned provider streams served by a stub handler.</summary>
 internal static class ChatModelAdapterTests
 {
-    private sealed class StubHandler(HttpStatusCode status, string body) : HttpMessageHandler
+    internal sealed class StubHandler(HttpStatusCode status, string body) : HttpMessageHandler
     {
         public HttpRequestMessage? Request { get; private set; }
 
@@ -25,9 +25,9 @@ internal static class ChatModelAdapterTests
         }
     }
 
-    private static string Fixture(string name) => File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Fixtures", name));
+    internal static string Fixture(string name) => File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Fixtures", name));
 
-    private static ModelSettings Settings(ModelProvider provider, Uri? baseUrl = null) =>
+    internal static ModelSettings Settings(ModelProvider provider, Uri? baseUrl = null) =>
         ModelSettings.Create(provider, "test-model", baseUrl, "v1:x:y:z", "abcd", null);
 
     private static readonly JsonElement Schema = JsonDocument.Parse("""{"type":"object","properties":{"query":{"type":"string"}}}""").RootElement.Clone();
@@ -35,9 +35,9 @@ internal static class ChatModelAdapterTests
     private static ModelRequest Request(params ChatMessage[] messages) =>
         new("be brief", messages, [new ToolSpec("find_nodes", "Find nodes.", Schema)]);
 
-    private static ModelRequest Simple() => Request(new ChatMessage(ChatRole.User, "hi"));
+    internal static ModelRequest Simple() => Request(new ChatMessage(ChatRole.User, "hi"));
 
-    private static List<ModelEvent> Collect(IChatModel model, ModelRequest request)
+    internal static List<ModelEvent> Collect(IChatModel model, ModelRequest request)
     {
         var events = new List<ModelEvent>();
         var enumerator = model.StreamAsync(request, default).GetAsyncEnumerator();

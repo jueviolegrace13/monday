@@ -8,15 +8,17 @@ using Monday.Domain.Agent;
 namespace Monday.Infrastructure.Models;
 
 /// <summary>Anthropic's Messages API over plain HttpClient, streamed.</summary>
-public sealed class AnthropicChatModel(HttpClient http, ModelSettings settings, string apiKey) : IChatModel
+public sealed class AnthropicChatModel(HttpClient http, ModelSettings settings, string apiKey, TimeSpan? idleTimeout = null) : IChatModel
 {
+    internal TimeSpan IdleTimeout { get; } = idleTimeout ?? ModelHttp.DefaultIdleTimeout;
+
     private const string Endpoint = "https://api.anthropic.com/v1/messages";
     private const int MaxTokens = 4096;
 
     public IAsyncEnumerable<ModelEvent> StreamAsync(ModelRequest request, CancellationToken ct)
     {
         ArgumentNullException.ThrowIfNull(request);
-        return ModelHttp.GuardAsync(RunAsync(request, ct));
+        return ModelHttp.GuardAsync(RunAsync(request, ct), ct);
     }
 
     internal JsonObject BuildBody(ModelRequest request)
@@ -81,6 +83,11 @@ public sealed class AnthropicChatModel(HttpClient http, ModelSettings settings, 
             pendingResults = null;
             if (message.Role == ChatRole.Assistant)
             {
+                if (string.IsNullOrEmpty(message.Text) && message.ToolCalls is not { Count: > 0 })
+                {
+                    continue; // Anthropic rejects an assistant turn with no content
+                }
+
                 var content = new JsonArray();
                 if (!string.IsNullOrEmpty(message.Text))
                 {
@@ -109,8 +116,12 @@ public sealed class AnthropicChatModel(HttpClient http, ModelSettings settings, 
         return messages;
     }
 
-    private async IAsyncEnumerable<ModelEvent> RunAsync(ModelRequest request, [EnumeratorCancellation] CancellationToken ct)
+    private async IAsyncEnumerable<ModelEvent> RunAsync(ModelRequest request, [EnumeratorCancellation] CancellationToken callerCt)
     {
+        // Gives up when nothing arrives for IdleTimeout; every line read resets it. GuardAsync turns that into model.unavailable.
+        using var idle = CancellationTokenSource.CreateLinkedTokenSource(callerCt);
+        idle.CancelAfter(IdleTimeout);
+        var ct = idle.Token;
         using var message = new HttpRequestMessage(HttpMethod.Post, Endpoint) { Content = ModelHttp.Json(BuildBody(request)) };
         message.Headers.Add("x-api-key", apiKey);
         message.Headers.Add("anthropic-version", "2023-06-01");
@@ -123,7 +134,7 @@ public sealed class AnthropicChatModel(HttpClient http, ModelSettings settings, 
         var reason = StopReason.EndTurn;
         var finished = false;
 
-        await foreach (var (_, data) in SseReader.ReadAsync(stream, ct).ConfigureAwait(false))
+        await foreach (var (_, data) in SseReader.ReadAsync(stream, ct, () => idle.CancelAfter(IdleTimeout)).ConfigureAwait(false))
         {
             using var doc = JsonDocument.Parse(data);
             var root = doc.RootElement;
@@ -191,7 +202,7 @@ public sealed class AnthropicChatModel(HttpClient http, ModelSettings settings, 
 
         if (!finished)
         {
-            yield return new Finished(reason, new Usage(inputTokens, outputTokens));
+            throw new ModelException("model.unavailable", "The model provider's stream ended early.");
         }
     }
 

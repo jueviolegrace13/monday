@@ -6,7 +6,7 @@ namespace Monday.Infrastructure.Models;
 /// <summary>Reads a server-sent-events stream: one (event, data) pair per blank-line-terminated block.</summary>
 public static class SseReader
 {
-    public static async IAsyncEnumerable<(string Event, string Data)> ReadAsync(Stream stream, [EnumeratorCancellation] CancellationToken ct)
+    public static async IAsyncEnumerable<(string Event, string Data)> ReadAsync(Stream stream, [EnumeratorCancellation] CancellationToken ct, Action? onActivity = null)
     {
         ArgumentNullException.ThrowIfNull(stream);
         using var reader = new StreamReader(stream, Encoding.UTF8);
@@ -16,6 +16,7 @@ public static class SseReader
 
         while (await reader.ReadLineAsync(ct).ConfigureAwait(false) is { } line)
         {
+            onActivity?.Invoke(); // any line, even a keep-alive comment, shows the stream is alive
             if (line.Length == 0)
             {
                 if (hasData)
@@ -36,7 +37,12 @@ public static class SseReader
 
             var colon = line.IndexOf(':', StringComparison.Ordinal);
             var field = colon < 0 ? line : line[..colon];
-            var value = colon < 0 ? string.Empty : line[(colon + 1)..].TrimStart(' ');
+            var value = colon < 0 ? string.Empty : line[(colon + 1)..];
+            if (value.StartsWith(' '))
+            {
+                value = value[1..]; // the spec strips exactly one space
+            }
+
             if (field == "event")
             {
                 eventName = value;

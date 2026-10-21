@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Net;
 using System.Text;
 using System.Text.Json;
@@ -9,6 +10,9 @@ namespace Monday.Infrastructure.Models;
 /// <summary>What both adapters share: sending the request, mapping failures to <see cref="ModelException"/>, never naming the key.</summary>
 internal static class ModelHttp
 {
+    /// <summary>How long a stream may go without a line before the call is given up.</summary>
+    public static readonly TimeSpan DefaultIdleTimeout = TimeSpan.FromSeconds(30);
+
     public static async Task<HttpResponseMessage> SendAsync(HttpClient client, HttpRequestMessage request, CancellationToken ct)
     {
         HttpResponseMessage response;
@@ -42,9 +46,9 @@ internal static class ModelHttp
     }
 
     /// <summary>Yields the inner stream, turning a mid-stream network failure into a ModelException.</summary>
-    public static async IAsyncEnumerable<T> GuardAsync<T>(IAsyncEnumerable<T> inner)
+    public static async IAsyncEnumerable<T> GuardAsync<T>(IAsyncEnumerable<T> inner, [EnumeratorCancellation] CancellationToken ct)
     {
-        await using var enumerator = inner.GetAsyncEnumerator();
+        await using var enumerator = inner.GetAsyncEnumerator(ct);
         while (true)
         {
             bool more;
@@ -55,6 +59,14 @@ internal static class ModelHttp
             catch (Exception ex) when (ex is HttpRequestException or IOException)
             {
                 throw Translate(ex);
+            }
+            catch (OperationCanceledException) when (!ct.IsCancellationRequested)
+            {
+                throw new ModelException("model.unavailable", "The model provider stopped sending.");
+            }
+            catch (Exception ex) when (ex is JsonException or KeyNotFoundException or InvalidOperationException or FormatException)
+            {
+                throw new ModelException("model.unavailable", "The model provider sent a response Monday could not read.");
             }
 
             if (!more)

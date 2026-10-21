@@ -8,14 +8,16 @@ using Monday.Domain.Agent;
 namespace Monday.Infrastructure.Models;
 
 /// <summary>Any OpenAI-style chat completions endpoint over plain HttpClient, streamed.</summary>
-public sealed class OpenAiCompatibleChatModel(HttpClient http, ModelSettings settings, string apiKey) : IChatModel
+public sealed class OpenAiCompatibleChatModel(HttpClient http, ModelSettings settings, string apiKey, TimeSpan? idleTimeout = null) : IChatModel
 {
+    internal TimeSpan IdleTimeout { get; } = idleTimeout ?? ModelHttp.DefaultIdleTimeout;
+
     private const string DefaultBase = "https://api.openai.com/v1";
 
     public IAsyncEnumerable<ModelEvent> StreamAsync(ModelRequest request, CancellationToken ct)
     {
         ArgumentNullException.ThrowIfNull(request);
-        return ModelHttp.GuardAsync(RunAsync(request, ct));
+        return ModelHttp.GuardAsync(RunAsync(request, ct), ct);
     }
 
     internal JsonObject BuildBody(ModelRequest request)
@@ -92,8 +94,12 @@ public sealed class OpenAiCompatibleChatModel(HttpClient http, ModelSettings set
     private Uri EndpointUri() =>
         new((settings.BaseUrl?.AbsoluteUri ?? DefaultBase).TrimEnd('/') + "/chat/completions");
 
-    private async IAsyncEnumerable<ModelEvent> RunAsync(ModelRequest request, [EnumeratorCancellation] CancellationToken ct)
+    private async IAsyncEnumerable<ModelEvent> RunAsync(ModelRequest request, [EnumeratorCancellation] CancellationToken callerCt)
     {
+        // Gives up when nothing arrives for IdleTimeout; every line read resets it. GuardAsync turns that into model.unavailable.
+        using var idle = CancellationTokenSource.CreateLinkedTokenSource(callerCt);
+        idle.CancelAfter(IdleTimeout);
+        var ct = idle.Token;
         using var message = new HttpRequestMessage(HttpMethod.Post, EndpointUri()) { Content = ModelHttp.Json(BuildBody(request)) };
         message.Headers.TryAddWithoutValidation("Authorization", "Bearer " + apiKey);
         using var response = await ModelHttp.SendAsync(http, message, ct).ConfigureAwait(false);
@@ -103,7 +109,7 @@ public sealed class OpenAiCompatibleChatModel(HttpClient http, ModelSettings set
         string? finishReason = null;
         var usage = new Usage(0, 0);
 
-        await foreach (var (_, data) in SseReader.ReadAsync(stream, ct).ConfigureAwait(false))
+        await foreach (var (_, data) in SseReader.ReadAsync(stream, ct, () => idle.CancelAfter(IdleTimeout)).ConfigureAwait(false))
         {
             if (data == "[DONE]")
             {
@@ -112,6 +118,11 @@ public sealed class OpenAiCompatibleChatModel(HttpClient http, ModelSettings set
 
             using var doc = JsonDocument.Parse(data);
             var root = doc.RootElement;
+            if (root.TryGetProperty("error", out _))
+            {
+                throw new ModelException("model.unavailable", "The model provider reported an error mid-stream.");
+            }
+
             if (root.TryGetProperty("usage", out var u) && u.ValueKind == JsonValueKind.Object)
             {
                 usage = new Usage(Int(u, "prompt_tokens"), Int(u, "completion_tokens"));
@@ -144,7 +155,7 @@ public sealed class OpenAiCompatibleChatModel(HttpClient http, ModelSettings set
                 finishReason = finish.GetString();
                 foreach (var (id, name, args) in calls.Values)
                 {
-                    yield return new ToolCall(id, name, ModelHttp.ParseArgs(args.ToString()));
+                    yield return new ToolCall(string.IsNullOrEmpty(id) ? "call_" + Guid.NewGuid().ToString("N") : id, name, ModelHttp.ParseArgs(args.ToString()));
                 }
 
                 var hadCalls = calls.Count > 0;
@@ -154,6 +165,11 @@ public sealed class OpenAiCompatibleChatModel(HttpClient http, ModelSettings set
                     finishReason = "tool_calls";
                 }
             }
+        }
+
+        if (finishReason is null)
+        {
+            throw new ModelException("model.unavailable", "The model provider's stream ended early.");
         }
 
         yield return new Finished(MapReason(finishReason), usage);
