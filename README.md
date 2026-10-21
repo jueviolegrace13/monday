@@ -17,8 +17,8 @@ Production is read-only: Monday watches it, never changes it.
 | --- | --- | --- |
 | 0 | Solution, domain, API, CI | Done |
 | 1 | Code graph indexer + Monday Graph viewer | In progress |
-| 2 | Agent chat in the graph; bring-your-own model (Anthropic, OpenAI-compatible, Gemini); MCP at `/mcp` with personal tokens; Angular viewer (graph, chat, model settings, tokens) | Done on this branch, not released |
-| 2 | Postgres store, GitHub sign-in | In progress: Postgres stores for chat, tokens and model usage are written but not yet run against a database; GitHub sign-in needs an OAuth app |
+| 2 | Agent chat in the graph; bring-your-own model (Anthropic, OpenAI-compatible, Gemini); MCP at `/mcp` with personal tokens; Angular viewer (graph, chat, model settings, tokens) | Built on this branch, not released. Usable locally through `ng serve` (the Development dev-user header signs you in). A deployed instance needs GitHub sign-in first: outside Development nobody can sign in yet |
+| 2 | Postgres store, GitHub sign-in | In progress: the Postgres stores (chat, tokens, model settings and usage, MCP) have run against a local Postgres 16 with every migration applied, but never on Neon; GitHub sign-in needs an OAuth app |
 | 3–7 | Request path, live traffic, replay and archive, second project | Planned |
 
 Publishing Monday for other organisations is not decided.

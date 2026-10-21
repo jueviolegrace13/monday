@@ -2,4 +2,6 @@
 **/obj
 .git
 .monday
-node_modules
+**/node_modules
+**/.angular
+src/Monday.Api/wwwroot

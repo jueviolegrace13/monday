@@ -53,6 +53,7 @@ Viewer (`viewer/app`, Node >= 22.22.3):
 ```bash
 npm test -- --watch=false                               # unit tests
 npm run build                                           # builds into src/Monday.Api/wwwroot
+npm run build -- --configuration development            # same, signed in as the dev user, for a local API-served run
 npm run e2e                                             # Playwright against local ng serve, API stubbed
 ```
 
