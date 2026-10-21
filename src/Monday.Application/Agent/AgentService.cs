@@ -171,7 +171,7 @@ public sealed class AgentService(
                     var (more, error) = await NextAsync(stream).ConfigureAwait(false);
                     if (error is not null || !more)
                     {
-                        failed = error;
+                        failed = error ?? failed;
                         break;
                     }
 
@@ -186,6 +186,13 @@ public sealed class AgentService(
                             break;
                         case Finished finished:
                             used = finished.Usage;
+
+                            // For example a malformed tool call or a content filter: no provider text reaches the viewer.
+                            if (finished.Reason == StopReason.Error)
+                            {
+                                failed = Stopped;
+                            }
+
                             break;
                     }
                 }
@@ -481,6 +488,8 @@ public sealed class AgentService(
             .SkipWhile(m => m.Role != ChatRole.User)];
 
     private static AgentError Busy => new("agent.busy", "This conversation changed in another tab. Reload it and ask again.");
+
+    private static AgentError Stopped => new("model.stopped", "The model stopped before it could answer. Ask again, or put the question another way.");
 
     /// <summary>The state one chat request carries between its turns.</summary>
     private sealed class Run(Conversation conversation)

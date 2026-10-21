@@ -341,6 +341,34 @@ internal static class AgentLoopTests
         Assert.Equal(3, events.Count);
     }
 
+    public static void ModelStoppingOnAnErrorEndsTheTurnWithAPlainError()
+    {
+        var w = World.Build(new ScriptedChatModel([new Finished(StopReason.Error, new Usage(12, 0))]));
+
+        var events = w.Chat(w.Ana, "Hi");
+
+        Assert.Equal(2, events.Count);
+        Assert.True(events[0] is AgentStarted, "The turn starts with its conversation id.");
+        var error = (AgentError)events[1];
+        Assert.Equal("model.stopped", error.Code);
+        Assert.Equal("The model stopped before it could answer. Ask again, or put the question another way.", error.Message);
+        Assert.Equal(new Usage(12, 0), w.MonthUsage());
+    }
+
+    public static void ModelStoppingOnAnErrorKeepsTheTextAndRunsNoTools()
+    {
+        var w = World.Build(new ScriptedChatModel(
+            [new TextDelta("Partial"), new ToolCall("c1", "find_nodes", Json("""{"query":"items"}""")), new Finished(StopReason.Error, new Usage(5, 3))]));
+
+        var events = w.Chat(w.Ana, "Hi");
+
+        Assert.Equal("Partial", ((AgentText)events[1]).Text);
+        Assert.Equal("model.stopped", ((AgentError)events[^1]).Code);
+        Assert.Equal(3, events.Count);
+        Assert.Equal(1, w.Model.Requests.Count);
+        Assert.Equal(new Usage(5, 3), w.MonthUsage());
+    }
+
     public static void ConversationVisibleOnlyToOwner()
     {
         var w = World.Build(new ScriptedChatModel(Answer("First."), Answer("Second.")));
