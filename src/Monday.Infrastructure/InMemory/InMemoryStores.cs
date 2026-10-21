@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using Monday.Application.Abstractions;
+using Monday.Domain.Access;
 using Monday.Domain.Activity;
 using Monday.Domain.Agent;
 using Monday.Domain.Audit;
@@ -193,4 +194,82 @@ public sealed class InMemoryConversationStore : IConversationStore
 
     private static Conversation Copy(Conversation c) =>
         Conversation.Restore(c.Id, c.ProjectId, c.Owner, c.Title, c.CreatedAt, [.. c.Messages]);
+}
+
+/// <summary>Keeps a copy on save and hands out a copy on read, so revoking and last-used merge as they do in Postgres.</summary>
+public sealed class InMemoryPersonalTokenStore : IPersonalTokenStore
+{
+    private readonly Lock _gate = new();
+    private readonly Dictionary<PersonalTokenId, PersonalToken> _tokens = [];
+
+    public Task AddAsync(PersonalToken token, CancellationToken ct)
+    {
+        ArgumentNullException.ThrowIfNull(token);
+        lock (_gate)
+        {
+            _tokens[token.Id] = Copy(token);
+        }
+
+        return Task.CompletedTask;
+    }
+
+    public Task<PersonalToken?> GetAsync(PersonalTokenId id, CancellationToken ct)
+    {
+        lock (_gate)
+        {
+            return Task.FromResult(_tokens.TryGetValue(id, out var t) ? Copy(t) : null);
+        }
+    }
+
+    public Task<PersonalToken?> FindByPrefixAsync(string prefix, CancellationToken ct)
+    {
+        lock (_gate)
+        {
+            var found = _tokens.Values.FirstOrDefault(t => t.Prefix == prefix);
+            return Task.FromResult(found is null ? null : Copy(found));
+        }
+    }
+
+    public Task<IReadOnlyList<PersonalToken>> ListForUserAsync(UserId user, CancellationToken ct)
+    {
+        lock (_gate)
+        {
+            return Task.FromResult<IReadOnlyList<PersonalToken>>(
+                _tokens.Values.Where(t => t.UserId == user).OrderByDescending(t => t.CreatedAt).Select(Copy).ToList());
+        }
+    }
+
+    public Task SaveRevokedAsync(PersonalToken token, CancellationToken ct)
+    {
+        ArgumentNullException.ThrowIfNull(token);
+        lock (_gate)
+        {
+            if (_tokens.TryGetValue(token.Id, out var t))
+            {
+                _tokens[token.Id] = With(t, revokedAt: t.RevokedAt ?? token.RevokedAt, lastUsedAt: t.LastUsedAt);
+            }
+        }
+
+        return Task.CompletedTask;
+    }
+
+    public Task SaveUsedAsync(PersonalToken token, CancellationToken ct)
+    {
+        ArgumentNullException.ThrowIfNull(token);
+        lock (_gate)
+        {
+            if (_tokens.TryGetValue(token.Id, out var t))
+            {
+                var latest = token.LastUsedAt > t.LastUsedAt || t.LastUsedAt is null ? token.LastUsedAt : t.LastUsedAt;
+                _tokens[token.Id] = With(t, revokedAt: t.RevokedAt, lastUsedAt: latest);
+            }
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private static PersonalToken With(PersonalToken t, DateTimeOffset? revokedAt, DateTimeOffset? lastUsedAt) =>
+        PersonalToken.Restore(t.Id, t.UserId, t.Name, t.Prefix, t.Hash, t.Scope, t.Projects, t.CreatedAt, t.ExpiresAt, revokedAt, lastUsedAt);
+
+    private static PersonalToken Copy(PersonalToken t) => With(t, t.RevokedAt, t.LastUsedAt);
 }

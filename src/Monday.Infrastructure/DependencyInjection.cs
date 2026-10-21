@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Monday.Application.Abstractions;
+using Monday.Application.Access;
 using Monday.Application.Activity;
 using Monday.Application.Agent;
 using Monday.Application.Agent.Tools;
@@ -48,6 +49,7 @@ public static class DependencyInjection
             services.AddSingleton<ITrafficStore, InMemoryTrafficStore>();
             services.AddSingleton<IModelUsageStore, InMemoryModelUsageStore>();
             services.AddSingleton<IConversationStore, InMemoryConversationStore>();
+            services.AddSingleton<IPersonalTokenStore, InMemoryPersonalTokenStore>();
         }
         else
         {
@@ -60,6 +62,7 @@ public static class DependencyInjection
             services.AddSingleton<ITrafficStore, PostgresTrafficStore>();
             services.AddSingleton<IModelUsageStore, PostgresModelUsageStore>();
             services.AddSingleton<IConversationStore, PostgresConversationStore>();
+            services.AddSingleton<IPersonalTokenStore, PostgresPersonalTokenStore>();
         }
 
         services.AddScoped<ApiKeyAuthenticator>();
@@ -69,6 +72,7 @@ public static class DependencyInjection
         services.AddScoped<DecisionService>();
         services.AddScoped<TrafficService>();
         services.AddScoped<ModelSettingsService>();
+        services.AddScoped<PersonalTokenService>();
         return services;
     }
 

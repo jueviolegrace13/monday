@@ -132,6 +132,22 @@ public static class Schema
             PRIMARY KEY (conversation_id, seq)
         );
         """,
+        """
+        CREATE TABLE personal_tokens (
+            id uuid PRIMARY KEY,
+            user_id text NOT NULL,
+            name text NOT NULL,
+            prefix text NOT NULL UNIQUE,
+            hash text NOT NULL,
+            scope text NOT NULL,
+            project_ids uuid[],
+            created_at timestamptz NOT NULL,
+            expires_at timestamptz NOT NULL,
+            revoked_at timestamptz,
+            last_used_at timestamptz
+        );
+        CREATE INDEX personal_tokens_by_user ON personal_tokens (user_id, created_at DESC);
+        """,
     ];
 
     public static async Task MigrateAsync(NpgsqlDataSource db, CancellationToken ct)

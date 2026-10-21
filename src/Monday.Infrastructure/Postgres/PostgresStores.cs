@@ -592,3 +592,89 @@ public sealed class PostgresConversationStore(NpgsqlDataSource db) : IConversati
         conversation.MarkStored();
     }
 }
+
+/// <summary>Personal access tokens. Revoking and last-used are single-column updates, so a use racing a revoke can never undo it.</summary>
+public sealed class PostgresPersonalTokenStore(NpgsqlDataSource db) : IPersonalTokenStore
+{
+    private const string Columns = "id, user_id, name, prefix, hash, scope, project_ids, created_at, expires_at, revoked_at, last_used_at";
+
+    public async Task AddAsync(PersonalToken token, CancellationToken ct)
+    {
+        ArgumentNullException.ThrowIfNull(token);
+        await using var cmd = db.CreateCommand($"INSERT INTO personal_tokens ({Columns}) VALUES (@id, @u, @n, @pf, @h, @s, @pr, @c, @e, @r, @l)");
+        cmd.Parameters.AddWithValue("id", token.Id.Value);
+        cmd.Parameters.AddWithValue("u", token.UserId.Value);
+        cmd.Parameters.AddWithValue("n", token.Name);
+        cmd.Parameters.AddWithValue("pf", token.Prefix);
+        cmd.Parameters.AddWithValue("h", token.Hash);
+        cmd.Parameters.AddWithValue("s", token.Scope.ToWire());
+        cmd.Parameters.Add(new NpgsqlParameter("pr", NpgsqlDbType.Array | NpgsqlDbType.Uuid)
+        {
+            Value = token.Projects is null ? DBNull.Value : token.Projects.Select(p => p.Value).ToArray(),
+        });
+        cmd.Parameters.AddWithValue("c", token.CreatedAt);
+        cmd.Parameters.AddWithValue("e", token.ExpiresAt);
+        cmd.Parameters.Add(new NpgsqlParameter("r", NpgsqlDbType.TimestampTz) { Value = (object?)token.RevokedAt ?? DBNull.Value });
+        cmd.Parameters.Add(new NpgsqlParameter("l", NpgsqlDbType.TimestampTz) { Value = (object?)token.LastUsedAt ?? DBNull.Value });
+        await cmd.ExecuteNonQueryAsync(ct).ConfigureAwait(false);
+    }
+
+    public async Task<PersonalToken?> GetAsync(PersonalTokenId id, CancellationToken ct)
+    {
+        await using var cmd = db.CreateCommand($"SELECT {Columns} FROM personal_tokens WHERE id = @id");
+        cmd.Parameters.AddWithValue("id", id.Value);
+        var found = await ReadAsync(cmd, ct).ConfigureAwait(false);
+        return found.Count > 0 ? found[0] : null;
+    }
+
+    public async Task<PersonalToken?> FindByPrefixAsync(string prefix, CancellationToken ct)
+    {
+        await using var cmd = db.CreateCommand($"SELECT {Columns} FROM personal_tokens WHERE prefix = @p");
+        cmd.Parameters.AddWithValue("p", prefix);
+        var found = await ReadAsync(cmd, ct).ConfigureAwait(false);
+        return found.Count > 0 ? found[0] : null;
+    }
+
+    public async Task<IReadOnlyList<PersonalToken>> ListForUserAsync(UserId user, CancellationToken ct)
+    {
+        await using var cmd = db.CreateCommand($"SELECT {Columns} FROM personal_tokens WHERE user_id = @u ORDER BY created_at DESC");
+        cmd.Parameters.AddWithValue("u", user.Value);
+        return await ReadAsync(cmd, ct).ConfigureAwait(false);
+    }
+
+    public async Task SaveRevokedAsync(PersonalToken token, CancellationToken ct)
+    {
+        ArgumentNullException.ThrowIfNull(token);
+        await using var cmd = db.CreateCommand("UPDATE personal_tokens SET revoked_at = coalesce(revoked_at, @r) WHERE id = @id");
+        cmd.Parameters.Add(new NpgsqlParameter("r", NpgsqlDbType.TimestampTz) { Value = (object?)token.RevokedAt ?? DBNull.Value });
+        cmd.Parameters.AddWithValue("id", token.Id.Value);
+        await cmd.ExecuteNonQueryAsync(ct).ConfigureAwait(false);
+    }
+
+    public async Task SaveUsedAsync(PersonalToken token, CancellationToken ct)
+    {
+        ArgumentNullException.ThrowIfNull(token);
+        await using var cmd = db.CreateCommand("UPDATE personal_tokens SET last_used_at = greatest(last_used_at, @l) WHERE id = @id");
+        cmd.Parameters.Add(new NpgsqlParameter("l", NpgsqlDbType.TimestampTz) { Value = (object?)token.LastUsedAt ?? DBNull.Value });
+        cmd.Parameters.AddWithValue("id", token.Id.Value);
+        await cmd.ExecuteNonQueryAsync(ct).ConfigureAwait(false);
+    }
+
+    private static async Task<IReadOnlyList<PersonalToken>> ReadAsync(NpgsqlCommand cmd, CancellationToken ct)
+    {
+        var list = new List<PersonalToken>();
+        await using var reader = await cmd.ExecuteReaderAsync(ct).ConfigureAwait(false);
+        while (await reader.ReadAsync(ct).ConfigureAwait(false))
+        {
+            IReadOnlyList<ProjectId>? projects = reader.IsDBNull(6) ? null : reader.GetFieldValue<Guid[]>(6).Select(g => new ProjectId(g)).ToList();
+            list.Add(PersonalToken.Restore(
+                new PersonalTokenId(reader.GetGuid(0)), new UserId(reader.GetString(1)), reader.GetString(2), reader.GetString(3),
+                reader.GetString(4), TokenScopes.Parse(reader.GetString(5)), projects,
+                reader.GetFieldValue<DateTimeOffset>(7), reader.GetFieldValue<DateTimeOffset>(8),
+                reader.IsDBNull(9) ? null : reader.GetFieldValue<DateTimeOffset>(9),
+                reader.IsDBNull(10) ? null : reader.GetFieldValue<DateTimeOffset>(10)));
+        }
+
+        return list;
+    }
+}

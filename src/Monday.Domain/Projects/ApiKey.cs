@@ -93,9 +93,10 @@ public sealed class ApiKey
 
     internal void ExpireAt(DateTimeOffset when) => ExpiresAt = when;
 
-    private static string HashOf(string plain) =>
+    /// <summary>SHA-256 of a presented credential, hex encoded. Shared with personal access tokens so both hash alike.</summary>
+    internal static string HashOf(string plain) =>
         Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(plain)));
 
-    private static string Base64Url(byte[] bytes) =>
+    internal static string Base64Url(byte[] bytes) =>
         Convert.ToBase64String(bytes).TrimEnd('=').Replace('+', '-').Replace('/', '-');
 }
