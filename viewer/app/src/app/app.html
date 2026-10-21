@@ -10,38 +10,62 @@
         }
       </select>
     </label>
+    @if (selected(); as project) {
+      <span class="role mono">{{ project.role }}</span>
+    }
   }
 </header>
 
-<main class="stage" aria-live="polite">
-  @switch (load()) {
-    @case ('loading') {
+@switch (load()) {
+  @case ('loading') {
+    <main class="stage">
       <p class="muted">Loading projects</p>
-    }
-    @case ('failed') {
+    </main>
+  }
+  @case ('failed') {
+    <main class="stage">
       <section class="empty">
         <h1>Could not load projects</h1>
         <p class="muted">{{ error() }}</p>
         <button type="button" (click)="reload()">Try again</button>
       </section>
-    }
-    @default {
-      @if (selected(); as project) {
-        <section class="empty">
-          <h1>{{ project.name }}</h1>
-          <p class="muted">
-            <span class="mono">{{ project.environments.length }}</span>
-            {{ project.environments.length === 1 ? 'environment' : 'environments' }}, you are
-            <span class="mono">{{ project.role }}</span
-            >. The code graph and chat panel open here.
-          </p>
-        </section>
-      } @else {
+    </main>
+  }
+  @default {
+    @if (selected(); as project) {
+      <main class="workspace">
+        <h1 class="sr-only">{{ project.name }}</h1>
+        <app-graph-canvas
+          [projectId]="project.id"
+          (engineReady)="engineReady($event)"
+          (selected)="selectedNode.set($event)"
+        />
+        <app-chat-panel
+          [store]="chat"
+          [projectId]="project.id"
+          [open]="chatOpen()"
+          [canAct]="canAct()"
+          [canManageModel]="canManageModel()"
+          [selectedName]="selectedName()"
+          (toggle)="toggleChat()"
+          (showNodes)="showNodes($event)"
+        />
+        <app-node-panel
+          [projectId]="project.id"
+          [nodeId]="selectedNode()"
+          [open]="nodeOpen()"
+          (toggle)="nodeOpen.set(!nodeOpen())"
+          (focusNode)="focusNode($event)"
+          (selectNode)="selectNode($event)"
+        />
+      </main>
+    } @else {
+      <main class="stage">
         <section class="empty">
           <h1>No projects yet</h1>
           <p class="muted">Projects you are a member of appear here.</p>
         </section>
-      }
+      </main>
     }
   }
-</main>
+}

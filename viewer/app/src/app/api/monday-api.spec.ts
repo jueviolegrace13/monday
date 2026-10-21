@@ -155,6 +155,35 @@ describe('MondayApi.chat', () => {
     expect(cancelled).toBe(true);
   });
 
+  it('ends quietly when Stop comes before the response headers', async () => {
+    const abort = new AbortController();
+    const api = new MondayApi({
+      fetch: (_url, init) =>
+        new Promise<Response>((_, reject) =>
+          init!.signal!.addEventListener('abort', () =>
+            reject(new DOMException('The operation was aborted.', 'AbortError')),
+          ),
+        ),
+    });
+
+    const chat = collect(api.chat(PROJECT, { message: 'x' }, abort.signal));
+    const live = collect(api.liveTraffic(PROJECT, abort.signal));
+    abort.abort();
+
+    expect(await chat).toEqual([]);
+    expect(await live).toEqual([]);
+  });
+
+  it('still throws a network failure that was not a Stop', async () => {
+    const api = new MondayApi({
+      fetch: () => Promise.reject(new TypeError('Failed to fetch')),
+    });
+
+    await expect(
+      collect(api.chat(PROJECT, { message: 'x' }, new AbortController().signal)),
+    ).rejects.toThrow('Failed to fetch');
+  });
+
   it('passes the signal to fetch', async () => {
     const { api, calls } = apiWith(sseResponse([]));
     const abort = new AbortController();

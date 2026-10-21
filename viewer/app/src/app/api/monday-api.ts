@@ -251,11 +251,12 @@ export class MondayApi {
 
   /** Requests as they happen (server-sent events). Ends when the signal aborts or the server closes. */
   async *liveTraffic(projectId: string, signal?: AbortSignal): AsyncGenerator<TrafficView> {
-    const response = await this.send(`/projects/${projectId}/traffic/live`, {
+    const response = await this.open(`/projects/${projectId}/traffic/live`, {
       method: 'GET',
       headers: this.headers({ Accept: 'text/event-stream' }),
       signal,
     });
+    if (!response) return;
     for await (const frame of readSse(this.bodyOf(response), signal)) {
       const view = parseJson<TrafficView>(frame);
       if (frame.event === 'request' && view) yield view;
@@ -272,12 +273,13 @@ export class MondayApi {
     input: ChatInput,
     signal?: AbortSignal,
   ): AsyncGenerator<AgentEvent> {
-    const response = await this.send(`/projects/${projectId}/chat`, {
+    const response = await this.open(`/projects/${projectId}/chat`, {
       method: 'POST',
       headers: this.headers({ 'Content-Type': 'application/json', Accept: 'text/event-stream' }),
       body: JSON.stringify(input),
       signal,
     });
+    if (!response) return;
     for await (const frame of readSse(this.bodyOf(response), signal)) {
       const data = parseJson<Record<string, unknown>>(frame);
       if (data && typeof data === 'object' && AGENT_EVENTS.has(frame.event)) {
@@ -306,6 +308,16 @@ export class MondayApi {
     const response = await this.fetchFn(this.baseUrl + path, init);
     if (!response.ok) throw await ApiError.from(response);
     return response;
+  }
+
+  /** Opens a stream; null when the signal aborted first (Stop before the headers arrived). */
+  private async open(path: string, init: RequestInit): Promise<Response | null> {
+    try {
+      return await this.send(path, init);
+    } catch (error) {
+      if (init.signal?.aborted) return null;
+      throw error;
+    }
   }
 
   private bodyOf(response: Response): ReadableStream<Uint8Array> {
