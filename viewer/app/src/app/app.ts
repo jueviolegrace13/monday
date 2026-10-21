@@ -143,9 +143,13 @@ export class App implements OnInit {
     this.engine()?.select(id);
   }
 
-  /** `/` opens the chat; Esc goes Back on the graph (undoing a screen action). Never while typing. */
+  /**
+   * `/` opens the chat; Esc goes Back on the graph (undoing a screen action). Never while typing,
+   * and never while another screen (tokens) replaces the graph.
+   */
   protected shortcut(event: KeyboardEvent): void {
     if (
+      this.routed() ||
       event.defaultPrevented ||
       event.ctrlKey ||
       event.metaKey ||

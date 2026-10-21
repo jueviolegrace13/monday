@@ -76,6 +76,9 @@ export class GraphCanvasComponent implements OnDestroy {
     this.loadAbort?.abort();
     this.stopLive();
     this.engine?.destroy();
+    // The parent must not keep a destroyed engine (another screen replaced the canvas).
+    if (this.engine) this.engineReady.emit(null);
+    this.engine = null;
   }
 
   protected async open(projectId: string): Promise<void> {

@@ -10,7 +10,7 @@
 
   @if (issued(); as i) {
     <section class="card issued" aria-labelledby="issued-title">
-      <h2 id="issued-title">Copy your new token now</h2>
+      <h2 id="issued-title" tabindex="-1">Copy your new token now</h2>
       <p class="muted">This is the only time it is shown. Monday keeps only a hash of it.</p>
       <div class="secret">
         <code class="mono">{{ i.plain }}</code>
@@ -140,7 +140,7 @@
   </form>
 
   <section class="list" aria-labelledby="list-title">
-    <h2 id="list-title">Your tokens</h2>
+    <h2 id="list-title" tabindex="-1">Your tokens</h2>
     @if (revokeError(); as e) {
       <p class="error" role="alert">{{ e }}</p>
     }
@@ -189,16 +189,22 @@
                           <button
                             type="button"
                             class="danger"
+                            data-confirm
                             [disabled]="revoking()"
                             (click)="revoke(t)"
                           >
                             Yes, revoke
                           </button>
-                          <button type="button" class="ghost" (click)="confirming.set(null)">
+                          <button type="button" class="ghost" (click)="cancelRevoke(t.id)">
                             Cancel
                           </button>
                         } @else {
-                          <button type="button" class="ghost" (click)="confirming.set(t.id)">
+                          <button
+                            type="button"
+                            class="ghost"
+                            [attr.data-revoke]="t.id"
+                            (click)="askRevoke(t.id)"
+                          >
                             Revoke
                           </button>
                         }

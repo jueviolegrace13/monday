@@ -1,5 +1,15 @@
 import { DatePipe, DOCUMENT } from '@angular/common';
-import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  Injector,
+  OnDestroy,
+  OnInit,
+  afterNextRender,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MondayApi, PersonalTokenView, ProjectSummary, TokenScope } from '../api/monday-api';
 
@@ -34,6 +44,8 @@ const message = (e: unknown, fallback: string) => (e instanceof Error ? e.messag
 export class TokensComponent implements OnInit, OnDestroy {
   private readonly api = inject(MondayApi);
   private readonly origin = inject(DOCUMENT).location.origin;
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly injector = inject(Injector);
 
   protected readonly maxDays = MAX_DAYS;
 
@@ -136,6 +148,8 @@ export class TokensComponent implements OnInit, OnDestroy {
       this.tokens.update((list) => [token, ...list.filter((t) => t.id !== token.id)]);
       this.issued.set({ plain, command: this.connectCommand(plain) });
       this.name.set('');
+      // Move to the one-time card so it is announced, and so the token is the next thing read.
+      this.focusAfterRender('#issued-title');
     } catch (e) {
       this.createError.set(message(e, 'Could not create the token.'));
     } finally {
@@ -161,17 +175,30 @@ export class TokensComponent implements OnInit, OnDestroy {
     }
   }
 
+  protected askRevoke(id: string): void {
+    this.revokeError.set('');
+    this.confirming.set(id);
+    this.focusAfterRender('[data-confirm]');
+  }
+
+  protected cancelRevoke(id: string): void {
+    this.confirming.set(null);
+    this.focusBack(id);
+  }
+
   protected async revoke(token: PersonalTokenView): Promise<void> {
     this.revoking.set(true);
     this.revokeError.set('');
     try {
       await this.api.revokeToken(token.id);
-      this.confirming.set(null);
-      await this.refresh();
     } catch (e) {
       this.revokeError.set(message(e, 'Could not revoke the token.'));
     } finally {
+      // Either way, show what the server now holds (it may have been revoked elsewhere).
+      this.confirming.set(null);
+      await this.refresh();
       this.revoking.set(false);
+      this.focusBack(token.id);
     }
   }
 
@@ -187,6 +214,23 @@ export class TokensComponent implements OnInit, OnDestroy {
 
   protected state(token: PersonalTokenView): 'Active' | 'Revoked' | 'Expired' {
     return token.revokedAt ? 'Revoked' : token.active ? 'Active' : 'Expired';
+  }
+
+  /** Back to the row's Revoke button when it is still there, otherwise to the list's heading. */
+  private focusBack(id: string): void {
+    this.focusAfterRender(`[data-revoke="${id}"]`, '#list-title');
+  }
+
+  private focusAfterRender(...selectors: string[]): void {
+    afterNextRender(
+      () => {
+        for (const selector of selectors) {
+          const el = this.host.nativeElement.querySelector<HTMLElement>(selector);
+          if (el) return el.focus();
+        }
+      },
+      { injector: this.injector },
+    );
   }
 
   private connectCommand(plain: string): string {

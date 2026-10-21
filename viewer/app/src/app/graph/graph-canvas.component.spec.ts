@@ -44,10 +44,13 @@ const graph: GraphView = {
 
 @Component({
   imports: [GraphCanvasComponent],
-  template: `<app-graph-canvas [projectId]="project()" (engineReady)="engine = $event" />`,
+  template: `@if (shown()) {
+    <app-graph-canvas [projectId]="project()" (engineReady)="engine = $event" />
+  }`,
 })
 class Host {
   readonly project = signal('a');
+  readonly shown = signal(true);
   engine: GraphEngine | null = null;
 }
 
@@ -114,6 +117,17 @@ describe('GraphCanvasComponent', () => {
     expect(host.engine).toBeNull();
     expect(networks[0].destroyed).toBe(true);
     expect((fixture.nativeElement as HTMLElement).textContent).toContain('No graph yet');
+  });
+
+  it('hands back no engine once the canvas is gone (another screen replaced it)', async () => {
+    const { host, settle } = await setup({ a: graph });
+    expect(host.engine).not.toBeNull();
+
+    host.shown.set(false);
+    await settle();
+
+    expect(host.engine).toBeNull();
+    expect(networks[0].destroyed).toBe(true);
   });
 
   it('clears the previous graph when the next load fails', async () => {

@@ -109,4 +109,19 @@ describe('App', () => {
     expect(page.querySelector('app-tokens')).toBeNull();
     expect(page.querySelector('app-graph-canvas')).not.toBeNull();
   });
+
+  it('keeps / and Esc for the graph while the tokens screen is open', async () => {
+    const { page, fixture } = await render(async () => [project('a', 'Monday')]);
+    await TestBed.inject(Router).navigateByUrl('/settings/tokens');
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(key('/')).toBe(true); // not taken: the default still happens
+    expect(key('Escape')).toBe(true);
+
+    await TestBed.inject(Router).navigateByUrl('/');
+    await fixture.whenStable();
+    fixture.detectChanges();
+    expect(page.querySelector('textarea')).toBeNull();
+  });
 });

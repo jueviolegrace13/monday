@@ -260,4 +260,80 @@ describe('TokensComponent', () => {
 
     expect(page.querySelector('[role="alert"]')!.textContent).toContain('Unauthorized');
   });
+
+  it('moves focus to the one-time card after a create', async () => {
+    const { api } = fakeApi();
+    const { page, fixture } = await render(api);
+
+    type(page, 'Name', 'laptop');
+    fixture.detectChanges();
+    button(page, 'Create token')!.click();
+    await settle(fixture);
+
+    expect(document.activeElement).toBe(page.querySelector('#issued-title'));
+    expect(document.activeElement?.getAttribute('tabindex')).toBe('-1');
+  });
+
+  it('forgets the previous plain token on the next create', async () => {
+    const { api } = fakeApi();
+    let n = 0;
+    const create = api.createToken;
+    api.createToken = async (input) => ({ ...(await create(input)), plain: `${PLAIN}${++n}` });
+    const { page, fixture } = await render(api);
+
+    type(page, 'Name', 'one');
+    fixture.detectChanges();
+    button(page, 'Create token')!.click();
+    await settle(fixture);
+    expect(page.textContent).toContain(`${PLAIN}1`);
+
+    type(page, 'Name', 'two');
+    fixture.detectChanges();
+    button(page, 'Create token')!.click();
+    await settle(fixture);
+
+    expect(page.textContent).toContain(`${PLAIN}2`);
+    expect(page.textContent).not.toContain(`${PLAIN}1`);
+  });
+
+  it('focuses the confirmation, and returns focus after cancel and after revoke', async () => {
+    const { api } = fakeApi([view()]);
+    const { page, fixture } = await render(api);
+
+    button(page, 'Revoke')!.click();
+    await settle(fixture);
+    expect(document.activeElement).toBe(button(page, 'Yes, revoke'));
+
+    button(page, 'Cancel')!.click();
+    await settle(fixture);
+    expect(document.activeElement).toBe(button(page, 'Revoke'));
+
+    button(page, 'Revoke')!.click();
+    await settle(fixture);
+    button(page, 'Yes, revoke')!.click();
+    await settle(fixture);
+    // The row has no Revoke button any more: focus lands on the list's heading.
+    expect(document.activeElement).toBe(page.querySelector('#list-title'));
+  });
+
+  it('shows a failed revoke and reloads the row from the server', async () => {
+    const { api } = fakeApi([view()]);
+    const { page, fixture } = await render(api);
+    // Someone revoked it elsewhere: the server says so, and the list now has it revoked.
+    api.revokeToken = async (id: string) => {
+      api.tokens = async () => [view({ id, revokedAt: '2026-10-21T00:00:00Z', active: false })];
+      throw new ApiError(400, 'This token is already revoked.', 'token.already_revoked');
+    };
+
+    button(page, 'Revoke')!.click();
+    await settle(fixture);
+    button(page, 'Yes, revoke')!.click();
+    await settle(fixture);
+
+    expect(page.querySelector('[role="alert"]')!.textContent).toContain(
+      'This token is already revoked.',
+    );
+    expect(page.querySelector('tbody tr td:nth-child(6)')!.textContent?.trim()).toBe('Revoked');
+    expect(document.activeElement).toBe(page.querySelector('#list-title'));
+  });
 });
