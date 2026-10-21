@@ -22,6 +22,16 @@ public sealed class DecisionService(IDecisionRepository decisions, ProjectServic
         return decision;
     }
 
+    public async Task<Decision> DraftAsync(ProjectId id, DecisionProposal proposal, UserId by, CancellationToken ct)
+    {
+        ArgumentNullException.ThrowIfNull(proposal);
+        var project = await projects.LoadForMemberAsync(id, by, ct).ConfigureAwait(false);
+        project.EnsureCan(by, Permission.ChatAct);
+        var decision = Decision.Draft(id, proposal.Area, proposal.Title, proposal.Context, proposal.Options, proposal.RecommendedKey, by, clock.Now);
+        await decisions.SaveAsync(decision, ct).ConfigureAwait(false);
+        return decision;
+    }
+
     public async Task<IReadOnlyList<Decision>> ListAsync(ProjectId id, UserId user, CancellationToken ct)
     {
         var project = await projects.LoadForMemberAsync(id, user, ct).ConfigureAwait(false);

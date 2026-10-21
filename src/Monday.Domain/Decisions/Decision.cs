@@ -81,6 +81,9 @@ public sealed class Decision : AggregateRoot<DecisionId>
 
     public string? Note { get; private set; }
 
+    /// <summary>Who asked the agent to draft this decision; null when a Claude session proposed it.</summary>
+    public UserId? DraftedBy { get; private set; }
+
     public static Decision Propose(ProjectId projectId, DecisionArea area, string title, string context, IReadOnlyList<DecisionOption> options, string recommendedKey, DateTimeOffset now, DecisionId? supersedes = null)
     {
         ArgumentNullException.ThrowIfNull(options);
@@ -95,14 +98,25 @@ public sealed class Decision : AggregateRoot<DecisionId>
         return decision;
     }
 
+    /// <summary>
+    /// A member drafts a decision through the agent. Same guards as <see cref="Propose"/>; the draft waits
+    /// as Proposed and only an Owner can resolve it.
+    /// </summary>
+    public static Decision Draft(ProjectId projectId, DecisionArea area, string title, string context, IReadOnlyList<DecisionOption> options, string recommendedKey, UserId draftedBy, DateTimeOffset now)
+    {
+        var decision = Propose(projectId, area, title, context, options, recommendedKey, now);
+        decision.DraftedBy = draftedBy;
+        return decision;
+    }
+
     /// <summary>Rebuilds a stored decision (persistence only). Raises no events.</summary>
     public static Decision Restore(
         DecisionId id, ProjectId projectId, DecisionArea area, string title, string context, IReadOnlyList<DecisionOption> options,
         string recommendedKey, DecisionId? supersedes, DateTimeOffset proposedAt, DecisionStatus status, string? chosenKey,
-        UserId? resolvedBy, DateTimeOffset? resolvedAt, string? note) =>
+        UserId? resolvedBy, DateTimeOffset? resolvedAt, string? note, UserId? draftedBy = null) =>
         new(id, projectId, area, title, context, options, recommendedKey, supersedes, proposedAt)
         {
-            Status = status, ChosenKey = chosenKey, ResolvedBy = resolvedBy, ResolvedAt = resolvedAt, Note = note,
+            Status = status, ChosenKey = chosenKey, ResolvedBy = resolvedBy, ResolvedAt = resolvedAt, Note = note, DraftedBy = draftedBy,
         };
 
     public void Approve(string optionKey, Project project, UserId by, DateTimeOffset now, string? note = null)

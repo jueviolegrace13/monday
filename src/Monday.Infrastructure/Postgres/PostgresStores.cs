@@ -256,7 +256,7 @@ public sealed class PostgresActivityStore(NpgsqlDataSource db) : IActivityStore
 public sealed class PostgresDecisionRepository(NpgsqlDataSource db) : IDecisionRepository
 {
     private sealed record Row(Guid Id, Guid ProjectId, DecisionArea Area, string Title, string Context, IReadOnlyList<DecisionOption> Options, string RecommendedKey,
-        Guid? Supersedes, DateTimeOffset ProposedAt, DecisionStatus Status, string? ChosenKey, string? ResolvedBy, DateTimeOffset? ResolvedAt, string? Note);
+        Guid? Supersedes, DateTimeOffset ProposedAt, DecisionStatus Status, string? ChosenKey, string? ResolvedBy, DateTimeOffset? ResolvedAt, string? Note, string? DraftedBy = null);
 
     public async Task<Decision?> GetAsync(DecisionId id, CancellationToken ct)
     {
@@ -283,18 +283,20 @@ public sealed class PostgresDecisionRepository(NpgsqlDataSource db) : IDecisionR
     {
         ArgumentNullException.ThrowIfNull(decision);
         var row = new Row(decision.Id.Value, decision.ProjectId.Value, decision.Area, decision.Title, decision.Context, decision.Options, decision.RecommendedKey,
-            decision.Supersedes?.Value, decision.ProposedAt, decision.Status, decision.ChosenKey, decision.ResolvedBy?.Value, decision.ResolvedAt, decision.Note);
-        await using var cmd = db.CreateCommand("INSERT INTO decisions (id, project_id, proposed_at, body) VALUES (@id, @p, @at, @b::jsonb) ON CONFLICT (id) DO UPDATE SET body = excluded.body");
+            decision.Supersedes?.Value, decision.ProposedAt, decision.Status, decision.ChosenKey, decision.ResolvedBy?.Value, decision.ResolvedAt, decision.Note, decision.DraftedBy?.Value);
+        await using var cmd = db.CreateCommand("INSERT INTO decisions (id, project_id, proposed_at, body, drafted_by_user) VALUES (@id, @p, @at, @b::jsonb, @d) ON CONFLICT (id) DO UPDATE SET body = excluded.body");
         cmd.Parameters.AddWithValue("id", row.Id);
         cmd.Parameters.AddWithValue("p", row.ProjectId);
         cmd.Parameters.AddWithValue("at", row.ProposedAt);
         cmd.Parameters.AddWithValue("b", Json.Write(row));
+        cmd.Parameters.AddWithValue("d", (object?)row.DraftedBy ?? DBNull.Value);
         await cmd.ExecuteNonQueryAsync(ct).ConfigureAwait(false);
         decision.ClearDomainEvents();
     }
 
     private static Decision FromRow(Row r) => Decision.Restore(new DecisionId(r.Id), new ProjectId(r.ProjectId), r.Area, r.Title, r.Context, r.Options, r.RecommendedKey,
-        r.Supersedes is { } s ? new DecisionId(s) : null, r.ProposedAt, r.Status, r.ChosenKey, r.ResolvedBy is { } u ? new UserId(u) : null, r.ResolvedAt, r.Note);
+        r.Supersedes is { } s ? new DecisionId(s) : null, r.ProposedAt, r.Status, r.ChosenKey, r.ResolvedBy is { } u ? new UserId(u) : null, r.ResolvedAt, r.Note,
+        r.DraftedBy is { } d ? new UserId(d) : null);
 }
 
 public sealed class PostgresAuditLog(NpgsqlDataSource db) : IAuditLog

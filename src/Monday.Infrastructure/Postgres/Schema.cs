@@ -90,6 +90,9 @@ public static class Schema
         CREATE INDEX traffic_by_time ON traffic (project_id, at);
         CREATE INDEX traffic_by_user ON traffic (project_id, user_hash, at) WHERE user_hash IS NOT NULL;
         """,
+        """
+        ALTER TABLE decisions ADD COLUMN drafted_by_user text NULL;
+        """,
     ];
 
     public static async Task MigrateAsync(NpgsqlDataSource db, CancellationToken ct)
