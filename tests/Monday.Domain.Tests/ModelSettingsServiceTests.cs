@@ -10,6 +10,7 @@ using Monday.Domain.Common;
 using Monday.Domain.Projects;
 using Monday.Domain.Tests.Fakes;
 using Monday.Infrastructure.InMemory;
+using Monday.Infrastructure.Models;
 using Monday.Infrastructure.Secrets;
 
 namespace Monday.Domain.Tests;
@@ -80,7 +81,7 @@ internal static class ModelSettingsServiceTests
         public AesGcmSecretBox Box { get; private init; } = null!;
         public ModelSettingsService Service { get; private set; } = null!;
 
-        public static World Build(bool secrets = true, bool refuse = false, IChatModel? model = null)
+        public static World Build(bool secrets = true, bool refuse = false, IChatModel? model = null, IChatModelFactory? factory = null)
         {
             var key = secrets ? Convert.ToBase64String(RandomNumberGenerator.GetBytes(32)) : null;
             var box = new AesGcmSecretBox(new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?> { ["MONDAY_SECRETS_KEY"] = key }).Build());
@@ -89,7 +90,7 @@ internal static class ModelSettingsServiceTests
             var projects = new ProjectService(w.Projects, w.Audit, clock);
             w.Project = new ProjectId(projects.CreateAsync("Shop", w.Owner, default).GetAwaiter().GetResult().Id);
             projects.SetMemberAsync(w.Project, w.Ana, Role.Debugger, w.Owner, default).GetAwaiter().GetResult();
-            w.Service = new ModelSettingsService(w.Projects, w.Audit, clock, box, w.Guard, w.Usage, new FakeFactory(model ?? new ScriptedChatModel()));
+            w.Service = new ModelSettingsService(w.Projects, w.Audit, clock, box, w.Guard, w.Usage, factory ?? new FakeFactory(model ?? new ScriptedChatModel()));
             return w;
         }
 
@@ -264,5 +265,26 @@ internal static class ModelSettingsServiceTests
         Assert.Throws<DomainException>(() => Test(w, w.Ana), "access.denied");
         Assert.Throws<NotFoundException>(() => Test(w, new UserId("github:stranger")));
         Assert.Equal("model.keys_disabled", Test(World.Build(secrets: false)).Code);
+    }
+
+    private sealed class StubClients(HttpMessageHandler handler) : IHttpClientFactory
+    {
+        public HttpClient CreateClient(string name) => new(handler, disposeHandler: false);
+    }
+
+    public static void GeminiSavesAndPassesTheConnectionTest()
+    {
+        const string ping = "data: {\"candidates\":[{\"content\":{\"parts\":[{\"functionCall\":{\"name\":\"ping\",\"args\":{}}}],\"role\":\"model\"},\"finishReason\":\"STOP\"}],\"usageMetadata\":{\"promptTokenCount\":20,\"candidatesTokenCount\":5}}\n\n";
+        var handler = new ChatModelAdapterTests.StubHandler(System.Net.HttpStatusCode.OK, ping);
+        var w = World.Build(factory: new ChatModelFactory(new StubClients(handler)));
+        w.Save(new ModelSettingsInput(ModelProvider.Gemini, "gemini-2.5-flash", null, "AIzaSy-PLAINSECRET-gemini", null));
+
+        var result = Test(w);
+
+        Assert.True(result.Ok && result.Code is null, "Gemini passes the connection test.");
+        Assert.Equal(ModelProvider.Gemini, w.Load().Model!.Provider);
+        Assert.Equal("AIzaSy-PLAINSECRET-gemini", handler.Request!.Headers.GetValues("x-goog-api-key").Single());
+        Assert.True(!handler.Request.RequestUri!.ToString().Contains("PLAINSECRET", StringComparison.Ordinal), "The key never goes in the URL.");
+        Assert.True(w.Guard.Checked.Count == 0, "Gemini's fixed host needs no saved base URL check.");
     }
 }

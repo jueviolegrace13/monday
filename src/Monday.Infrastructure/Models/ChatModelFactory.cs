@@ -15,6 +15,7 @@ public sealed class ChatModelFactory(IHttpClientFactory clients) : IChatModelFac
         {
             ModelProvider.Anthropic => new AnthropicChatModel(clients.CreateClient(ClientName), settings, apiKey),
             ModelProvider.OpenAiCompatible => new OpenAiCompatibleChatModel(clients.CreateClient(ClientName), settings, apiKey),
+            ModelProvider.Gemini => new GeminiChatModel(clients.CreateClient(ClientName), settings, apiKey),
             _ => throw new ModelException("model.unsupported", "This model provider is not supported yet."),
         };
     }

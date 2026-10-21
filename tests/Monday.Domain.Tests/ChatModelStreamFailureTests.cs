@@ -100,6 +100,13 @@ internal static class ChatModelStreamFailureTests
         Assert.Equal("model.unavailable", ex.Code);
     }
 
+    public static void HungGeminiStreamTimesOutAsUnavailable()
+    {
+        var model = new GeminiChatModel(new HttpClient(Serving("data: {\"candidates\":[{\"content\":{\"parts\":[{\"text\":\"hi\"}]}}]}\n\n", ct => Task.Delay(Timeout.Infinite, ct))),
+            ModelSettings.Create(ModelProvider.Gemini, "gemini-2.5-flash", null, "v1:x:y:z", "abcd", null), "AIza-gemini-secret-key", Idle);
+        Assert.Equal("model.unavailable", Fails(model).Code);
+    }
+
     public static void AnthropicStreamWithoutMessageStopIsUnavailable()
     {
         var ex = Fails(Anthropic(Serving(AnthropicHead)));
