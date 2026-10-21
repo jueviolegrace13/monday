@@ -37,8 +37,8 @@ const MANAGERS: readonly string[] = ['Owner', 'Admin'];
 const message = (e: unknown, fallback: string) => (e instanceof Error ? e.message : fallback);
 
 /** Two base URLs are the same when they parse to the same address (the server compares Uris). */
-const sameUrl = (a: string | null, b: string | null): boolean => {
-  if (a === null || b === null) return a === b;
+const sameUrl = (a: string | null | undefined, b: string | null | undefined): boolean => {
+  if (a == null || b == null) return a == b;
   try {
     return new URL(a).href === new URL(b).href;
   } catch {
@@ -151,7 +151,8 @@ export class ModelComponent {
   });
   protected readonly percent = computed(() => {
     const cap = this.usage()?.monthlyTokenCap;
-    return cap ? Math.min(100, Math.round((this.total() / cap) * 100)) : null;
+    // Floored, so 100% only shows once the cap is really reached.
+    return cap ? Math.min(100, Math.floor((this.total() / cap) * 100)) : null;
   });
 
   /** Bumped on every load, so an answer for a project no longer on screen is dropped. */
@@ -186,7 +187,8 @@ export class ModelComponent {
       ]);
       if (run !== this.run) return;
       this.show(settings);
-      this.usage.set(usage);
+      // With settings off there is no chat, so no usage to show.
+      this.usage.set(settings.enabled ? usage : null);
       this.load.set('ready');
     } catch (e) {
       if (run !== this.run) return;
@@ -197,12 +199,18 @@ export class ModelComponent {
 
   protected typed(field: Field, event: Event): void {
     this[field].set((event.target as HTMLInputElement).value);
-    this.savedNote.set('');
+    this.edited();
   }
 
   protected chooseProvider(event: Event): void {
     this.provider.set((event.target as HTMLSelectElement).value as ModelProvider);
+    this.edited();
+  }
+
+  /** A test result or "Saved" was about the settings before this edit. */
+  private edited(): void {
     this.savedNote.set('');
+    this.testResult.set(null);
   }
 
   protected async save(event: Event): Promise<void> {
@@ -225,8 +233,11 @@ export class ModelComponent {
       this.testResult.set(null);
       this.savedNote.set('Saved');
       void this.refreshUsage(id);
+      // Save was disabled while saving, which drops focus; give it back.
+      this.focusAfterRender('#model-save');
     } catch (e) {
       this.saveError.set(message(e, 'Could not save the model settings.'));
+      this.focusAfterRender('#model-save-error');
     } finally {
       this.saving.set(false);
     }
@@ -296,7 +307,7 @@ export class ModelComponent {
     this.modelName.set(view.model ?? '');
     this.baseUrl.set(view.baseUrl ?? '');
     this.key.set('');
-    this.cap.set(view.monthlyTokenCap === null ? '' : String(view.monthlyTokenCap));
+    this.cap.set(view.monthlyTokenCap == null ? '' : String(view.monthlyTokenCap));
   }
 
   private async refreshUsage(id: string): Promise<void> {

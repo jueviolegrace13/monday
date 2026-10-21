@@ -8,7 +8,9 @@ import {
   untracked,
   viewChild,
 } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { filter, map } from 'rxjs';
 import { MondayApi, ProjectSummary } from './api/monday-api';
 import { ChatPanelComponent } from './chat/chat-panel.component';
 import { ChatStore } from './chat/chat-store';
@@ -87,6 +89,15 @@ export class App implements OnInit {
 
   private readonly chatPanel = viewChild(ChatPanelComponent);
 
+  /** `?project=` of the current screen (a model settings link), or null. */
+  private readonly routeProject = toSignal(
+    this.router.events.pipe(
+      filter((e) => e instanceof NavigationEnd),
+      map(() => this.projectInUrl()),
+    ),
+    { initialValue: this.projectInUrl() },
+  );
+
   constructor() {
     // Another project is another conversation and another graph.
     effect(() => {
@@ -97,6 +108,12 @@ export class App implements OnInit {
         this.screen.engine = null;
         this.engine.set(null);
       });
+    });
+
+    // A link that names a project (/settings/model?project=…) picks it in the bar too.
+    effect(() => {
+      const wanted = this.routeProject();
+      if (wanted && this.projects().some((p) => p.id === wanted)) this.selectedId.set(wanted);
     });
   }
 
@@ -125,6 +142,10 @@ export class App implements OnInit {
   protected screenOpened(): void {
     this.routed.set(true);
     this.selectedNode.set(null);
+  }
+
+  private projectInUrl(): string | null {
+    return this.router.parseUrl(this.router.url).queryParamMap.get('project');
   }
 
   protected select(event: Event): void {

@@ -23,8 +23,6 @@ test('newTokenShownOnceThenGone', async ({ page }) => {
         projects: [PROJECT],
         createdAt: '2026-10-21T12:00:00Z',
         expiresAt: '2027-01-19T12:00:00Z',
-        revokedAt: null,
-        lastUsedAt: null,
         active: true,
       };
       tokens.unshift(token);

@@ -54,7 +54,11 @@ const usage = (over: Partial<ModelUsageView> = {}): ModelUsageView => ({
   ...over,
 });
 
-/** An in-memory /projects/{id}/model that mirrors the server's key rule. */
+/** What the server sends: it leaves null fields out of its JSON (WhenWritingNull). */
+const wire = <T>(value: T): T =>
+  JSON.parse(JSON.stringify(value, (_k, v: unknown) => (v === null ? undefined : v))) as T;
+
+/** An in-memory /projects/{id}/model that mirrors the server's key rule and its JSON. */
 function fakeApi(initial: ModelSettingsView = saved(), used: ModelUsageView = usage()) {
   let settings = { ...initial };
   const calls = {
@@ -70,9 +74,9 @@ function fakeApi(initial: ModelSettingsView = saved(), used: ModelUsageView = us
       calls.settingsFor.push(id);
       if (projects.find((p) => p.id === id)?.role === 'Debugger')
         throw new ApiError(403, 'Not allowed', 'access.denied');
-      return { ...settings };
+      return wire(settings);
     },
-    modelUsage: async () => ({ ...used, monthlyTokenCap: settings.monthlyTokenCap }),
+    modelUsage: async () => wire({ ...used, monthlyTokenCap: settings.monthlyTokenCap }),
     saveModelSettings: async (_id: string, input: ModelSettingsInput) => {
       calls.saved.push(input);
       if (!input.apiKey && settings.configured && input.provider !== settings.provider)
@@ -84,7 +88,7 @@ function fakeApi(initial: ModelSettingsView = saved(), used: ModelUsageView = us
         keyLast4: input.apiKey ? input.apiKey.slice(-4) : settings.keyLast4,
         monthlyTokenCap: input.monthlyTokenCap,
       });
-      return { ...settings };
+      return wire(settings);
     },
     clearModelSettings: async () => {
       calls.cleared++;
@@ -92,7 +96,7 @@ function fakeApi(initial: ModelSettingsView = saved(), used: ModelUsageView = us
     },
     testModel: async () => {
       calls.tested++;
-      return test;
+      return wire(test);
     },
   };
   return { api, calls, setTest: (r: ModelTestResult) => (test = r) };
@@ -243,6 +247,41 @@ describe('ModelComponent', () => {
     type(page, 'API key', 'sk-ant-first-key-1234');
     await settle();
     expect(button(page, 'Save')!.disabled).toBe(false);
+    expect(field(page, 'Monthly token cap')!.value).toBe('');
+  });
+
+  it('saves a first model when the server left the empty fields out', async () => {
+    const { api, calls } = fakeApi(none, usage({ monthlyTokenCap: null }));
+    const { page, settle } = await render(api);
+
+    type(page, 'Model', 'claude-sonnet-4-5');
+    type(page, 'API key', 'sk-ant-first-key-1234');
+    await settle();
+    button(page, 'Save')!.click();
+    await settle();
+
+    expect(calls.saved).toEqual([
+      {
+        provider: 'Anthropic',
+        model: 'claude-sonnet-4-5',
+        baseUrl: null,
+        apiKey: 'sk-ant-first-key-1234',
+        monthlyTokenCap: null,
+      },
+    ]);
+    expect(page.querySelector('.usage')!.textContent).toContain('No monthly cap');
+  });
+
+  it('clears an old test result once the form changes', async () => {
+    const { api } = fakeApi();
+    const { page, settle } = await render(api);
+    button(page, 'Test connection')!.click();
+    await settle();
+    expect(page.querySelector('.test')).not.toBeNull();
+
+    type(page, 'Model', 'claude-opus-4-1');
+    await settle();
+    expect(page.querySelector('.test')).toBeNull();
   });
 
   it('testResultShown', async () => {
@@ -275,9 +314,10 @@ describe('ModelComponent', () => {
     const { page, settle } = await render(api);
     button(page, 'Save')!.click();
     await settle();
-    expect(page.querySelector('[role="alert"]')!.textContent).toContain(
-      'The base URL must use HTTPS.',
-    );
+    const alert = page.querySelector<HTMLElement>('[role="alert"]')!;
+    expect(alert.textContent).toContain('The base URL must use HTTPS.');
+    // Focus goes to the error, not to the page body (Save was disabled while saving).
+    expect(document.activeElement).toBe(alert);
   });
 
   it('clears the settings only after a confirmation', async () => {
@@ -311,6 +351,17 @@ describe('ModelComponent', () => {
     expect(meter.textContent).toContain('25%');
   });
 
+  it('never shows 100% before the cap is reached', async () => {
+    const { api } = fakeApi(
+      saved({ monthlyTokenCap: 1_000_000 }),
+      usage({ inputTokens: 999_000, outputTokens: 999, capReached: false }),
+    );
+    const { page } = await render(api);
+    const meter = page.querySelector('.usage')!;
+    expect(meter.textContent).toContain('(99%)');
+    expect(meter.textContent).not.toContain('Cap reached');
+  });
+
   it('says when the cap is reached, and when there is none', async () => {
     const reached = fakeApi(saved({ monthlyTokenCap: 200_000 }), usage({ capReached: true }));
     let { page } = await render(reached.api);
@@ -337,5 +388,6 @@ describe('ModelComponent', () => {
 
     expect(page.textContent).toContain('MONDAY_SECRETS_KEY');
     expect(page.querySelector('form')).toBeNull();
+    expect(page.querySelector('.usage')).toBeNull();
   });
 });

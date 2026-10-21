@@ -5,6 +5,10 @@ import { PROJECT, stubApi } from './stubs';
 // and changing the provider asks for it again.
 const KEY = 'sk-ant-api-key-ABCD';
 
+/** The API leaves null fields out of its JSON (WhenWritingNull); the stubs do the same. */
+const wire = (value: object): object =>
+  JSON.parse(JSON.stringify(value, (_k, v: unknown) => (v === null ? undefined : v)));
+
 test('modelSettingsKeepTheKeyWriteOnly', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
@@ -50,9 +54,9 @@ test('modelSettingsKeepTheKeyWriteOnly', async ({ page }) => {
         baseUrl: body['baseUrl'] as string,
         keyLast4: body['apiKey'] ? (body['apiKey'] as string).slice(-4) : settings.keyLast4,
       };
-      return route.fulfill({ json: settings });
+      return route.fulfill({ json: wire(settings) });
     }
-    return route.fulfill({ json: settings });
+    return route.fulfill({ json: wire(settings) });
   });
 
   await page.goto('/');
@@ -96,5 +100,54 @@ test('modelSettingsKeepTheKeyWriteOnly', async ({ page }) => {
   // Back to the graph without a reload.
   await page.getByRole('link', { name: 'Back to the graph' }).click();
   await expect(page.locator('.graph canvas')).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test('firstModelSavesWhenTheServerLeavesNullsOut', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  await stubApi(page);
+
+  const puts: unknown[] = [];
+  await page.route(`**/projects/${PROJECT}/model/**`, async (route) => {
+    const request = route.request();
+    if (new URL(request.url()).pathname.endsWith('/usage'))
+      return route.fulfill({
+        json: { month: '2026-10', inputTokens: 0, outputTokens: 0, capReached: false },
+      });
+    if (request.method() === 'PUT') {
+      puts.push(request.postDataJSON());
+      return route.fulfill({
+        json: {
+          enabled: true,
+          configured: true,
+          provider: 'Anthropic',
+          model: 'claude-sonnet-4-5',
+          keyLast4: 'ABCD',
+          updatedAt: '2026-10-21T12:00:00Z',
+        },
+      });
+    }
+    // Nothing set yet: the server sends only these two fields.
+    return route.fulfill({ json: { enabled: true, configured: false } });
+  });
+
+  await page.goto(`/settings/model?project=${PROJECT}`);
+  await expect(page.getByLabel('Monthly token cap')).toHaveValue('');
+  await expect(page.locator('.usage')).toContainText('No monthly cap');
+  await page.getByLabel('Model', { exact: true }).fill('claude-sonnet-4-5');
+  await page.getByLabel('API key').fill(KEY);
+  await page.getByRole('button', { name: 'Save' }).click();
+
+  await expect(page.getByLabel('API key')).toHaveAttribute('placeholder', '••••ABCD');
+  expect(puts).toEqual([
+    {
+      provider: 'Anthropic',
+      model: 'claude-sonnet-4-5',
+      baseUrl: null,
+      apiKey: KEY,
+      monthlyTokenCap: null,
+    },
+  ]);
   expect(errors).toEqual([]);
 });

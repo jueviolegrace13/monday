@@ -241,6 +241,36 @@ const AGENT_EVENTS: ReadonlySet<string> = new Set([
   'error',
 ]);
 
+// ---- Fields the server leaves out ---------------------------------------------------------
+
+/**
+ * The API writes no null fields (WhenWritingNull), so an unset value arrives missing, not null.
+ * These fill them back in, so the viewer's `null` checks and the types above tell the truth.
+ */
+function withNulls<T extends object>(value: T, keys: readonly (keyof T)[]): T {
+  const out = { ...value };
+  for (const k of keys) out[k] ??= null as T[keyof T];
+  return out;
+}
+
+const MODEL_SETTINGS_NULLS = [
+  'provider',
+  'model',
+  'baseUrl',
+  'keyLast4',
+  'monthlyTokenCap',
+  'updatedBy',
+  'updatedAt',
+] as const satisfies readonly (keyof ModelSettingsView)[];
+const TOKEN_NULLS = [
+  'projects',
+  'revokedAt',
+  'lastUsedAt',
+] as const satisfies readonly (keyof PersonalTokenView)[];
+
+const modelSettingsView = (v: ModelSettingsView) => withNulls(v, MODEL_SETTINGS_NULLS);
+const tokenView = (v: PersonalTokenView) => withNulls(v, TOKEN_NULLS);
+
 // ---- Client --------------------------------------------------------------------------------
 
 /** A response that was not 2xx. `code` is the API's stable problem code when it sent one. */
@@ -327,8 +357,8 @@ export class MondayApi {
   }
 
   /** The signed-in person's own personal access tokens, newest first. */
-  tokens(signal?: AbortSignal): Promise<PersonalTokenView[]> {
-    return this.get('/me/tokens/', signal);
+  async tokens(signal?: AbortSignal): Promise<PersonalTokenView[]> {
+    return (await this.get<PersonalTokenView[]>('/me/tokens/', signal)).map(tokenView);
   }
 
   /** Creates a token. The plain token comes back here once and is never sent again. */
@@ -339,7 +369,8 @@ export class MondayApi {
       body: JSON.stringify(input),
       signal,
     });
-    return (await response.json()) as IssuedToken;
+    const issued = (await response.json()) as IssuedToken;
+    return { ...issued, token: tokenView(issued.token) };
   }
 
   async revokeToken(id: string, signal?: AbortSignal): Promise<void> {
@@ -351,8 +382,8 @@ export class MondayApi {
   }
 
   /** Owners and Admins only; the key never comes back, only its last 4. */
-  modelSettings(projectId: string, signal?: AbortSignal): Promise<ModelSettingsView> {
-    return this.get(`/projects/${projectId}/model/`, signal);
+  async modelSettings(projectId: string, signal?: AbortSignal): Promise<ModelSettingsView> {
+    return modelSettingsView(await this.get(`/projects/${projectId}/model/`, signal));
   }
 
   /** Saves the model; the answer is the settings as now stored. The key goes in here and nowhere else. */
@@ -367,7 +398,7 @@ export class MondayApi {
       body: JSON.stringify(input),
       signal,
     });
-    return (await response.json()) as ModelSettingsView;
+    return modelSettingsView((await response.json()) as ModelSettingsView);
   }
 
   async clearModelSettings(projectId: string, signal?: AbortSignal): Promise<void> {
@@ -385,11 +416,12 @@ export class MondayApi {
       headers: this.headers({ Accept: 'application/json' }),
       signal,
     });
-    return (await response.json()) as ModelTestResult;
+    return withNulls((await response.json()) as ModelTestResult, ['code', 'message']);
   }
 
-  modelUsage(projectId: string, signal?: AbortSignal): Promise<ModelUsageView> {
-    return this.get(`/projects/${projectId}/model/usage`, signal);
+  async modelUsage(projectId: string, signal?: AbortSignal): Promise<ModelUsageView> {
+    const usage = await this.get<ModelUsageView>(`/projects/${projectId}/model/usage`, signal);
+    return withNulls(usage, ['monthlyTokenCap']);
   }
 
   /** Requests as they happen (server-sent events). Ends when the signal aborts or the server closes. */

@@ -261,9 +261,9 @@ describe('MondayApi personal tokens', () => {
           : json([token]),
     );
 
-    expect(await api.tokens()).toEqual([token]);
+    expect(await api.tokens()).toMatchObject([token]);
     const input = { name: 'laptop', scope: 'read' as const, projects: null, lifetimeDays: 90 };
-    expect(await api.createToken(input)).toEqual({ token, plain: 'mpat_abc_secret' });
+    expect(await api.createToken(input)).toMatchObject({ token, plain: 'mpat_abc_secret' });
     await api.revokeToken('t1');
 
     expect(calls.map((c) => `${c.init.method} ${c.url}`)).toEqual([
@@ -307,8 +307,8 @@ describe('MondayApi model settings', () => {
       monthlyTokenCap: null,
     };
 
-    expect(await api.modelSettings(PROJECT)).toEqual(view);
-    expect(await api.saveModelSettings(PROJECT, input)).toEqual(view);
+    expect(await api.modelSettings(PROJECT)).toMatchObject(view);
+    expect(await api.saveModelSettings(PROJECT, input)).toMatchObject(view);
     expect((await api.testModel(PROJECT)).ok).toBe(true);
     expect((await api.modelUsage(PROJECT)).month).toBe('2026-10');
     await api.clearModelSettings(PROJECT);
@@ -321,5 +321,56 @@ describe('MondayApi model settings', () => {
       `DELETE /projects/${PROJECT}/model/`,
     ]);
     expect(JSON.parse(String(calls[1].init.body))).toEqual(input);
+  });
+});
+
+describe('MondayApi fields the server leaves out', () => {
+  // The API writes no null fields (WhenWritingNull); the client hands the viewer nulls instead.
+  const apiAnswering = (body: unknown) => new MondayApi({ fetch: async () => json(body) });
+
+  it('fills an unconfigured model with nulls', async () => {
+    const view = await apiAnswering({ enabled: true, configured: false }).modelSettings(PROJECT);
+    expect(view).toEqual({
+      enabled: true,
+      configured: false,
+      provider: null,
+      model: null,
+      baseUrl: null,
+      keyLast4: null,
+      monthlyTokenCap: null,
+      updatedBy: null,
+      updatedAt: null,
+    });
+  });
+
+  it('fills usage without a cap, and a passing test, with nulls', async () => {
+    const usage = { month: '2026-10', inputTokens: 1, outputTokens: 2, capReached: false };
+    expect((await apiAnswering(usage).modelUsage(PROJECT)).monthlyTokenCap).toBeNull();
+    expect(await apiAnswering({ ok: true }).testModel(PROJECT)).toEqual({
+      ok: true,
+      code: null,
+      message: null,
+    });
+  });
+
+  it('fills a token without limits, revocation or use with nulls', async () => {
+    const token = {
+      id: 't1',
+      name: 'laptop',
+      prefix: 'mpat_abc',
+      scope: 'read',
+      createdAt: '2026-10-01T00:00:00Z',
+      expiresAt: '2026-12-30T00:00:00Z',
+      active: true,
+    };
+    const [listed] = await apiAnswering([token]).tokens();
+    expect(listed).toMatchObject({ projects: null, revokedAt: null, lastUsedAt: null });
+    const issued = await apiAnswering({ token, plain: 'mpat_abc_secret' }).createToken({
+      name: 'laptop',
+      scope: 'read',
+      projects: null,
+      lifetimeDays: null,
+    });
+    expect(issued.token).toMatchObject({ projects: null, revokedAt: null, lastUsedAt: null });
   });
 });

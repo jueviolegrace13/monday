@@ -144,10 +144,12 @@
           </div>
 
           @if (saveError(); as e) {
-            <p class="error" role="alert">{{ e }}</p>
+            <p id="model-save-error" class="error" role="alert" tabindex="-1">{{ e }}</p>
           }
           <div class="row">
-            <button type="submit" class="primary" [disabled]="!canSave()">Save</button>
+            <button id="model-save" type="submit" class="primary" [disabled]="!canSave()">
+              Save
+            </button>
             <span class="note mono" aria-live="polite">{{ savedNote() }}</span>
           </div>
           @if (saved()?.updatedAt; as at) {
@@ -225,7 +227,7 @@
               <dd class="mono">{{ u.outputTokens | number }}</dd>
             </div>
           </dl>
-          @if (u.monthlyTokenCap !== null) {
+          @if (u.monthlyTokenCap != null) {
             <div class="meter" [class.full]="u.capReached" aria-hidden="true">
               <div class="fill" [style.width.%]="percent()"></div>
             </div>

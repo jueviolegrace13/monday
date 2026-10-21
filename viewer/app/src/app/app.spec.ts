@@ -171,4 +171,16 @@ describe('App', () => {
 
     expect(router.url).toBe('/settings/model?project=b');
   });
+
+  it('picks the project named in a model settings link', async () => {
+    const { page, fixture } = await render(async () => [
+      project('a', 'Monday'),
+      project('b', 'Garage'),
+    ]);
+    await TestBed.inject(Router).navigateByUrl('/settings/model?project=b');
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(page.querySelector('select')!.value).toBe('b');
+  });
 });
