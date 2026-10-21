@@ -14,7 +14,7 @@ public static class ModelEndpoints
         model.MapGet("/", GetSettings);
         model.MapPut("/", SaveSettings);
         model.MapDelete("/", ClearSettings);
-        model.MapPost("/test", TestConnection);
+        model.MapPost("/test", TestConnection).RequireRateLimiting(ChatEndpoints.RateLimitPolicy); // spends a call on the key
         model.MapGet("/usage", GetUsage);
         return app;
     }

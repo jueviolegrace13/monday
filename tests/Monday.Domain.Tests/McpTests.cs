@@ -3,6 +3,8 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -292,5 +294,19 @@ internal static class McpTests
         Assert.Equal(HttpStatusCode.Unauthorized, RawStatus(host, r => r.Headers.Add(UserAuthentication.DevHeader, Ana.Value)));
         Assert.Equal(HttpStatusCode.Unauthorized, RawStatus(host, _ => { }));
         Assert.Equal(HttpStatusCode.Unauthorized, RawStatus(host, r => r.Headers.Authorization = new("Bearer", "mpat_nope_nope")));
+    }
+
+    public static void ModelTestUsesThePerUserChatRateLimit()
+    {
+        // Each test call spends a request on the project's model key, so it shares chat's per-person bucket.
+        var builder = WebApplication.CreateBuilder();
+        builder.Configuration["ConnectionStrings:Monday"] = string.Empty;
+        builder.Services.AddMonday(builder.Configuration);
+        var app = builder.Build();
+        app.MapModel();
+        var endpoints = ((IEndpointRouteBuilder)app).DataSources.SelectMany(d => d.Endpoints).OfType<RouteEndpoint>().ToList();
+
+        var test = endpoints.Single(e => e.RoutePattern.RawText!.EndsWith("/test", StringComparison.Ordinal));
+        Assert.Equal(ChatEndpoints.RateLimitPolicy, test.Metadata.GetMetadata<EnableRateLimitingAttribute>()?.PolicyName);
     }
 }

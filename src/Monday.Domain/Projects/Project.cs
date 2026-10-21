@@ -258,8 +258,9 @@ public sealed class Project : AggregateRoot<ProjectId>
         Guard.That(Model is null || !Model.MovesKeyElsewhere(settings), "model.key_required",
             "Enter the API key again to change the provider or base URL.");
         var keyReplaced = !string.Equals(Model?.KeyCipher, settings.KeyCipher, StringComparison.Ordinal);
+        var oldCap = Model?.MonthlyTokenCap;
         (Model, ModelUpdatedBy, ModelUpdatedAt) = (settings, by, now);
-        Raise(new ModelSettingsChanged(Id, settings.Provider, settings.Model, keyReplaced, by, now));
+        Raise(new ModelSettingsChanged(Id, settings.Provider, settings.Model, settings.BaseUrl?.Host, oldCap, settings.MonthlyTokenCap, keyReplaced, by, now));
     }
 
     /// <summary>Removes the model and its key; chat is off until one is set again. Audited.</summary>

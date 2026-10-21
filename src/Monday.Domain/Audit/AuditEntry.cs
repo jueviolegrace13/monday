@@ -18,10 +18,18 @@ public sealed record AuditEntry(ProjectId ProjectId, UserId Actor, string Action
         EnvironmentKindChanged e => new(e.ProjectId, e.By, "environment.kind_changed", $"{e.EnvironmentId}: {e.From} -> {e.To}", e.OccurredAt),
         ProjectCreated e => new(e.ProjectId, e.Owner, "project.created", e.Name, e.OccurredAt),
         UserHashKeyRevealed e => new(e.ProjectId, e.By, "user_hash_key.revealed", "shown to the Owner for app configuration", e.OccurredAt),
-        ModelSettingsChanged e => new(e.ProjectId, e.By, "model.settings_changed", $"{e.Provider} {e.Model}{(e.KeyReplaced ? ", new key" : string.Empty)}", e.OccurredAt),
+        ModelSettingsChanged e => new(e.ProjectId, e.By, "model.settings_changed", ModelDetail(e), e.OccurredAt),
         ModelSettingsCleared e => new(e.ProjectId, e.By, "model.settings_cleared", "model and key removed", e.OccurredAt),
         _ => throw new ArgumentOutOfRangeException(nameof(domainEvent), domainEvent.GetType().Name, "Not an audited event."),
     };
+
+    /// <summary>Provider, model, base URL host, cap change and whether the key changed. Never the key or its cipher.</summary>
+    private static string ModelDetail(ModelSettingsChanged e)
+    {
+        static string Cap(long? cap) => cap?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? "none";
+        var host = e.BaseUrlHost is { } h ? $" at {h}" : string.Empty;
+        return $"{e.Provider} {e.Model}{host}, cap {Cap(e.OldCap)} -> {Cap(e.NewCap)}{(e.KeyReplaced ? ", new key" : string.Empty)}";
+    }
 
     public static bool IsAudited(IDomainEvent domainEvent) =>
         domainEvent is ApiKeyIssued or ApiKeyRevoked or MemberChanged or EnvironmentKindChanged or ProjectCreated or UserHashKeyRevealed

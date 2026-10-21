@@ -109,6 +109,31 @@ internal static class PersonalTokenTests
         Assert.True(Issue().Plain != plain, "Each token is different.");
     }
 
+    public static void PrefixParsingHoldsForEveryGeneratedToken()
+    {
+        // PrefixOf splits on '_', so the generator must never put one in the prefix or the secret.
+        for (var i = 0; i < 500; i++)
+        {
+            var (token, plain) = Issue();
+            Assert.True(!token.Prefix.Contains('_', StringComparison.Ordinal), "A prefix never holds '_'.");
+            Assert.Equal(token.Prefix, PersonalToken.PrefixOf(plain)!);
+            Assert.True(token.Matches(plain, Now), "The parsed token still matches.");
+        }
+    }
+
+    public static void AtMostTwentyActiveTokensPerUser()
+    {
+        var active = Enumerable.Range(0, 20).Select(_ => Issue().Token).ToList();
+        Assert.Throws<DomainException>(() => PersonalToken.EnsureRoomForAnother(active, Now), "token.too_many");
+
+        active[0].Revoke(Now);
+        PersonalToken.EnsureRoomForAnother(active, Now);
+
+        var expiring = Enumerable.Range(0, 20).Select(_ => Issue(lifetime: TimeSpan.FromDays(1)).Token).ToList();
+        Assert.Throws<DomainException>(() => PersonalToken.EnsureRoomForAnother(expiring, Now), "token.too_many");
+        PersonalToken.EnsureRoomForAnother(expiring, Now.AddDays(1));
+    }
+
     public static void TouchRecordsLastUsedAtMostOncePerMinute()
     {
         var (token, _) = Issue();
@@ -286,5 +311,22 @@ internal static class PersonalTokenTests
         stale.Touch(w.Clock.Now);
         w.Store.SaveUsedAsync(stale, default).GetAwaiter().GetResult();
         Assert.True(w.Authenticate(issued.Plain) is null, "The late last-used save did not bring the token back.");
+    }
+
+    public static void ServiceRefusesTheTwentyFirstActiveToken()
+    {
+        var w = World.Build();
+        var first = w.Issue();
+        for (var i = 1; i < 20; i++)
+        {
+            w.Issue($"Agent {i}");
+        }
+
+        Assert.Throws<DomainException>(() => w.Issue("One too many"), "token.too_many");
+        Assert.Equal(20, w.Service.ListAsync(Ana, default).GetAwaiter().GetResult().Count);
+
+        w.Service.RevokeAsync(Ana, new PersonalTokenId(first.Token.Id), default).GetAwaiter().GetResult();
+        w.Issue("Room again");
+        Assert.Equal(21, w.Service.ListAsync(Ana, default).GetAwaiter().GetResult().Count);
     }
 }

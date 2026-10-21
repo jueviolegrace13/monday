@@ -317,6 +317,15 @@ internal static class AgentLoopTests
         Assert.Equal(0, disabled.Model.Requests.Count);
     }
 
+    public static void KeysDisabledIsReportedBeforeMissingSettings()
+    {
+        // With no MONDAY_SECRETS_KEY, saving a model is impossible too, so "add a model" would send people in a circle.
+        var w = World.Build(new ScriptedChatModel(Answer("Never.")), configured: false, secrets: false);
+
+        Assert.Equal("model.keys_disabled", ((AgentError)w.Chat(w.Ana, "Hi").Single()).Code);
+        Assert.Equal(0, w.Model.Requests.Count);
+    }
+
     public static void NonMemberIsRefusedBeforeModelCall()
     {
         var w = World.Build(new ScriptedChatModel(Answer("Never.")));

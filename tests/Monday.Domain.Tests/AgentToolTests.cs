@@ -60,7 +60,7 @@ internal static class AgentToolTests
             w.Graph = new GraphService(w.Graphs, w.ProjectService, clock);
             w.TrafficService = new TrafficService(w.Traffic, new TrafficFeed(), w.ProjectService, w.Audit, clock);
             w.Activity = new ActivityService(w.ActivityStore, w.ProjectService, clock);
-            w.Decisions = new DecisionService(new InMemoryDecisionRepository(), w.ProjectService, clock);
+            w.Decisions = new DecisionService(new InMemoryDecisionRepository(), w.ProjectService, w.Audit, clock);
 
             var summary = w.ProjectService.CreateAsync("Shop", w.Owner, default).GetAwaiter().GetResult();
             w.Project = new ProjectId(summary.Id);
@@ -159,6 +159,10 @@ internal static class AgentToolTests
         var stored = w.Decisions.ListAsync(w.Project, w.Owner, default).GetAwaiter().GetResult();
         Assert.Equal(1, stored.Count);
         Assert.Equal(w.Ana, stored[0].DraftedBy!.Value);
+
+        var drafted = w.Audit.ListAsync(w.Project, default).GetAwaiter().GetResult().Single(e => e.Action == "decision.drafted");
+        Assert.Equal(w.Ana, drafted.Actor);
+        Assert.Equal("Live store", drafted.Detail);
     }
 
     public static void MonitorCannotDraftDecision()
@@ -312,7 +316,16 @@ internal static class AgentToolTests
             Assert.True(item.TryGetProperty(field, out _), $"{field} is returned.");
         }
 
-        Assert.True(!item.TryGetProperty("draftedBy", out _), "draftedBy is not part of the view.");
+        Assert.Equal("github:ana", item.GetProperty("draftedBy").GetString());
+    }
+
+    public static void RecentRequestsServiceNeedsInspectRequests()
+    {
+        var w = World.Build();
+
+        Assert.Throws<AccessDeniedException>(
+            () => w.TrafficService.RecentAsync(w.Project, Now.AddHours(-1), Now, 10, w.Mia, default).GetAwaiter().GetResult(), "access.denied");
+        Assert.Equal(3, w.TrafficService.RecentAsync(w.Project, Now.AddHours(-1), Now, 10, w.Ana, default).GetAwaiter().GetResult().Count);
     }
 
     public static void UnknownFilterValuesAreToolErrors()

@@ -32,6 +32,7 @@ public sealed class ListDecisionsTool(DecisionService decisions) : IAgentTool
         {
             id = d.Id.Value, d.Area, d.Title, d.Context, d.Options, d.RecommendedKey,
             supersedes = d.Supersedes?.Value, d.Status, d.ChosenKey, resolvedBy = d.ResolvedBy?.Value, d.ProposedAt, d.ResolvedAt, d.Note,
+            draftedBy = d.DraftedBy?.Value,
         });
         return new ToolResult(ToolInput.Data(new { decisions = items, total = matches.Count, truncated = matches.Count > page.Count }), []);
     }

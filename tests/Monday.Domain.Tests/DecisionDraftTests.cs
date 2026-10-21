@@ -1,3 +1,4 @@
+using Monday.Api.Endpoints;
 using Monday.Domain.Access;
 using Monday.Domain.Common;
 using Monday.Domain.Decisions;
@@ -38,5 +39,16 @@ internal static class DecisionDraftTests
         Assert.Throws<AccessDeniedException>(() => decision.Reject(project, Ana, Now, "no"), "access.denied");
         decision.Approve("neon", project, Owner, Now);
         Assert.Equal(DecisionStatus.Approved, decision.Status);
+    }
+
+    public static void DecisionViewShowsWhoDraftedIt()
+    {
+        var project = Project.Create("Monday", Owner, Now);
+        project.SetMember(Ana, Role.Debugger, Owner, Now);
+
+        Assert.Equal("github:ana", DecisionView.Of(DraftBy(project, Ana)).DraftedBy);
+
+        var proposed = Decision.Propose(project.Id, DecisionArea.Stack, "Live store", "Why.", [new("a", "A", "x"), new("b", "B", "y")], "a", Now);
+        Assert.True(DecisionView.Of(proposed).DraftedBy is null, "A session's proposal has no drafter.");
     }
 }

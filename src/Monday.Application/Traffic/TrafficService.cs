@@ -97,13 +97,14 @@ public sealed class TrafficService(ITrafficStore store, ITrafficFeed feed, Proje
     }
 
     /// <summary>
-    /// The newest requests in a time window, newest first. Same permission and window rules as replay, but it
-    /// cannot follow one user, so there is no user-replay audit.
+    /// The newest requests in a time window, newest first. Same window rules as replay, and it needs request
+    /// inspection as well (as the recent_requests tool does). It cannot follow one user, so there is no user-replay audit.
     /// </summary>
     public async Task<IReadOnlyList<TrafficView>> RecentAsync(ProjectId id, DateTimeOffset since, DateTimeOffset until, int limit, UserId user, CancellationToken ct)
     {
         var project = await projects.LoadForMemberAsync(id, user, ct).ConfigureAwait(false);
         project.EnsureCan(user, Permission.ReplayAppTraffic);
+        project.EnsureCan(user, Permission.InspectRequests);
         Guard.That(since < until && until - since <= TimeSpan.FromDays(1), "traffic.range", "Look at most one day at a time.");
         Guard.That(clock.Now - since <= TrafficRetention.Live, "traffic.archived", "That window is older than 7 days: restore it from the archive first.");
         Guard.That(limit is > 0 and <= MaxRange, "traffic.limit", $"Ask for between 1 and {MaxRange} requests.");

@@ -291,14 +291,15 @@ public sealed class AgentService(
 
     private async Task<AgentError?> RefusalAsync(Project project, CancellationToken ct)
     {
-        if (project.Model is null)
-        {
-            return new AgentError("model.not_configured", "No model is set up for this project yet. An Owner or Admin can add one in settings.");
-        }
-
+        // Keys first: without MONDAY_SECRETS_KEY no model can be saved either, so "add one in settings" would not help.
         if (!secrets.Enabled)
         {
             return new AgentError("model.keys_disabled", "Chat is off: Monday has no MONDAY_SECRETS_KEY to open the model key.");
+        }
+
+        if (project.Model is null)
+        {
+            return new AgentError("model.not_configured", "No model is set up for this project yet. An Owner or Admin can add one in settings.");
         }
 
         return await CapReachedAsync(project, ct).ConfigureAwait(false);

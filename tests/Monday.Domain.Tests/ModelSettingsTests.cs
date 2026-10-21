@@ -117,4 +117,18 @@ internal static class ModelSettingsTests
             "Audit details never hold the key or its cipher.");
         Assert.True(project.Model is null, "Clear removes the settings.");
     }
+
+    public static void ModelAuditNamesTheHostAndTheCapChange()
+    {
+        var project = Project.Create("Monday", Owner, Now);
+        project.ClearDomainEvents();
+        project.SetModel(ModelSettings.Create(ModelProvider.OpenAiCompatible, "gpt-4o", new Uri("https://api.example.com/v1/secret-path"), "v1:SECRET:b:c", "wxyz", 1000), Owner, Now);
+        project.SetModel(ModelSettings.Create(ModelProvider.OpenAiCompatible, "gpt-4o", new Uri("https://api.example.com/v1/secret-path"), "v1:SECRET:b:c", "wxyz", 2000), Owner, Now);
+        project.SetModel(Anthropic(), Owner, Now);
+
+        var details = project.DomainEvents.Where(AuditEntry.IsAudited).Select(e => AuditEntry.For(e).Detail).ToList();
+        Assert.Equal("OpenAiCompatible gpt-4o at api.example.com, cap none -> 1000, new key", details[0]);
+        Assert.Equal("OpenAiCompatible gpt-4o at api.example.com, cap 1000 -> 2000", details[1]);
+        Assert.Equal("Anthropic claude-sonnet-4-5, cap 2000 -> none, new key", details[2]);
+    }
 }

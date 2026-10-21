@@ -47,6 +47,9 @@ public sealed class PersonalToken
     public static readonly TimeSpan DefaultLifetime = TimeSpan.FromDays(90);
     public static readonly TimeSpan MaxLifetime = TimeSpan.FromDays(365);
 
+    /// <summary>Active (unrevoked, unexpired) tokens one person may hold at once.</summary>
+    public const int MaxActivePerUser = 20;
+
     /// <summary>Last-used time is recorded at most this often, so a busy agent doesn't cost a write per call.</summary>
     public static readonly TimeSpan TouchInterval = TimeSpan.FromMinutes(1);
 
@@ -118,6 +121,14 @@ public sealed class PersonalToken
         return (token, plain);
     }
 
+    /// <summary>Refuses a new token when the person already holds <see cref="MaxActivePerUser"/> active ones.</summary>
+    public static void EnsureRoomForAnother(IEnumerable<PersonalToken> held, DateTimeOffset now)
+    {
+        ArgumentNullException.ThrowIfNull(held);
+        Guard.That(held.Count(t => t.IsActive(now)) < MaxActivePerUser, "token.too_many",
+            $"You already have {MaxActivePerUser} active tokens. Revoke one you no longer use first.");
+    }
+
     /// <summary>Rebuilds a stored token (persistence only).</summary>
     public static PersonalToken Restore(
         PersonalTokenId id, UserId userId, string name, string prefix, string hash, TokenScope scope,
@@ -133,6 +144,8 @@ public sealed class PersonalToken
             return null;
         }
 
+        // Safe because ApiKey.Base64Url never emits '_' (it maps both '+' and '/' to '-'), so neither the
+        // prefix nor the secret can hold the separator. PrefixParsingHoldsForEveryGeneratedToken pins this.
         var parts = presented.Split('_', 3);
         return parts.Length == 3 && parts[0] == Scheme && parts[1].Length > 0 && parts[2].Length > 0 ? parts[1] : null;
     }

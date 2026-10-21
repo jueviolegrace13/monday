@@ -55,6 +55,7 @@ public sealed class PersonalTokenService(IPersonalTokenStore tokens, IProjectRep
 
         var lifetime = input.LifetimeDays is { } days ? TimeSpan.FromDays(Math.Clamp(days, -1, DaysCeiling)) : (TimeSpan?)null;
         var now = clock.Now;
+        PersonalToken.EnsureRoomForAnother(await tokens.ListForUserAsync(user, ct).ConfigureAwait(false), now);
         var (token, plain) = PersonalToken.Issue(user, input.Name, TokenScopes.Parse(input.Scope), limited, lifetime, now);
         await tokens.AddAsync(token, ct).ConfigureAwait(false);
 

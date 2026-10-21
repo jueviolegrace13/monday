@@ -88,6 +88,8 @@ public sealed record ModelSettings
         && (next.Provider != Provider || next.BaseUrl != BaseUrl);
 }
 
-public sealed record ModelSettingsChanged(ProjectId ProjectId, ModelProvider Provider, string Model, bool KeyReplaced, UserId By, DateTimeOffset OccurredAt) : IDomainEvent;
+/// <summary>Carries the base URL's host only (never its path) and the cap before and after; never the key.</summary>
+public sealed record ModelSettingsChanged(
+    ProjectId ProjectId, ModelProvider Provider, string Model, string? BaseUrlHost, long? OldCap, long? NewCap, bool KeyReplaced, UserId By, DateTimeOffset OccurredAt) : IDomainEvent;
 
 public sealed record ModelSettingsCleared(ProjectId ProjectId, UserId By, DateTimeOffset OccurredAt) : IDomainEvent;
