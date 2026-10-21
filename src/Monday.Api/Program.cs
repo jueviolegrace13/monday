@@ -13,7 +13,11 @@ builder.Services.AddAgentTools();
 
 // Monday watches itself: its own agent records every request it serves (never bodies, queries,
 // headers or IPs). Locally it reports in-process; deployed, set Monday:Agent:Self=true and its key.
-builder.Services.AddMondayAgent(builder.Configuration, o => o.ExcludeRoutes.Add("/ingest/traffic"));
+builder.Services.AddMondayAgent(builder.Configuration, o =>
+{
+    o.ExcludeRoutes.Add("/ingest/traffic");
+    o.ExcludeRoutes.Add(ViewerEndpoints.FallbackRoute); // the viewer's page fallback, not an API route
+});
 if (builder.Environment.IsDevelopment() || builder.Configuration.GetValue<bool>("Monday:Agent:Self"))
 {
     builder.Services.AddSingleton<ITraceSink, SelfTraceSink>();
@@ -61,6 +65,10 @@ var app = builder.Build();
 await app.Services.MigrateMondayAsync();
 await DevBootstrap.RunAsync(app);
 
+// The viewer (built from viewer/app into wwwroot). Before the agent so serving a file is not recorded as traffic.
+app.UseDefaultFiles();
+app.UseStaticFiles();
+
 app.UseMondayAgent();
 app.UseExceptionHandler();
 if (!app.Environment.IsDevelopment())
@@ -79,6 +87,7 @@ app.MapProjects();
 app.MapTraffic();
 app.MapChat();
 app.MapModel();
+app.MapViewer(); // last: the fallback only answers what no API route matched
 
 app.Run();
 

@@ -27,6 +27,25 @@ jobs:
       - name: Domain tests
         run: dotnet run --project tests/Monday.Domain.Tests --configuration Release --no-build
 
+      # The viewer builds into src/Monday.Api/wwwroot. Its unit tests run headless (jsdom), once, no watch.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: viewer/app/package-lock.json
+
+      - name: Viewer install
+        working-directory: viewer/app
+        run: npm ci
+
+      - name: Viewer build
+        working-directory: viewer/app
+        run: npm run build
+
+      - name: Viewer tests
+        working-directory: viewer/app
+        run: npm test -- --watch=false
+
       - name: Index code graph
         run: dotnet run --project src/Monday.Indexer --configuration Release --no-build -- --root . --name Monday --commit "${GITHUB_SHA::12}"
 

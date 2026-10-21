@@ -1,0 +1,47 @@
+<header class="bar">
+  <span class="wordmark">Monday</span>
+
+  @if (load() === 'ready' && projects().length > 0) {
+    <label class="picker">
+      <span class="label">Project</span>
+      <select [value]="selectedId()" (change)="select($event)">
+        @for (p of projects(); track p.id) {
+          <option [value]="p.id" [selected]="p.id === selectedId()">{{ p.name }}</option>
+        }
+      </select>
+    </label>
+  }
+</header>
+
+<main class="stage" aria-live="polite">
+  @switch (load()) {
+    @case ('loading') {
+      <p class="muted">Loading projects</p>
+    }
+    @case ('failed') {
+      <section class="empty">
+        <h1>Could not load projects</h1>
+        <p class="muted">{{ error() }}</p>
+        <button type="button" (click)="reload()">Try again</button>
+      </section>
+    }
+    @default {
+      @if (selected(); as project) {
+        <section class="empty">
+          <h1>{{ project.name }}</h1>
+          <p class="muted">
+            <span class="mono">{{ project.environments.length }}</span>
+            {{ project.environments.length === 1 ? 'environment' : 'environments' }}, you are
+            <span class="mono">{{ project.role }}</span
+            >. The code graph and chat panel open here.
+          </p>
+        </section>
+      } @else {
+        <section class="empty">
+          <h1>No projects yet</h1>
+          <p class="muted">Projects you are a member of appear here.</p>
+        </section>
+      }
+    }
+  }
+</main>

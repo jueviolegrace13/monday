@@ -11,3 +11,6 @@ appsettings.*.local.json
 
 # Playwright screenshots from the design loop (regenerated, not committed)
 design/screenshots/
+
+# Angular viewer build output (npm run build in viewer/app)
+src/Monday.Api/wwwroot/
