@@ -63,3 +63,9 @@ public interface IChatModelFactory
 {
     IChatModel Create(ModelSettings settings, string apiKey);
 }
+
+/// <summary>A model call that failed in a way the person can act on. Codes: model.auth, model.rate_limited, model.unavailable, model.rejected, model.unsupported.</summary>
+public sealed class ModelException(string code, string message) : Exception(message)
+{
+    public string Code { get; } = code;
+}

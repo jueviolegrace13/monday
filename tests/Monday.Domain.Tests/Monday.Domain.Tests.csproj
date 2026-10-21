@@ -13,5 +13,8 @@
     <ProjectReference Include="..\..\src\Monday.Infrastructure\Monday.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="Fixtures\*.txt" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 
 </Project>

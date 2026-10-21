@@ -32,6 +32,11 @@ public static class DependencyInjection
         services.AddSingleton<ISecretBox>(new AesGcmSecretBox(configuration));
         services.AddSingleton<IModelEndpointGuard, SafeEndpointGuard>();
 
+        // Every model call dials through SafeEndpoint's handler, which re-checks the address it connects to.
+        services.AddHttpClient(ChatModelFactory.ClientName, client => client.Timeout = TimeSpan.FromSeconds(60))
+            .ConfigurePrimaryHttpMessageHandler(() => SafeEndpoint.CreateHandler());
+        services.AddSingleton<IChatModelFactory, ChatModelFactory>();
+
         var connection = configuration.GetConnectionString("Monday");
         if (string.IsNullOrWhiteSpace(connection))
         {
