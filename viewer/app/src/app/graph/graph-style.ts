@@ -31,6 +31,7 @@ export interface Palette {
   edge: Record<EdgeKind, string>;
   fontDisplay: string;
   fontMono: string;
+  weightStrong: string;
   /** Label sizes in px, from the type scale. */
   label: { app: number; module: number; container: number; leaf: number; badge: number };
   /** Camera moves (--dur-slow), in ms. */
@@ -73,6 +74,7 @@ export function readPalette(token: TokenReader): Palette {
     },
     fontDisplay: token('--font-display'),
     fontMono: token('--font-mono'),
+    weightStrong: token('--weight-strong'),
     label: {
       app: remPx(token('--text-lg')),
       module: remPx(token('--text-md')),

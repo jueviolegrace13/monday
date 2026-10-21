@@ -59,7 +59,10 @@ export const loadVis: VisLoader = () => {
     script.onload = () => {
       const vis = (window as unknown as { vis?: VisLib }).vis;
       if (vis) resolve(vis);
-      else reject(new Error('The graph library did not load.'));
+      else {
+        loading = null;
+        reject(new Error('The graph library did not load.'));
+      }
     };
     script.onerror = () => {
       loading = null;

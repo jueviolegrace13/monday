@@ -38,7 +38,7 @@ const NOT_CONFIGURED = 'model.not_configured';
 export class ChatStore {
   readonly messages = signal<ChatMessage[]>([]);
   readonly streaming = signal(false);
-  /** The project has no model yet; the panel says so instead of offering the input. */
+  /** The last answer was refused for want of a model; the panel says so and links to settings. Cleared when an answer starts. */
   readonly notConfigured = signal(false);
 
   private conversationId: string | undefined;
@@ -59,6 +59,7 @@ export class ChatStore {
 
     const abort = new AbortController();
     this.abort = abort;
+    this.lastStepNodes = [];
     this.streaming.set(true);
     this.append({ role: 'user', text: message, steps: [], state: 'done' });
     const answer = this.append({ role: 'assistant', text: '', steps: [], state: 'streaming' });
@@ -110,6 +111,7 @@ export class ChatStore {
     switch (event.event) {
       case 'started':
         this.conversationId = event.conversationId;
+        this.notConfigured.set(false);
         break;
       case 'text':
         this.update(answer, (m) => ({ ...m, text: m.text + event.text }));

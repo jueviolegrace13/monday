@@ -106,7 +106,7 @@ export class App implements OnInit {
     this.selectedId.set((event.target as HTMLSelectElement).value);
   }
 
-  protected engineReady(engine: GraphEngine): void {
+  protected engineReady(engine: GraphEngine | null): void {
     this.screen.engine = engine;
     this.engine.set(engine);
   }

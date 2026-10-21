@@ -40,8 +40,8 @@ export class GraphCanvasComponent implements OnDestroy {
   private readonly loadVis = inject(VIS_LOADER);
 
   readonly projectId = input.required<string>();
-  /** The engine, once the graph is drawn; the chat panel acts on the screen through it. */
-  readonly engineReady = output<GraphEngine>();
+  /** The engine once a graph is drawn, and null when none is (no graph yet, or it failed to load). */
+  readonly engineReady = output<GraphEngine | null>();
   readonly selected = output<string | null>();
 
   private readonly host = viewChild.required<ElementRef<HTMLElement>>('graph');
@@ -54,6 +54,7 @@ export class GraphCanvasComponent implements OnDestroy {
     canBack: false,
     pulsing: [],
   });
+  protected readonly liveUnavailable = signal(false);
   protected readonly lenses = LENSES;
   protected readonly lensLabel = LENS_LABEL;
   protected readonly legend = (Object.keys(EDGE_LINE) as (keyof typeof EDGE_LINE)[])
@@ -90,30 +91,46 @@ export class GraphCanvasComponent implements OnDestroy {
       ]);
       if (abort.signal.aborted) return;
       if (!graph || !graph.nodes.length) {
+        this.drop();
         this.load.set('empty');
         return;
       }
-      if (!this.engine) {
-        const reduce =
-          typeof matchMedia === 'function' &&
-          matchMedia('(prefers-reduced-motion: reduce)').matches;
-        this.engine = new GraphEngine(
-          vis,
-          this.host().nativeElement,
-          readPalette(cssTokens),
-          reduce,
-        );
-        this.engine.onChange((s) => this.changed(s));
-        this.engine.onSelect((id) => this.selected.emit(id));
-      }
+      // A new engine per graph; the person's lens carries over to the next project.
+      const lens = this.state().lens;
+      this.drop();
+      const reduce =
+        typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const engine = new GraphEngine(
+        vis,
+        this.host().nativeElement,
+        readPalette(cssTokens),
+        reduce,
+      );
+      engine.onChange((s) => this.changed(s));
+      engine.onSelect((id) => this.selected.emit(id));
+      engine.chooseLens(lens);
+      this.engine = engine;
       this.load.set('ready');
-      this.engine.load(graph);
-      this.engineReady.emit(this.engine);
+      engine.load(graph);
+      this.engineReady.emit(engine);
+      // The lens did not change, so changed() saw no transition: open this project's stream here.
+      if (lens === 'live') void this.startLive();
     } catch (e) {
       if (abort.signal.aborted) return;
+      this.drop();
       this.error.set(e instanceof Error ? e.message : 'The graph could not be loaded.');
       this.load.set('failed');
     }
+  }
+
+  /** Removes the drawn graph, so nothing of the previous project stays on screen or clickable. */
+  private drop(): void {
+    if (!this.engine) return;
+    this.engine.destroy();
+    this.engine = null;
+    this.selected.emit(null);
+    this.engineReady.emit(null);
+    this.state.update((s) => ({ ...s, crumb: '', canBack: false, pulsing: [] }));
   }
 
   protected retry(): void {
@@ -152,12 +169,14 @@ export class GraphCanvasComponent implements OnDestroy {
       for await (const request of this.api.liveTraffic(this.projectId(), abort.signal))
         this.engine?.request(request);
     } catch {
-      // No live traffic for this person or project: the lens still shows the request chains.
+      // Not allowed or not reachable: the lens still shows the request chains, and says so.
+      if (!abort.signal.aborted) this.liveUnavailable.set(true);
     }
   }
 
   private stopLive(): void {
     this.liveAbort?.abort();
     this.liveAbort = null;
+    this.liveUnavailable.set(false);
   }
 }

@@ -337,3 +337,13 @@ export class GraphModel {
     return { ids, gate: Math.min(gate, ids.length - 1) };
   }
 }
+
+/** Guards the indexer emits that take a protection away (src/Monday.Indexer/RepoIndexer.cs). */
+const OPEN_GUARDS: ReadonlySet<string> = new Set([
+  'AllowAnonymous',
+  'DisableAntiforgery',
+  'DisableRateLimiting',
+]);
+
+/** True for a guard that opens an endpoint up; the name may carry arguments: `AllowAnonymous()`. */
+export const isOpenGuard = (guard: string): boolean => OPEN_GUARDS.has(guard.split('(')[0].trim());

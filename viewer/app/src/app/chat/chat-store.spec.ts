@@ -250,6 +250,40 @@ describe('ChatStore', () => {
     expect(script.inputs[1].conversationId).toBe(CONVERSATION);
   });
 
+  it('forgets the last step nodes between messages', async () => {
+    const { screen, script, store } = setup();
+    script.push({ event: 'tool', name: 'find_nodes', nodeIds: ['old'], isError: false });
+    script.end();
+    await store.send('First');
+
+    script.reopen();
+    script.push({
+      event: 'action',
+      type: 'start_replay',
+      args: { since: '2026-10-21T00:00:00Z', until: '2026-10-21T01:00:00Z' },
+    });
+    script.end();
+    await store.send('Second');
+
+    expect(screen.calls).toContain('replay ');
+    expect(screen.calls).not.toContain('replay old');
+  });
+
+  it('clears not configured once a later answer starts', async () => {
+    const { script, store } = setup();
+    script.push({ event: 'error', code: 'model.not_configured', message: 'No model.' });
+    script.end();
+    await store.send('Hello');
+    expect(store.notConfigured()).toBe(true);
+
+    script.reopen();
+    script.push({ event: 'started', conversationId: CONVERSATION });
+    script.end();
+    await store.send('Again');
+
+    expect(store.notConfigured()).toBe(false);
+  });
+
   it('shows a missing model as not configured', async () => {
     const { script, store } = setup();
     script.push({

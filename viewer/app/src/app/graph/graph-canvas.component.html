@@ -44,7 +44,12 @@
         </div>
       </div>
 
-      <p class="crumb" aria-live="polite">{{ state().crumb }}</p>
+      <p class="crumb" aria-live="polite">
+        {{ state().crumb }}
+        @if (liveUnavailable()) {
+          · live traffic unavailable
+        }
+      </p>
       <p class="sr-only" aria-live="polite">
         @if (state().pulsing.length) {
           {{ state().pulsing.length }} nodes pulsing

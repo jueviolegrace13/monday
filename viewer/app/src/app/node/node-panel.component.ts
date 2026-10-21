@@ -1,5 +1,6 @@
 import { Component, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { CodeNode, MondayApi, NodeDetail } from '../api/monday-api';
+import { isOpenGuard } from '../graph/graph-model';
 
 type Load = 'idle' | 'loading' | 'ready' | 'failed';
 
@@ -55,9 +56,7 @@ export class NodePanelComponent {
     return n.startLine ? `${n.file}:${n.startLine}–${n.endLine ?? n.startLine}` : n.file;
   }
 
-  protected isOpenGuard(g: string): boolean {
-    return /AllowAnonymous|Disable/.test(g);
-  }
+  protected readonly isOpenGuard = isOpenGuard;
 
   private async fetch(projectId: string, nodeId: string | null): Promise<void> {
     this.abort?.abort();

@@ -118,7 +118,7 @@ export class LiveRequests {
       ctx.globalAlpha = 1;
     }
     // In-flight count per endpoint: a number, so it reads without colour.
-    ctx.font = `600 ${p.label.badge}px ${p.fontMono}`;
+    ctx.font = `${p.weightStrong} ${p.label.badge}px ${p.fontMono}`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     for (const [id, n] of counts) {
