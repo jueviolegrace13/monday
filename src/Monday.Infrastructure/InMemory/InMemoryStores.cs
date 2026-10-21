@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using Monday.Application.Abstractions;
 using Monday.Domain.Activity;
+using Monday.Domain.Agent;
 using Monday.Domain.Audit;
 using Monday.Domain.CodeGraph;
 using Monday.Domain.Common;
@@ -153,4 +154,30 @@ public sealed class InMemoryModelUsageStore : IModelUsageStore
 
     public Task<Usage> MonthAsync(ProjectId project, string month, CancellationToken ct) =>
         Task.FromResult(_months.GetValueOrDefault((project, month), new Usage(0, 0)));
+}
+
+/// <summary>Keeps a copy on save and hands out a copy on read, so only what was saved is ever seen, as with Postgres.</summary>
+public sealed class InMemoryConversationStore : IConversationStore
+{
+    private readonly ConcurrentDictionary<ConversationId, Conversation> _conversations = new();
+
+    public Task<Conversation?> GetAsync(ConversationId id, CancellationToken ct) =>
+        Task.FromResult(_conversations.TryGetValue(id, out var c) ? Copy(c) : null);
+
+    public Task<IReadOnlyList<ConversationSummary>> ListAsync(ProjectId project, UserId owner, CancellationToken ct) =>
+        Task.FromResult<IReadOnlyList<ConversationSummary>>(_conversations.Values
+            .Where(c => c.ProjectId == project && c.Owner == owner)
+            .OrderByDescending(c => c.UpdatedAt)
+            .Select(c => new ConversationSummary(c.Id.Value, c.Title, c.CreatedAt, c.UpdatedAt))
+            .ToList());
+
+    public Task SaveAsync(Conversation conversation, CancellationToken ct)
+    {
+        ArgumentNullException.ThrowIfNull(conversation);
+        _conversations[conversation.Id] = Copy(conversation);
+        return Task.CompletedTask;
+    }
+
+    private static Conversation Copy(Conversation c) =>
+        Conversation.Restore(c.Id, c.ProjectId, c.Owner, c.Title, c.CreatedAt, [.. c.Messages]);
 }

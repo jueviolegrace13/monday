@@ -47,6 +47,7 @@ public static class DependencyInjection
             services.AddSingleton<IAuditLog, InMemoryAuditLog>();
             services.AddSingleton<ITrafficStore, InMemoryTrafficStore>();
             services.AddSingleton<IModelUsageStore, InMemoryModelUsageStore>();
+            services.AddSingleton<IConversationStore, InMemoryConversationStore>();
         }
         else
         {
@@ -58,6 +59,7 @@ public static class DependencyInjection
             services.AddSingleton<IAuditLog, PostgresAuditLog>();
             services.AddSingleton<ITrafficStore, PostgresTrafficStore>();
             services.AddSingleton<IModelUsageStore, PostgresModelUsageStore>();
+            services.AddSingleton<IConversationStore, PostgresConversationStore>();
         }
 
         services.AddScoped<ApiKeyAuthenticator>();
@@ -71,8 +73,8 @@ public static class DependencyInjection
     }
 
     /// <summary>
-    /// Registers the agent's v1 tools and the registry that filters them by role and channel. Scoped, because
-    /// every tool wraps a scoped use case. Lives here because Monday.Application takes no DI package.
+    /// Registers the agent's v1 tools, the registry that filters them by role and channel, and the agent loop. Scoped,
+    /// because every tool wraps a scoped use case. Lives here because Monday.Application takes no DI package.
     /// </summary>
     public static IServiceCollection AddAgentTools(this IServiceCollection services)
     {
@@ -91,6 +93,7 @@ public static class DependencyInjection
         services.AddScoped<IAgentTool, StartReplayTool>();
         services.AddScoped<IAgentTool, DraftDecisionTool>();
         services.AddScoped<ToolRegistry>();
+        services.AddScoped<AgentService>();
         return services;
     }
 

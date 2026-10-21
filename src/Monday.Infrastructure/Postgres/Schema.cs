@@ -113,6 +113,25 @@ public static class Schema
             PRIMARY KEY (project_id, month)
         );
         """,
+        """
+        CREATE TABLE conversations (
+            id uuid PRIMARY KEY,
+            project_id uuid NOT NULL REFERENCES projects(id),
+            owner_user text NOT NULL,
+            title text NOT NULL,
+            created_at timestamptz NOT NULL,
+            updated_at timestamptz NOT NULL
+        );
+        CREATE INDEX conversations_by_owner ON conversations (project_id, owner_user, updated_at DESC);
+        CREATE TABLE conversation_messages (
+            conversation_id uuid NOT NULL REFERENCES conversations(id),
+            seq int NOT NULL,
+            role text NOT NULL,
+            at timestamptz NOT NULL,
+            body jsonb NOT NULL,
+            PRIMARY KEY (conversation_id, seq)
+        );
+        """,
     ];
 
     public static async Task MigrateAsync(NpgsqlDataSource db, CancellationToken ct)

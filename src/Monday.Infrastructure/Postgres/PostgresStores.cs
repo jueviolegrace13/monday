@@ -477,3 +477,105 @@ public sealed class PostgresModelUsageStore(NpgsqlDataSource db) : IModelUsageSt
             : new Usage(0, 0);
     }
 }
+
+/// <summary>Conversations and their messages. Messages are append-only: a save inserts only the ones past those stored.</summary>
+public sealed class PostgresConversationStore(NpgsqlDataSource db) : IConversationStore
+{
+    private sealed record MessageBody(string? Text, IReadOnlyList<ConversationToolCall>? ToolCalls, ConversationToolResult? ToolResult);
+
+    public async Task<Conversation?> GetAsync(ConversationId id, CancellationToken ct)
+    {
+        await using var conn = await db.OpenConnectionAsync(ct).ConfigureAwait(false);
+        Guid project;
+        string owner, title;
+        DateTimeOffset created;
+        await using (var head = new NpgsqlCommand("SELECT project_id, owner_user, title, created_at FROM conversations WHERE id = @id", conn))
+        {
+            head.Parameters.AddWithValue("id", id.Value);
+            await using var reader = await head.ExecuteReaderAsync(ct).ConfigureAwait(false);
+            if (!await reader.ReadAsync(ct).ConfigureAwait(false))
+            {
+                return null;
+            }
+
+            (project, owner, title, created) = (reader.GetGuid(0), reader.GetString(1), reader.GetString(2), reader.GetFieldValue<DateTimeOffset>(3));
+        }
+
+        var messages = new List<ConversationMessage>();
+        await using (var rows = new NpgsqlCommand("SELECT role, at, body FROM conversation_messages WHERE conversation_id = @id ORDER BY seq", conn))
+        {
+            rows.Parameters.AddWithValue("id", id.Value);
+            await using var reader = await rows.ExecuteReaderAsync(ct).ConfigureAwait(false);
+            while (await reader.ReadAsync(ct).ConfigureAwait(false))
+            {
+                var body = Json.Read<MessageBody>(reader.GetString(2));
+                messages.Add(ConversationMessage.Restore(Enum.Parse<ConversationRole>(reader.GetString(0)), body.Text, body.ToolCalls, body.ToolResult,
+                    reader.GetFieldValue<DateTimeOffset>(1)));
+            }
+        }
+
+        return Conversation.Restore(id, new ProjectId(project), new UserId(owner), title, created, messages);
+    }
+
+    public async Task<IReadOnlyList<ConversationSummary>> ListAsync(ProjectId project, UserId owner, CancellationToken ct)
+    {
+        var list = new List<ConversationSummary>();
+        await using var cmd = db.CreateCommand("""
+            SELECT id, title, created_at, updated_at FROM conversations WHERE project_id = @p AND owner_user = @o ORDER BY updated_at DESC
+            """);
+        cmd.Parameters.AddWithValue("p", project.Value);
+        cmd.Parameters.AddWithValue("o", owner.Value);
+        await using var reader = await cmd.ExecuteReaderAsync(ct).ConfigureAwait(false);
+        while (await reader.ReadAsync(ct).ConfigureAwait(false))
+        {
+            list.Add(new ConversationSummary(reader.GetGuid(0), reader.GetString(1), reader.GetFieldValue<DateTimeOffset>(2), reader.GetFieldValue<DateTimeOffset>(3)));
+        }
+
+        return list;
+    }
+
+    public async Task SaveAsync(Conversation conversation, CancellationToken ct)
+    {
+        ArgumentNullException.ThrowIfNull(conversation);
+        await using var conn = await db.OpenConnectionAsync(ct).ConfigureAwait(false);
+        await using var tx = await conn.BeginTransactionAsync(ct).ConfigureAwait(false);
+
+        await using (var upsert = new NpgsqlCommand("""
+            INSERT INTO conversations (id, project_id, owner_user, title, created_at, updated_at) VALUES (@id, @p, @o, @t, @c, @u)
+            ON CONFLICT (id) DO UPDATE SET updated_at = excluded.updated_at
+            """, conn, tx))
+        {
+            upsert.Parameters.AddWithValue("id", conversation.Id.Value);
+            upsert.Parameters.AddWithValue("p", conversation.ProjectId.Value);
+            upsert.Parameters.AddWithValue("o", conversation.Owner.Value);
+            upsert.Parameters.AddWithValue("t", conversation.Title);
+            upsert.Parameters.AddWithValue("c", conversation.CreatedAt);
+            upsert.Parameters.AddWithValue("u", conversation.UpdatedAt);
+            await upsert.ExecuteNonQueryAsync(ct).ConfigureAwait(false);
+        }
+
+        int stored;
+        await using (var count = new NpgsqlCommand("SELECT count(*) FROM conversation_messages WHERE conversation_id = @id", conn, tx))
+        {
+            count.Parameters.AddWithValue("id", conversation.Id.Value);
+            stored = Convert.ToInt32(await count.ExecuteScalarAsync(ct).ConfigureAwait(false), System.Globalization.CultureInfo.InvariantCulture);
+        }
+
+        for (var seq = stored; seq < conversation.Messages.Count; seq++)
+        {
+            var m = conversation.Messages[seq];
+            await using var insert = new NpgsqlCommand("""
+                INSERT INTO conversation_messages (conversation_id, seq, role, at, body) VALUES (@id, @s, @r, @at, @b::jsonb)
+                ON CONFLICT (conversation_id, seq) DO NOTHING
+                """, conn, tx);
+            insert.Parameters.AddWithValue("id", conversation.Id.Value);
+            insert.Parameters.AddWithValue("s", seq);
+            insert.Parameters.AddWithValue("r", m.Role.ToString());
+            insert.Parameters.AddWithValue("at", m.At);
+            insert.Parameters.AddWithValue("b", Json.Write(new MessageBody(m.Text, m.ToolCalls, m.ToolResult)));
+            await insert.ExecuteNonQueryAsync(ct).ConfigureAwait(false);
+        }
+
+        await tx.CommitAsync(ct).ConfigureAwait(false);
+    }
+}

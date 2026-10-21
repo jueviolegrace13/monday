@@ -8,6 +8,7 @@ using Monday.Infrastructure;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddMonday(builder.Configuration);
+builder.Services.AddAgentTools();
 
 // Monday watches itself: its own agent records every request it serves (never bodies, queries,
 // headers or IPs). Locally it reports in-process; deployed, set Monday:Agent:Self=true and its key.
@@ -64,6 +65,7 @@ app.MapGet("/health", () => Results.Ok(new { status = "ok" })).WithTags("Health"
 app.MapIngest();
 app.MapProjects();
 app.MapTraffic();
+app.MapChat();
 
 app.Run();
 
