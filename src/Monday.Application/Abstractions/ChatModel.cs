@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Monday.Application.Agent;
+using Monday.Domain.Agent;
 
 namespace Monday.Application.Abstractions;
 
@@ -55,4 +56,10 @@ public sealed record Finished(StopReason Reason, Usage Usage) : ModelEvent;
 public interface IChatModel
 {
     IAsyncEnumerable<ModelEvent> StreamAsync(ModelRequest request, CancellationToken ct);
+}
+
+/// <summary>Builds the adapter for a project's model settings, with the key already opened. (Named Create, not For: CA1716.)</summary>
+public interface IChatModelFactory
+{
+    IChatModel Create(ModelSettings settings, string apiKey);
 }

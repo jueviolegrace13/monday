@@ -93,6 +93,26 @@ public static class Schema
         """
         ALTER TABLE decisions ADD COLUMN drafted_by_user text NULL;
         """,
+        """
+        CREATE TABLE model_settings (
+            project_id uuid PRIMARY KEY REFERENCES projects(id),
+            provider text NOT NULL,
+            model text NOT NULL,
+            base_url text NULL,
+            key_cipher text NOT NULL,
+            key_last4 text NOT NULL,
+            monthly_cap bigint NULL,
+            updated_by text NOT NULL,
+            updated_at timestamptz NOT NULL
+        );
+        CREATE TABLE model_usage (
+            project_id uuid NOT NULL REFERENCES projects(id),
+            month char(7) NOT NULL,
+            input_tokens bigint NOT NULL DEFAULT 0,
+            output_tokens bigint NOT NULL DEFAULT 0,
+            PRIMARY KEY (project_id, month)
+        );
+        """,
     ];
 
     public static async Task MigrateAsync(NpgsqlDataSource db, CancellationToken ct)

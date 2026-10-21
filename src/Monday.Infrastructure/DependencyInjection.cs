@@ -9,7 +9,9 @@ using Monday.Application.Decisions;
 using Monday.Application.Projects;
 using Monday.Application.Traffic;
 using Monday.Infrastructure.InMemory;
+using Monday.Infrastructure.Models;
 using Monday.Infrastructure.Postgres;
+using Monday.Infrastructure.Secrets;
 using Npgsql;
 
 namespace Monday.Infrastructure;
@@ -26,6 +28,10 @@ public static class DependencyInjection
         services.AddSingleton<IClock, SystemClock>();
         services.AddSingleton<ITrafficFeed, TrafficFeed>();
 
+        // Model keys are sealed under MONDAY_SECRETS_KEY (environment). Missing: the API starts, model settings are off.
+        services.AddSingleton<ISecretBox>(new AesGcmSecretBox(configuration));
+        services.AddSingleton<IModelEndpointGuard, SafeEndpointGuard>();
+
         var connection = configuration.GetConnectionString("Monday");
         if (string.IsNullOrWhiteSpace(connection))
         {
@@ -35,6 +41,7 @@ public static class DependencyInjection
             services.AddSingleton<IDecisionRepository, InMemoryDecisionRepository>();
             services.AddSingleton<IAuditLog, InMemoryAuditLog>();
             services.AddSingleton<ITrafficStore, InMemoryTrafficStore>();
+            services.AddSingleton<IModelUsageStore, InMemoryModelUsageStore>();
         }
         else
         {
@@ -45,6 +52,7 @@ public static class DependencyInjection
             services.AddSingleton<IDecisionRepository, PostgresDecisionRepository>();
             services.AddSingleton<IAuditLog, PostgresAuditLog>();
             services.AddSingleton<ITrafficStore, PostgresTrafficStore>();
+            services.AddSingleton<IModelUsageStore, PostgresModelUsageStore>();
         }
 
         services.AddScoped<ApiKeyAuthenticator>();
@@ -53,6 +61,7 @@ public static class DependencyInjection
         services.AddScoped<ActivityService>();
         services.AddScoped<DecisionService>();
         services.AddScoped<TrafficService>();
+        services.AddScoped<ModelSettingsService>();
         return services;
     }
 

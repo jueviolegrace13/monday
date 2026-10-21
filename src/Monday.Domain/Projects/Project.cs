@@ -1,4 +1,5 @@
 using Monday.Domain.Access;
+using Monday.Domain.Agent;
 using Monday.Domain.Common;
 
 namespace Monday.Domain.Projects;
@@ -77,6 +78,13 @@ public sealed class Project : AggregateRoot<ProjectId>
 
     public IReadOnlyList<Membership> Members => _members.Select(m => new Membership(m.Key, m.Value)).ToList();
 
+    /// <summary>The model the project's chat uses, with its sealed key. Null until an Owner or Admin sets one.</summary>
+    public ModelSettings? Model { get; private set; }
+
+    public UserId? ModelUpdatedBy { get; private set; }
+
+    public DateTimeOffset? ModelUpdatedAt { get; private set; }
+
     /// <summary>A new project starts with one development environment and its creator as Owner.</summary>
     public static Project Create(string name, UserId owner, DateTimeOffset now)
     {
@@ -105,6 +113,13 @@ public sealed class Project : AggregateRoot<ProjectId>
         }
 
         return project;
+    }
+
+    /// <summary>Puts back stored model settings (persistence only). Raises no events.</summary>
+    public void RestoreModel(ModelSettings model, UserId updatedBy, DateTimeOffset updatedAt)
+    {
+        ArgumentNullException.ThrowIfNull(model);
+        (Model, ModelUpdatedBy, ModelUpdatedAt) = (model, updatedBy, updatedAt);
     }
 
     public Role? RoleOf(UserId user) => _members.TryGetValue(user, out var role) ? role : null;
@@ -230,6 +245,34 @@ public sealed class Project : AggregateRoot<ProjectId>
         {
             Raise(new MemberChanged(Id, member, null, by, now));
         }
+    }
+
+    /// <summary>
+    /// Sets the model and its sealed key. Owners and Admins only; audited without the key. A stored key
+    /// is never carried to another provider or base URL, so nobody can point it at a server they choose.
+    /// </summary>
+    public void SetModel(ModelSettings settings, UserId by, DateTimeOffset now)
+    {
+        ArgumentNullException.ThrowIfNull(settings);
+        EnsureCan(by, Permission.ManageMembersAndKeys);
+        Guard.That(Model is null || !Model.MovesKeyElsewhere(settings), "model.key_required",
+            "Enter the API key again to change the provider or base URL.");
+        var keyReplaced = !string.Equals(Model?.KeyCipher, settings.KeyCipher, StringComparison.Ordinal);
+        (Model, ModelUpdatedBy, ModelUpdatedAt) = (settings, by, now);
+        Raise(new ModelSettingsChanged(Id, settings.Provider, settings.Model, keyReplaced, by, now));
+    }
+
+    /// <summary>Removes the model and its key; chat is off until one is set again. Audited.</summary>
+    public void ClearModel(UserId by, DateTimeOffset now)
+    {
+        EnsureCan(by, Permission.ManageMembersAndKeys);
+        if (Model is null)
+        {
+            return;
+        }
+
+        (Model, ModelUpdatedBy, ModelUpdatedAt) = (null, by, now);
+        Raise(new ModelSettingsCleared(Id, by, now));
     }
 
     private void EnsureOwnerRemains(UserId member, Role? newRole)

@@ -4,6 +4,7 @@ using Monday.Application.Abstractions;
 using Monday.Application.Traffic;
 using Monday.Domain.Access;
 using Monday.Domain.Activity;
+using Monday.Domain.Agent;
 using Monday.Domain.Audit;
 using Monday.Domain.CodeGraph;
 using Monday.Domain.Common;
@@ -116,7 +117,38 @@ public sealed class PostgresProjectRepository(NpgsqlDataSource db) : IProjectRep
             await add.ExecuteNonQueryAsync(ct).ConfigureAwait(false);
         }
 
+        await SaveModelAsync(project, conn, tx, ct).ConfigureAwait(false);
         await tx.CommitAsync(ct).ConfigureAwait(false);
+    }
+
+    /// <summary>The model settings row: upserted when set, deleted when cleared. Holds the sealed key only.</summary>
+    private static async Task SaveModelAsync(Project project, NpgsqlConnection conn, NpgsqlTransaction tx, CancellationToken ct)
+    {
+        if (project.Model is not { } m)
+        {
+            await using var delete = new NpgsqlCommand("DELETE FROM model_settings WHERE project_id = @p", conn, tx);
+            delete.Parameters.AddWithValue("p", project.Id.Value);
+            await delete.ExecuteNonQueryAsync(ct).ConfigureAwait(false);
+            return;
+        }
+
+        await using var upsert = new NpgsqlCommand("""
+            INSERT INTO model_settings (project_id, provider, model, base_url, key_cipher, key_last4, monthly_cap, updated_by, updated_at)
+            VALUES (@p, @provider, @model, @url, @cipher, @last4, @cap, @by, @at)
+            ON CONFLICT (project_id) DO UPDATE SET provider = excluded.provider, model = excluded.model, base_url = excluded.base_url,
+                key_cipher = excluded.key_cipher, key_last4 = excluded.key_last4, monthly_cap = excluded.monthly_cap,
+                updated_by = excluded.updated_by, updated_at = excluded.updated_at
+            """, conn, tx);
+        upsert.Parameters.AddWithValue("p", project.Id.Value);
+        upsert.Parameters.AddWithValue("provider", m.Provider.ToString());
+        upsert.Parameters.AddWithValue("model", m.Model);
+        upsert.Parameters.AddWithValue("url", (object?)m.BaseUrl?.ToString() ?? DBNull.Value);
+        upsert.Parameters.AddWithValue("cipher", m.KeyCipher);
+        upsert.Parameters.AddWithValue("last4", m.KeyLast4);
+        upsert.Parameters.AddWithValue("cap", (object?)m.MonthlyTokenCap ?? DBNull.Value);
+        upsert.Parameters.AddWithValue("by", project.ModelUpdatedBy!.Value.Value);
+        upsert.Parameters.AddWithValue("at", project.ModelUpdatedAt!.Value);
+        await upsert.ExecuteNonQueryAsync(ct).ConfigureAwait(false);
     }
 
     private async Task<Project?> LoadAsync(string sql, Action<NpgsqlCommand> bind, CancellationToken ct)
@@ -146,10 +178,25 @@ public sealed class PostgresProjectRepository(NpgsqlDataSource db) : IProjectRep
             }
         }
 
-        return Project.Restore(new ProjectId(id), name, created, hashKey,
+        var project = Project.Restore(new ProjectId(id), name, created, hashKey,
             Json.Read<List<EnvRow>>(envs).Select(e => (new EnvironmentId(e.Id), e.Name, e.Kind)),
             keys,
             Json.Read<List<MemberRow>>(members).Select(m => new Membership(new UserId(m.UserId), m.Role)));
+
+        await using (var cmd = db.CreateCommand("SELECT provider, model, base_url, key_cipher, key_last4, monthly_cap, updated_by, updated_at FROM model_settings WHERE project_id = @p"))
+        {
+            cmd.Parameters.AddWithValue("p", id);
+            await using var reader = await cmd.ExecuteReaderAsync(ct).ConfigureAwait(false);
+            if (await reader.ReadAsync(ct).ConfigureAwait(false))
+            {
+                var model = ModelSettings.Create(
+                    Enum.Parse<ModelProvider>(reader.GetString(0)), reader.GetString(1), reader.IsDBNull(2) ? null : new Uri(reader.GetString(2)),
+                    reader.GetString(3), reader.GetString(4), reader.IsDBNull(5) ? null : reader.GetInt64(5));
+                project.RestoreModel(model, new UserId(reader.GetString(6)), reader.GetFieldValue<DateTimeOffset>(7));
+            }
+        }
+
+        return project;
     }
 }
 
@@ -398,5 +445,35 @@ public sealed class PostgresTrafficStore(NpgsqlDataSource db) : ITrafficStore
         }
 
         return list;
+    }
+}
+
+/// <summary>Monthly token totals per project; each call adds to its month's row.</summary>
+public sealed class PostgresModelUsageStore(NpgsqlDataSource db) : IModelUsageStore
+{
+    public async Task AddAsync(ProjectId project, string month, Usage usage, CancellationToken ct)
+    {
+        ArgumentNullException.ThrowIfNull(usage);
+        await using var cmd = db.CreateCommand("""
+            INSERT INTO model_usage (project_id, month, input_tokens, output_tokens) VALUES (@p, @m, @i, @o)
+            ON CONFLICT (project_id, month) DO UPDATE SET input_tokens = model_usage.input_tokens + excluded.input_tokens,
+                output_tokens = model_usage.output_tokens + excluded.output_tokens
+            """);
+        cmd.Parameters.AddWithValue("p", project.Value);
+        cmd.Parameters.AddWithValue("m", month);
+        cmd.Parameters.AddWithValue("i", (long)usage.InputTokens);
+        cmd.Parameters.AddWithValue("o", (long)usage.OutputTokens);
+        await cmd.ExecuteNonQueryAsync(ct).ConfigureAwait(false);
+    }
+
+    public async Task<Usage> MonthAsync(ProjectId project, string month, CancellationToken ct)
+    {
+        await using var cmd = db.CreateCommand("SELECT input_tokens, output_tokens FROM model_usage WHERE project_id = @p AND month = @m");
+        cmd.Parameters.AddWithValue("p", project.Value);
+        cmd.Parameters.AddWithValue("m", month);
+        await using var reader = await cmd.ExecuteReaderAsync(ct).ConfigureAwait(false);
+        return await reader.ReadAsync(ct).ConfigureAwait(false)
+            ? new Usage((int)Math.Min(int.MaxValue, reader.GetInt64(0)), (int)Math.Min(int.MaxValue, reader.GetInt64(1)))
+            : new Usage(0, 0);
     }
 }

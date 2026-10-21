@@ -137,3 +137,20 @@ public sealed class InMemoryAuditLog : IAuditLog
         }
     }
 }
+
+public sealed class InMemoryModelUsageStore : IModelUsageStore
+{
+    private readonly ConcurrentDictionary<(ProjectId, string), Usage> _months = new();
+
+    public Task AddAsync(ProjectId project, string month, Usage usage, CancellationToken ct)
+    {
+        ArgumentNullException.ThrowIfNull(usage);
+        _months.AddOrUpdate((project, month), usage, (_, sum) => new Usage(
+            (int)Math.Min(int.MaxValue, (long)sum.InputTokens + usage.InputTokens),
+            (int)Math.Min(int.MaxValue, (long)sum.OutputTokens + usage.OutputTokens)));
+        return Task.CompletedTask;
+    }
+
+    public Task<Usage> MonthAsync(ProjectId project, string month, CancellationToken ct) =>
+        Task.FromResult(_months.GetValueOrDefault((project, month), new Usage(0, 0)));
+}
