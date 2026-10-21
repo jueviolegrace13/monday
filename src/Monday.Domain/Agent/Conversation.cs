@@ -105,6 +105,14 @@ public sealed class Conversation : AggregateRoot<ConversationId>
 
     public IReadOnlyList<ConversationMessage> Messages => _messages;
 
+    /// <summary>How many messages the store held when this copy was loaded or last saved. A save from a stale copy is refused.</summary>
+    public int StoredCount { get; private set; }
+
+    public bool HasUnsaved => _messages.Count > StoredCount;
+
+    /// <summary>Persistence only: the store calls it after a save.</summary>
+    public void MarkStored() => StoredCount = _messages.Count;
+
     public static Conversation Start(ProjectId projectId, UserId owner, string firstMessage, DateTimeOffset at)
     {
         var first = ConversationMessage.User(firstMessage, at);
@@ -123,6 +131,7 @@ public sealed class Conversation : AggregateRoot<ConversationId>
             conversation.Add(message);
         }
 
+        conversation.MarkStored();
         return conversation;
     }
 
@@ -139,10 +148,6 @@ public sealed class Conversation : AggregateRoot<ConversationId>
     }
 
     public bool IsVisibleTo(UserId user) => user == Owner;
-
-    /// <summary>Someone else's conversation does not exist, as far as they can tell.</summary>
-    public void EnsureVisibleTo(UserId user) =>
-        Guard.That(IsVisibleTo(user), "conversation.not_found", "No such conversation.");
 
     private void Add(ConversationMessage message)
     {

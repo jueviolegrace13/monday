@@ -1,7 +1,9 @@
 using System.Text.Json;
 using Monday.Domain.Agent;
 using Monday.Domain.Common;
+using Monday.Application.Abstractions;
 using Monday.Domain.Projects;
+using Monday.Infrastructure.InMemory;
 
 namespace Monday.Domain.Tests;
 
@@ -50,7 +52,6 @@ internal static class ConversationTests
 
         Assert.True(c.IsVisibleTo(Ana), "The owner sees it.");
         Assert.True(!c.IsVisibleTo(Owner), "Even a project Owner does not see someone else's conversation.");
-        Assert.Throws<DomainException>(() => c.EnsureVisibleTo(Owner), "conversation.not_found");
     }
 
     public static void ToolMessagesCarryAResultAndAssistantCallsAreKept()
@@ -64,5 +65,34 @@ internal static class ConversationTests
         Assert.Equal("set_lens", c.Messages[1].ToolCalls[0].Name);
         Assert.Equal("c1", c.Messages[2].ToolResult!.CallId);
         Assert.Equal(Now.AddSeconds(1), c.UpdatedAt);
+    }
+
+    public static void UnsavedMessagesAreTrackedUntilStored()
+    {
+        var c = Conversation.Start(ProjectId.New(), Ana, "Hello", Now);
+        Assert.True(c.HasUnsaved, "A new conversation is unsaved.");
+
+        c.MarkStored();
+        Assert.True(!c.HasUnsaved, "Stored means nothing is pending.");
+        Assert.Equal(1, c.StoredCount);
+
+        c.Append(ConversationMessage.Assistant("Hi", null, Now));
+        Assert.True(c.HasUnsaved, "An appended message is pending.");
+    }
+
+    public static void InMemoryStoreRefusesAStaleSave()
+    {
+        var store = new InMemoryConversationStore();
+        var c = Conversation.Start(ProjectId.New(), Ana, "Hello", Now);
+        store.SaveAsync(c, default).GetAwaiter().GetResult();
+
+        var tabA = store.GetAsync(c.Id, default).GetAwaiter().GetResult()!;
+        var tabB = store.GetAsync(c.Id, default).GetAwaiter().GetResult()!;
+        tabB.Append(ConversationMessage.User("From B", Now));
+        store.SaveAsync(tabB, default).GetAwaiter().GetResult();
+
+        tabA.Append(ConversationMessage.User("From A", Now));
+        Assert.Throws<ConversationConflictException>(() => store.SaveAsync(tabA, default).GetAwaiter().GetResult());
+        Assert.Equal("From B", store.GetAsync(c.Id, default).GetAwaiter().GetResult()!.Messages[^1].Text);
     }
 }

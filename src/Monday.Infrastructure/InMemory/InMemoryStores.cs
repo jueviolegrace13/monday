@@ -159,6 +159,7 @@ public sealed class InMemoryModelUsageStore : IModelUsageStore
 /// <summary>Keeps a copy on save and hands out a copy on read, so only what was saved is ever seen, as with Postgres.</summary>
 public sealed class InMemoryConversationStore : IConversationStore
 {
+    private readonly Lock _gate = new();
     private readonly ConcurrentDictionary<ConversationId, Conversation> _conversations = new();
 
     public Task<Conversation?> GetAsync(ConversationId id, CancellationToken ct) =>
@@ -171,10 +172,22 @@ public sealed class InMemoryConversationStore : IConversationStore
             .Select(c => new ConversationSummary(c.Id.Value, c.Title, c.CreatedAt, c.UpdatedAt))
             .ToList());
 
+    /// <summary>Refuses a save from a copy loaded before someone else's save, as the Postgres store does.</summary>
     public Task SaveAsync(Conversation conversation, CancellationToken ct)
     {
         ArgumentNullException.ThrowIfNull(conversation);
-        _conversations[conversation.Id] = Copy(conversation);
+        lock (_gate)
+        {
+            var stored = _conversations.TryGetValue(conversation.Id, out var c) ? c.Messages.Count : 0;
+            if (stored != conversation.StoredCount)
+            {
+                throw new ConversationConflictException();
+            }
+
+            _conversations[conversation.Id] = Copy(conversation);
+        }
+
+        conversation.MarkStored();
         return Task.CompletedTask;
     }
 

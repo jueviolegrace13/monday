@@ -12,17 +12,20 @@ namespace Monday.Api.Endpoints;
 /// <summary>The agent chat and each person's own history. Closing the stream (Stop) cancels the loop.</summary>
 public static class ChatEndpoints
 {
+    /// <summary>One token bucket per signed-in person: 20 questions a minute.</summary>
+    public const string RateLimitPolicy = "chat";
+
     public static IEndpointRouteBuilder MapChat(this IEndpointRouteBuilder app)
     {
         var chat = app.MapGroup("/projects/{id:guid}").WithTags("Chat").RequireAuthorization();
-        chat.MapPost("/chat", Chat);
+        chat.MapPost("/chat", Chat).RequireRateLimiting(RateLimitPolicy);
         chat.MapGet("/conversations", ListConversations);
         chat.MapGet("/conversations/{cid:guid}", GetConversation);
         return app;
     }
 
     /// <summary>
-    /// Server-sent events: one event per <see cref="AgentEvent"/> (text, tool, action, done, error). Errors of the
+    /// Server-sent events: one event per <see cref="AgentEvent"/> (started, text, tool, action, done, error). Errors of the
     /// request itself (not a member, no ChatAsk, a message too long, someone else's conversation) are found before
     /// the first event, so they still come back as a plain problem response with its status.
     /// </summary>
@@ -53,6 +56,7 @@ public static class ChatEndpoints
 
     private static (string Name, object Data) Frame(AgentEvent e) => e switch
     {
+        AgentStarted s => ("started", s),
         AgentText t => ("text", t),
         AgentTool t => ("tool", t),
         AgentAction a => ("action", a.Action),

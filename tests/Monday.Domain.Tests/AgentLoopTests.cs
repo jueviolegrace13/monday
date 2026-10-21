@@ -49,7 +49,8 @@ internal static class AgentLoopTests
         public ProjectId Project { get; private set; }
         public InMemoryProjectRepository Projects { get; } = new();
         public InMemoryModelUsageStore Usage { get; } = new();
-        public InMemoryConversationStore Conversations { get; } = new();
+        public CountingStore Conversations { get; } = new();
+        public ProjectService ProjectService { get; private set; } = null!;
         public ScriptedChatModel Model { get; private init; } = null!;
         public FakeFactory Factory { get; private init; } = null!;
         public AgentService Agent { get; private set; } = null!;
@@ -65,6 +66,7 @@ internal static class AgentLoopTests
             w.Box = box;
 
             var projects = new ProjectService(w.Projects, audit, clock);
+            w.ProjectService = projects;
             w.Project = new ProjectId(projects.CreateAsync("Shop", w.Owner, default).GetAwaiter().GetResult().Id);
             projects.SetMemberAsync(w.Project, w.Ana, Role.Debugger, w.Owner, default).GetAwaiter().GetResult();
             projects.SetMemberAsync(w.Project, w.Mia, Role.Monitor, w.Owner, default).GetAwaiter().GetResult();
@@ -95,6 +97,26 @@ internal static class AgentLoopTests
             Collect(Agent.ChatAsync(Project, user, new ChatInput(conversation, message, selected), default));
 
         public Usage MonthUsage() => Usage.MonthAsync(Project, "2026-10", default).GetAwaiter().GetResult();
+    }
+
+    /// <summary>The in-memory store, counting saves; it can fail every save after the first few.</summary>
+    private sealed class CountingStore : IConversationStore
+    {
+        public InMemoryConversationStore Inner { get; } = new();
+
+        public int Saves { get; private set; }
+
+        public int? FailAfter { get; set; }
+
+        public Task<Conversation?> GetAsync(ConversationId id, CancellationToken ct) => Inner.GetAsync(id, ct);
+
+        public Task<IReadOnlyList<ConversationSummary>> ListAsync(ProjectId project, UserId owner, CancellationToken ct) => Inner.ListAsync(project, owner, ct);
+
+        public Task SaveAsync(Conversation conversation, CancellationToken ct)
+        {
+            Saves++;
+            return Saves > FailAfter ? throw new InvalidOperationException("The database is down.") : Inner.SaveAsync(conversation, ct);
+        }
     }
 
     private sealed class FailingModel : IChatModel
@@ -140,9 +162,12 @@ internal static class AgentLoopTests
 
         var events = w.Chat(w.Ana, "Hi");
 
-        Assert.Equal("Hello there.", ((AgentText)events[0]).Text);
+        var started = (AgentStarted)events[0];
+        Assert.Equal("Hello there.", ((AgentText)events[1]).Text);
         var done = (AgentDone)events[^1];
         Assert.Equal(new Usage(100, 20), done.Usage);
+        Assert.Equal(started.ConversationId, done.ConversationId);
+        Assert.Equal(2, w.Conversations.Saves);
         Assert.Equal(new Usage(100, 20), w.MonthUsage());
         Assert.Equal(PlainKey, w.Factory.Key);
 
@@ -309,10 +334,11 @@ internal static class AgentLoopTests
 
         var events = Collect(agent.ChatAsync(w.Project, w.Ana, new ChatInput(null, "Hi", null), default));
 
-        Assert.Equal("Partial", ((AgentText)events[0]).Text);
+        Assert.True(events[0] is AgentStarted, "The turn starts with its conversation id.");
+        Assert.Equal("Partial", ((AgentText)events[1]).Text);
         var error = (AgentError)events[^1];
         Assert.Equal("model.rate_limited", error.Code);
-        Assert.Equal(2, events.Count);
+        Assert.Equal(3, events.Count);
     }
 
     public static void ConversationVisibleOnlyToOwner()
@@ -346,5 +372,156 @@ internal static class AgentLoopTests
         Assert.Equal("security", action.Action.Args.GetProperty("lens").GetString());
         Assert.True(events.IndexOf(action) > events.FindIndex(e => e is AgentTool), "The action follows its tool event.");
         Assert.True(w.Model.Requests[0].Instructions.Contains(Endpoint, StringComparison.Ordinal), "The selected node is in the instructions.");
+    }
+
+    public static void StartedComesFirstAndItsIdCanBeContinued()
+    {
+        var turns = Enumerable.Range(0, 8).Select(i => Call($"c{i}", "set_lens", """{"lens":"security"}""")).Append(Answer("Carrying on.")).ToArray();
+        var w = World.Build(new ScriptedChatModel(turns));
+
+        // A new conversation that ends in an error still tells the viewer its id, first.
+        var first = w.Chat(w.Ana, "Loop");
+        var started = (AgentStarted)first[0];
+        Assert.Equal("agent.step_cap", ((AgentError)first[^1]).Code);
+        Assert.Equal(1, first.OfType<AgentStarted>().Count());
+
+        var next = w.Chat(w.Ana, "Go on", started.ConversationId);
+        Assert.Equal(started.ConversationId, ((AgentStarted)next[0]).ConversationId);
+        Assert.Equal(started.ConversationId, ((AgentDone)next[^1]).ConversationId);
+    }
+
+    public static void ContinuingReplaysOnlyTextUnderTheCurrentRole()
+    {
+        var w = World.Build(new ScriptedChatModel(Answer("No code for you.")));
+        var earlier = Conversation.Start(w.Project, w.Ana, "Show me List", Now);
+        earlier.Append(ConversationMessage.Assistant("Here it is.", [new ConversationToolCall("c1", "node_detail", Json("""{"nodeId":"Shop.Items.List"}"""))], Now));
+        earlier.Append(ConversationMessage.Tool(new ConversationToolResult("c1", Json("""{"node":{"code":"return SECRETCODE;"}}"""), false), Now));
+        earlier.Append(ConversationMessage.Assistant("It returns SECRET items.", null, Now));
+        w.Conversations.SaveAsync(earlier, default).GetAwaiter().GetResult();
+        w.ProjectService.SetMemberAsync(w.Project, w.Ana, Role.Monitor, w.Owner, default).GetAwaiter().GetResult();
+
+        w.Chat(w.Ana, "And again?", earlier.Id.Value);
+
+        var sent = w.Model.Requests.Single().Messages;
+        Assert.True(sent.All(m => m.Role != ChatRole.Tool && m.ToolCalls is null && m.ToolResult is null), "No stored tool call or result is replayed.");
+        Assert.True(sent.All(m => m.Text?.Contains("SECRETCODE", StringComparison.Ordinal) != true), "Stored tool data never reaches the model.");
+        Assert.Equal(4, sent.Count);
+        Assert.Equal("Here it is.", sent[1].Text);
+        Assert.True(w.Model.Requests[0].Instructions.Contains("Monitor", StringComparison.Ordinal), "Tools run under the current role.");
+    }
+
+    public static void HistorySentIsAtMostTheLastTwentyTextMessages()
+    {
+        var w = World.Build(new ScriptedChatModel(Answer("Done.")));
+        var earlier = Conversation.Start(w.Project, w.Ana, "m0", Now);
+        for (var i = 1; i < 30; i++)
+        {
+            earlier.Append(i % 2 == 1 ? ConversationMessage.Assistant($"m{i}", null, Now) : ConversationMessage.User($"m{i}", Now));
+        }
+
+        w.Conversations.SaveAsync(earlier, default).GetAwaiter().GetResult();
+
+        w.Chat(w.Ana, "latest", earlier.Id.Value);
+
+        var sent = w.Model.Requests.Single().Messages;
+        Assert.True(sent.Count <= AgentService.MaxHistoryMessages, $"At most {AgentService.MaxHistoryMessages} messages are sent, got {sent.Count}.");
+        Assert.True(sent.Count >= AgentService.MaxHistoryMessages - 1, "The window is not cut further than needed.");
+        Assert.Equal(ChatRole.User, sent[0].Role);
+        Assert.Equal("latest", sent[^1].Text);
+    }
+
+    public static void ConcurrentAppendEndsWithBusy()
+    {
+        var w = World.Build(new ScriptedChatModel(Answer("First."), Answer("From B."), Answer("From A.")));
+        var id = ((AgentDone)w.Chat(w.Ana, "Start")[^1]).ConversationId;
+
+        // A is mid-answer when B, in another tab, appends to the same conversation.
+        var a = w.Agent.ChatAsync(w.Project, w.Ana, new ChatInput(id, "From tab A", null), default).GetAsyncEnumerator();
+        Assert.True(a.MoveNextAsync().AsTask().GetAwaiter().GetResult() && a.Current is AgentStarted, "A has started.");
+        Assert.True(w.Chat(w.Ana, "From tab B", id)[^1] is AgentDone, "B finishes first.");
+
+        var rest = new List<AgentEvent>();
+        while (a.MoveNextAsync().AsTask().GetAwaiter().GetResult())
+        {
+            rest.Add(a.Current);
+        }
+
+        a.DisposeAsync().AsTask().GetAwaiter().GetResult();
+        Assert.Equal("agent.busy", ((AgentError)rest[^1]).Code);
+
+        var stored = w.Conversations.GetAsync(new ConversationId(id), default).GetAwaiter().GetResult()!;
+        Assert.True(stored.Messages.All(m => m.Text != "From A."), "The losing turn is not mixed into the winner's history.");
+        Assert.Equal("From B.", stored.Messages[^1].Text);
+    }
+
+    public static void CapIsCheckedAgainBeforeEachStep()
+    {
+        var w = World.Build(new ScriptedChatModel(Call("c1", "set_lens", """{"lens":"security"}""", 60, 40), Answer("Never.")), cap: 100);
+
+        var events = w.Chat(w.Ana, "Show security");
+
+        Assert.Equal(1, w.Model.Requests.Count);
+        Assert.Equal("model.cap_reached", ((AgentError)events[^1]).Code);
+    }
+
+    public static void StopMidStreamKeepsThePartialAnswer()
+    {
+        var w = World.Build(new ScriptedChatModel([new TextDelta("Partial "), new TextDelta("rest"), new Finished(StopReason.EndTurn, new Usage(1, 1))]));
+        using var cts = new CancellationTokenSource();
+        Guid id = default;
+
+        Assert.Throws<OperationCanceledException>(() =>
+        {
+            var e = w.Agent.ChatAsync(w.Project, w.Ana, new ChatInput(null, "Tell me", null), cts.Token).GetAsyncEnumerator();
+            try
+            {
+                while (e.MoveNextAsync().AsTask().GetAwaiter().GetResult())
+                {
+                    if (e.Current is AgentStarted s)
+                    {
+                        id = s.ConversationId;
+                    }
+
+                    if (e.Current is AgentText)
+                    {
+                        cts.Cancel();
+                    }
+                }
+            }
+            finally
+            {
+                e.DisposeAsync().AsTask().GetAwaiter().GetResult();
+            }
+        });
+
+        var stored = w.Conversations.GetAsync(new ConversationId(id), default).GetAwaiter().GetResult()!;
+        Assert.Equal(2, stored.Messages.Count);
+        Assert.Equal("Partial", stored.Messages[1].Text);
+    }
+
+    public static void FailingFinalSaveDoesNotHideTheCancellation()
+    {
+        var w = World.Build(new ScriptedChatModel([new TextDelta("Partial "), new TextDelta("rest"), new Finished(StopReason.EndTurn, new Usage(1, 1))]));
+        w.Conversations.FailAfter = 1;
+        using var cts = new CancellationTokenSource();
+
+        Assert.Throws<OperationCanceledException>(() =>
+        {
+            var e = w.Agent.ChatAsync(w.Project, w.Ana, new ChatInput(null, "Tell me", null), cts.Token).GetAsyncEnumerator();
+            try
+            {
+                while (e.MoveNextAsync().AsTask().GetAwaiter().GetResult())
+                {
+                    if (e.Current is AgentText)
+                    {
+                        cts.Cancel();
+                    }
+                }
+            }
+            finally
+            {
+                e.DisposeAsync().AsTask().GetAwaiter().GetResult();
+            }
+        });
     }
 }

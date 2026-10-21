@@ -478,7 +478,7 @@ public sealed class PostgresModelUsageStore(NpgsqlDataSource db) : IModelUsageSt
     }
 }
 
-/// <summary>Conversations and their messages. Messages are append-only: a save inserts only the ones past those stored.</summary>
+/// <summary>Conversations and their messages. Messages are append-only: a save inserts only the ones past those stored, and a stale save fails.</summary>
 public sealed class PostgresConversationStore(NpgsqlDataSource db) : IConversationStore
 {
     private sealed record MessageBody(string? Text, IReadOnlyList<ConversationToolCall>? ToolCalls, ConversationToolResult? ToolResult);
@@ -561,21 +561,34 @@ public sealed class PostgresConversationStore(NpgsqlDataSource db) : IConversati
             stored = Convert.ToInt32(await count.ExecuteScalarAsync(ct).ConfigureAwait(false), System.Globalization.CultureInfo.InvariantCulture);
         }
 
+        // A copy loaded before another save is stale; so is one whose insert races another (the seq key is unique).
+        if (stored != conversation.StoredCount)
+        {
+            throw new ConversationConflictException();
+        }
+
         for (var seq = stored; seq < conversation.Messages.Count; seq++)
         {
             var m = conversation.Messages[seq];
             await using var insert = new NpgsqlCommand("""
                 INSERT INTO conversation_messages (conversation_id, seq, role, at, body) VALUES (@id, @s, @r, @at, @b::jsonb)
-                ON CONFLICT (conversation_id, seq) DO NOTHING
                 """, conn, tx);
             insert.Parameters.AddWithValue("id", conversation.Id.Value);
             insert.Parameters.AddWithValue("s", seq);
             insert.Parameters.AddWithValue("r", m.Role.ToString());
             insert.Parameters.AddWithValue("at", m.At);
             insert.Parameters.AddWithValue("b", Json.Write(new MessageBody(m.Text, m.ToolCalls, m.ToolResult)));
-            await insert.ExecuteNonQueryAsync(ct).ConfigureAwait(false);
+            try
+            {
+                await insert.ExecuteNonQueryAsync(ct).ConfigureAwait(false);
+            }
+            catch (PostgresException e) when (e.SqlState == PostgresErrorCodes.UniqueViolation)
+            {
+                throw new ConversationConflictException();
+            }
         }
 
         await tx.CommitAsync(ct).ConfigureAwait(false);
+        conversation.MarkStored();
     }
 }

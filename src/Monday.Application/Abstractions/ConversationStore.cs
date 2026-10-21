@@ -17,3 +17,6 @@ public interface IConversationStore
 
     Task SaveAsync(Conversation conversation, CancellationToken ct);
 }
+
+/// <summary>Someone else appended to the conversation since it was loaded; this save lost.</summary>
+public sealed class ConversationConflictException() : Exception("The conversation changed since it was loaded.");

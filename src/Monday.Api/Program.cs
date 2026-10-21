@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using Monday.Agent;
@@ -37,6 +38,17 @@ builder.Services.AddRateLimiter(o =>
             TokenLimit = 200,
             TokensPerPeriod = 50,
             ReplenishmentPeriod = TimeSpan.FromSeconds(1),
+            QueueLimit = 0,
+        }));
+
+    // One bucket per person for chat: each question can run up to 8 model turns on the project's key.
+    o.AddPolicy(ChatEndpoints.RateLimitPolicy, http => RateLimitPartition.GetTokenBucketLimiter(
+        http.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "anonymous",
+        _ => new TokenBucketRateLimiterOptions
+        {
+            TokenLimit = 20,
+            TokensPerPeriod = 20,
+            ReplenishmentPeriod = TimeSpan.FromMinutes(1),
             QueueLimit = 0,
         }));
 });

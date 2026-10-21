@@ -17,6 +17,9 @@ public sealed record ChatInput(Guid? ConversationId, string Message, string? Sel
 /// <summary>One thing the agent streams to the viewer while it answers.</summary>
 public abstract record AgentEvent;
 
+/// <summary>The turn has begun in this conversation; the first event of every turn.</summary>
+public sealed record AgentStarted(Guid ConversationId) : AgentEvent;
+
 /// <summary>A piece of the answer text.</summary>
 public sealed record AgentText(string Text) : AgentEvent;
 
@@ -53,6 +56,9 @@ public sealed class AgentService(
     /// <summary>Most model turns that run tools for one message; then the loop stops and says so.</summary>
     public const int MaxToolSteps = 8;
 
+    /// <summary>Most stored messages (user and assistant text) sent back to the model when a conversation continues.</summary>
+    public const int MaxHistoryMessages = 20;
+
     private const int MaxSelectedNodeLength = 512;
 
     public async IAsyncEnumerable<AgentEvent> ChatAsync(ProjectId id, UserId user, ChatInput input, [EnumeratorCancellation] CancellationToken ct)
@@ -80,108 +86,158 @@ public sealed class AgentService(
             conversation.Append(asked);
         }
 
-        var history = conversation.Messages.Select(ToChat).ToList();
-        var instructions = AgentInstructions.Build(project, role, selected);
-        var offered = tools.For(role, ToolChannel.Chat).Select(t => t.ToSpec()).ToList();
-        var context = new ToolContext(id, user, role, ToolChannel.Chat);
-        var month = ModelSettingsService.MonthOf(clock.Now);
-        var total = new Usage(0, 0);
-        var turn = new List<ConversationMessage>();
+        // The question is stored first: the id the viewer is given is real, and an append from another tab shows now.
+        var run = new Run(conversation);
+        if (!await TrySaveAsync(run).ConfigureAwait(false))
+        {
+            yield return Busy;
+            yield break;
+        }
 
+        yield return new AgentStarted(conversation.Id.Value);
+
+        // The turns run in an inner iterator, so a failure can be caught here (no yield may sit inside a catch'd try):
+        // what finished is saved, quietly, and the original exception is the one that surfaces.
+        var turns = TurnsAsync(run, project, role, selected, model, ct).GetAsyncEnumerator(ct);
+        var faulted = false;
         try
         {
-            for (var steps = 0; ; steps++)
+            while (true)
             {
-                if (steps == MaxToolSteps)
-                {
-                    yield return new AgentError("agent.step_cap", $"Stopped after {MaxToolSteps} tool steps. Ask again to carry on from here.");
-                    yield break;
-                }
-
-                ct.ThrowIfCancellationRequested();
-                var text = new StringBuilder();
-                var calls = new List<ConversationToolCall>();
-                Usage? used = null;
-                AgentError? failed = null;
-                var stream = model.StreamAsync(new ModelRequest(instructions, [.. history], offered), ct).GetAsyncEnumerator(ct);
+                AgentEvent next;
                 try
                 {
-                    while (true)
+                    if (!await turns.MoveNextAsync().ConfigureAwait(false))
                     {
-                        var (more, error) = await NextAsync(stream).ConfigureAwait(false);
-                        if (error is not null || !more)
-                        {
-                            failed = error;
-                            break;
-                        }
-
-                        switch (stream.Current)
-                        {
-                            case TextDelta { Text.Length: > 0 } delta:
-                                text.Append(delta.Text);
-                                yield return new AgentText(delta.Text);
-                                break;
-                            case ToolCall call:
-                                calls.Add(new ConversationToolCall(call.Id, call.Name, call.Args));
-                                break;
-                            case Finished finished:
-                                used = finished.Usage;
-                                break;
-                        }
-                    }
-                }
-                finally
-                {
-                    await stream.DisposeAsync().ConfigureAwait(false);
-
-                    // Recorded even when the viewer left mid-turn: the provider charged for it.
-                    if (used is not null)
-                    {
-                        total = new Usage(total.InputTokens + used.InputTokens, total.OutputTokens + used.OutputTokens);
-                        await usage.AddAsync(id, month, used, CancellationToken.None).ConfigureAwait(false);
-                    }
-                }
-
-                if (failed is not null)
-                {
-                    if (text.Length > 0)
-                    {
-                        conversation.Append(ConversationMessage.Assistant(text.ToString(), null, clock.Now));
+                        break;
                     }
 
-                    yield return failed;
-                    yield break;
+                    next = turns.Current;
                 }
-
-                turn.Add(ConversationMessage.Assistant(text.ToString(), calls, clock.Now));
-                foreach (var call in calls)
+                catch (Exception)
                 {
-                    var (result, nodeIds, action) = await RunToolAsync(call, context, ct).ConfigureAwait(false);
-                    turn.Add(ConversationMessage.Tool(result, clock.Now));
-                    yield return new AgentTool(call.Name, nodeIds, result.IsError);
-                    if (action is not null)
-                    {
-                        yield return new AgentAction(action);
-                    }
+                    faulted = true;
+                    await SaveQuietlyAsync(run).ConfigureAwait(false);
+                    throw;
                 }
 
-                history.AddRange(turn.Select(ToChat));
-                CloseTurn(conversation, turn);
-                await conversations.SaveAsync(conversation, CancellationToken.None).ConfigureAwait(false);
-
-                if (calls.Count == 0)
-                {
-                    yield return new AgentDone(conversation.Id.Value, total);
-                    yield break;
-                }
+                yield return next;
             }
         }
         finally
         {
-            // A turn cut off while its tools ran keeps what finished; each unanswered call gets a "cancelled" result,
-            // so the stored history stays valid for providers that require a result for every call.
-            CloseTurn(conversation, turn);
-            await conversations.SaveAsync(conversation, CancellationToken.None).ConfigureAwait(false);
+            await turns.DisposeAsync().ConfigureAwait(false);
+
+            // The viewer stopped reading (Stop, closed tab) between events: keep what finished.
+            if (!faulted)
+            {
+                await SaveQuietlyAsync(run).ConfigureAwait(false);
+            }
+        }
+    }
+
+    private async IAsyncEnumerable<AgentEvent> TurnsAsync(Run run, Project project, Role role, string? selected, IChatModel model, [EnumeratorCancellation] CancellationToken ct)
+    {
+        var conversation = run.Conversation;
+        var history = Replay(conversation);
+        var instructions = AgentInstructions.Build(project, role, selected);
+        var offered = tools.For(role, ToolChannel.Chat).Select(t => t.ToSpec()).ToList();
+        var context = new ToolContext(project.Id, conversation.Owner, role, ToolChannel.Chat);
+        var month = ModelSettingsService.MonthOf(clock.Now);
+
+        for (var steps = 0; ; steps++)
+        {
+            if (steps == MaxToolSteps)
+            {
+                yield return new AgentError("agent.step_cap", $"Stopped after {MaxToolSteps} tool steps. Ask again to carry on from here.");
+                yield break;
+            }
+
+            if (steps > 0 && await CapReachedAsync(project, ct).ConfigureAwait(false) is { } capped)
+            {
+                yield return capped;
+                yield break;
+            }
+
+            ct.ThrowIfCancellationRequested();
+            var calls = new List<ConversationToolCall>();
+            Usage? used = null;
+            AgentError? failed = null;
+            var stream = model.StreamAsync(new ModelRequest(instructions, [.. history], offered), ct).GetAsyncEnumerator(ct);
+            try
+            {
+                while (true)
+                {
+                    var (more, error) = await NextAsync(stream).ConfigureAwait(false);
+                    if (error is not null || !more)
+                    {
+                        failed = error;
+                        break;
+                    }
+
+                    switch (stream.Current)
+                    {
+                        case TextDelta { Text.Length: > 0 } delta:
+                            run.Streaming.Append(delta.Text);
+                            yield return new AgentText(delta.Text);
+                            break;
+                        case ToolCall call:
+                            calls.Add(new ConversationToolCall(call.Id, call.Name, call.Args));
+                            break;
+                        case Finished finished:
+                            used = finished.Usage;
+                            break;
+                    }
+                }
+            }
+            finally
+            {
+                await stream.DisposeAsync().ConfigureAwait(false);
+
+                // Recorded even when the viewer left mid-turn: the provider charged for it.
+                if (used is not null)
+                {
+                    run.Total = new Usage(run.Total.InputTokens + used.InputTokens, run.Total.OutputTokens + used.OutputTokens);
+                    await usage.AddAsync(project.Id, month, used, CancellationToken.None).ConfigureAwait(false);
+                }
+            }
+
+            if (failed is not null)
+            {
+                // Partial text is kept (CloseTurn), the model's failure is what the viewer sees.
+                CloseTurn(run);
+                await TrySaveAsync(run).ConfigureAwait(false);
+                yield return failed;
+                yield break;
+            }
+
+            run.Turn.Add(ConversationMessage.Assistant(run.Streaming.ToString(), calls, clock.Now));
+            run.Streaming.Clear();
+            foreach (var call in calls)
+            {
+                var (result, nodeIds, action) = await RunToolAsync(call, context, ct).ConfigureAwait(false);
+                run.Turn.Add(ConversationMessage.Tool(result, clock.Now));
+                yield return new AgentTool(call.Name, nodeIds, result.IsError);
+                if (action is not null)
+                {
+                    yield return new AgentAction(action);
+                }
+            }
+
+            // This turn's own tool calls and results go to the model; stored ones from earlier messages never do.
+            history.AddRange(run.Turn.Select(ToChat));
+            CloseTurn(run);
+            if (!await TrySaveAsync(run).ConfigureAwait(false))
+            {
+                yield return Busy;
+                yield break;
+            }
+
+            if (calls.Count == 0)
+            {
+                yield return new AgentDone(conversation.Id.Value, run.Total);
+                yield break;
+            }
         }
     }
 
@@ -228,7 +284,7 @@ public sealed class AgentService(
 
     private async Task<AgentError?> RefusalAsync(Project project, CancellationToken ct)
     {
-        if (project.Model is not { } settings)
+        if (project.Model is null)
         {
             return new AgentError("model.not_configured", "No model is set up for this project yet. An Owner or Admin can add one in settings.");
         }
@@ -238,7 +294,13 @@ public sealed class AgentService(
             return new AgentError("model.keys_disabled", "Chat is off: Monday has no MONDAY_SECRETS_KEY to open the model key.");
         }
 
-        if (settings.MonthlyTokenCap is { } cap)
+        return await CapReachedAsync(project, ct).ConfigureAwait(false);
+    }
+
+    /// <summary>Checked before the first model call and again before each tool step.</summary>
+    private async Task<AgentError?> CapReachedAsync(Project project, CancellationToken ct)
+    {
+        if (project.Model?.MonthlyTokenCap is { } cap)
         {
             var used = await usage.MonthAsync(project.Id, ModelSettingsService.MonthOf(clock.Now), ct).ConfigureAwait(false);
             if ((long)used.InputTokens + used.OutputTokens >= cap)
@@ -341,26 +403,100 @@ public sealed class AgentService(
     private static (ConversationToolResult, IReadOnlyList<string>, ScreenAction?) Failed(ConversationToolCall call, string message) =>
         (new ConversationToolResult(call.Id, JsonSerializer.SerializeToElement(new Dictionary<string, string> { ["error"] = message }), true), [], null);
 
-    /// <summary>Moves a finished (or cut off) turn into the conversation, answering any call left without a result.</summary>
-    private void CloseTurn(Conversation conversation, List<ConversationMessage> turn)
+    /// <summary>
+    /// Moves a finished (or cut off) turn into the conversation: text that was streaming when the turn stopped is kept,
+    /// and each call left without a result gets a "cancelled" one, so the stored record stays whole.
+    /// </summary>
+    private void CloseTurn(Run run)
     {
-        if (turn.Count == 0)
+        if (run.Turn.Count == 0 && run.Streaming.Length > 0)
+        {
+            run.Turn.Add(ConversationMessage.Assistant(run.Streaming.ToString().TrimEnd(), null, clock.Now));
+        }
+
+        run.Streaming.Clear();
+        if (run.Turn.Count == 0)
         {
             return;
         }
 
-        var answered = turn.Where(m => m.ToolResult is not null).Select(m => m.ToolResult!.CallId).ToHashSet(StringComparer.Ordinal);
-        foreach (var call in turn[0].ToolCalls.Where(c => !answered.Contains(c.Id)))
+        var answered = run.Turn.Where(m => m.ToolResult is not null).Select(m => m.ToolResult!.CallId).ToHashSet(StringComparer.Ordinal);
+        foreach (var call in run.Turn[0].ToolCalls.Where(c => !answered.Contains(c.Id)))
         {
-            turn.Add(ConversationMessage.Tool(Failed(call, "cancelled: The person stopped the answer.").Item1, clock.Now));
+            run.Turn.Add(ConversationMessage.Tool(Failed(call, "cancelled: The person stopped the answer.").Item1, clock.Now));
         }
 
-        foreach (var message in turn)
+        foreach (var message in run.Turn)
         {
-            conversation.Append(message);
+            run.Conversation.Append(message);
         }
 
-        turn.Clear();
+        run.Turn.Clear();
+    }
+
+    /// <summary>Saves what is unsaved. False when another tab appended first: this turn lost, and nothing more is saved.</summary>
+    private async Task<bool> TrySaveAsync(Run run)
+    {
+        if (run.Abandoned || !run.Conversation.HasUnsaved)
+        {
+            return !run.Abandoned;
+        }
+
+        try
+        {
+            await conversations.SaveAsync(run.Conversation, CancellationToken.None).ConfigureAwait(false);
+            return true;
+        }
+        catch (ConversationConflictException)
+        {
+            run.Abandoned = true;
+            return false;
+        }
+    }
+
+    /// <summary>The last save on the way out. Best effort: it never replaces the exception (or Stop) that ended the turn.</summary>
+    private async Task SaveQuietlyAsync(Run run)
+    {
+        try
+        {
+            CloseTurn(run);
+            await TrySaveAsync(run).ConfigureAwait(false);
+        }
+        catch (Exception)
+        {
+            // Swallowed on purpose: the original exception is rethrown by the caller.
+        }
+    }
+
+    /// <summary>
+    /// What a continued conversation sends the model: the last <see cref="MaxHistoryMessages"/> user and assistant texts,
+    /// starting with a user message. Stored tool calls and results are never replayed, so a member whose role dropped
+    /// cannot get back data their old role saw; the model runs tools again under the current role.
+    /// </summary>
+    private static List<ChatMessage> Replay(Conversation conversation) =>
+        [.. conversation.Messages
+            .Where(m => m.Role != ConversationRole.Tool && !string.IsNullOrEmpty(m.Text))
+            .Select(m => new ChatMessage(m.Role == ConversationRole.User ? ChatRole.User : ChatRole.Assistant, m.Text))
+            .TakeLast(MaxHistoryMessages)
+            .SkipWhile(m => m.Role != ChatRole.User)];
+
+    private static AgentError Busy => new("agent.busy", "This conversation changed in another tab. Reload it and ask again.");
+
+    /// <summary>The state one chat request carries between its turns.</summary>
+    private sealed class Run(Conversation conversation)
+    {
+        public Conversation Conversation { get; } = conversation;
+
+        /// <summary>The current turn: the assistant message and the tool results that answer it.</summary>
+        public List<ConversationMessage> Turn { get; } = [];
+
+        /// <summary>Text of the model stream in progress, kept if the turn is cut off.</summary>
+        public StringBuilder Streaming { get; } = new();
+
+        public Usage Total { get; set; } = new(0, 0);
+
+        /// <summary>Another tab saved first; this request saves nothing more.</summary>
+        public bool Abandoned { get; set; }
     }
 
     private static ChatMessage ToChat(ConversationMessage m) => m.Role switch
