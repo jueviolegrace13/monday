@@ -8,6 +8,7 @@ import {
   untracked,
   viewChild,
 } from '@angular/core';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { MondayApi, ProjectSummary } from './api/monday-api';
 import { ChatPanelComponent } from './chat/chat-panel.component';
 import { ChatStore } from './chat/chat-store';
@@ -26,11 +27,19 @@ const isTyping = (target: EventTarget | null): boolean =>
 
 /**
  * The shell: a top bar with the project picker, and the workspace: the code graph, with the chat
- * floating docked left and the node detail docked right.
+ * floating docked left and the node detail docked right. A routed screen (personal tokens)
+ * takes the workspace's place below the bar while it is open.
  */
 @Component({
   selector: 'app-root',
-  imports: [GraphCanvasComponent, ChatPanelComponent, NodePanelComponent],
+  imports: [
+    RouterOutlet,
+    RouterLink,
+    RouterLinkActive,
+    GraphCanvasComponent,
+    ChatPanelComponent,
+    NodePanelComponent,
+  ],
   templateUrl: './app.html',
   styleUrl: './app.css',
   host: { '(document:keydown)': 'shortcut($event)' },
@@ -51,6 +60,9 @@ export class App implements OnInit {
   protected readonly canManageModel = computed(() =>
     ['Owner', 'Admin'].includes(this.selected()?.role ?? ''),
   );
+
+  /** True while a routed screen is open in place of the workspace. */
+  protected readonly routed = signal(false);
 
   protected readonly chatOpen = signal(false);
   protected readonly nodeOpen = signal(true);

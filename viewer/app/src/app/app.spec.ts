@@ -1,5 +1,7 @@
 import { TestBed } from '@angular/core/testing';
+import { Router, provideRouter } from '@angular/router';
 import { App } from './app';
+import { routes } from './app.routes';
 import { GraphView, MondayApi, ProjectSummary } from './api/monday-api';
 import { VIS_LOADER } from './graph/vis';
 
@@ -14,9 +16,14 @@ async function render(projects: () => Promise<ProjectSummary[]>) {
   await TestBed.configureTestingModule({
     imports: [App],
     providers: [
+      provideRouter(routes),
       {
         provide: MondayApi,
-        useValue: { projects, graph: async (): Promise<GraphView | null> => null },
+        useValue: {
+          projects,
+          graph: async (): Promise<GraphView | null> => null,
+          tokens: async () => [],
+        },
       },
       // jsdom has no canvas: the graph library never loads in these tests.
       { provide: VIS_LOADER, useValue: () => new Promise(() => undefined) },
@@ -82,5 +89,24 @@ describe('App', () => {
     fixture.detectChanges();
 
     expect(page.querySelector('.mode')?.textContent).toBe('ask only');
+  });
+
+  it('links to the tokens screen, which replaces the graph until you go back', async () => {
+    const { page, fixture } = await render(async () => [project('a', 'Monday')]);
+    const link = page.querySelector<HTMLAnchorElement>('a.nav')!;
+    expect(link.textContent?.trim()).toBe('Tokens');
+    expect(link.getAttribute('href')).toBe('/settings/tokens');
+
+    await TestBed.inject(Router).navigateByUrl('/settings/tokens');
+    await fixture.whenStable();
+    fixture.detectChanges();
+    expect(page.querySelector('app-tokens')).not.toBeNull();
+    expect(page.querySelector('app-graph-canvas')).toBeNull();
+
+    await TestBed.inject(Router).navigateByUrl('/');
+    await fixture.whenStable();
+    fixture.detectChanges();
+    expect(page.querySelector('app-tokens')).toBeNull();
+    expect(page.querySelector('app-graph-canvas')).not.toBeNull();
   });
 });

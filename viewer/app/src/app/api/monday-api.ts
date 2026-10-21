@@ -129,6 +129,40 @@ export interface Conversation {
   messages: ConversationMessage[];
 }
 
+// ---- Personal access tokens ---------------------------------------------------------------
+
+/** `read`, or `read_propose`: read and also propose a decision (never approve one). */
+export type TokenScope = 'read' | 'read_propose';
+
+/** A token as the list shows it: its public prefix, never the secret. */
+export interface PersonalTokenView {
+  id: string;
+  name: string;
+  prefix: string;
+  scope: TokenScope;
+  /** The projects it is limited to; null means every project its owner is a member of. */
+  projects: string[] | null;
+  createdAt: string;
+  expiresAt: string;
+  revokedAt: string | null;
+  lastUsedAt: string | null;
+  active: boolean;
+}
+
+/** Null projects means all of the person's projects; null lifetime means 90 days. */
+export interface PersonalTokenInput {
+  name: string;
+  scope: TokenScope;
+  projects: string[] | null;
+  lifetimeDays: number | null;
+}
+
+/** A new token. `plain` is in this one response only; the API never returns it again. */
+export interface IssuedToken {
+  token: PersonalTokenView;
+  plain: string;
+}
+
 // ---- Chat ----------------------------------------------------------------------------------
 
 /** What the person asks; the server finds the rest (who they are, what they may see). */
@@ -247,6 +281,30 @@ export class MondayApi {
     signal?: AbortSignal,
   ): Promise<Conversation> {
     return this.get(`/projects/${projectId}/conversations/${conversationId}`, signal);
+  }
+
+  /** The signed-in person's own personal access tokens, newest first. */
+  tokens(signal?: AbortSignal): Promise<PersonalTokenView[]> {
+    return this.get('/me/tokens/', signal);
+  }
+
+  /** Creates a token. The plain token comes back here once and is never sent again. */
+  async createToken(input: PersonalTokenInput, signal?: AbortSignal): Promise<IssuedToken> {
+    const response = await this.send('/me/tokens/', {
+      method: 'POST',
+      headers: this.headers({ 'Content-Type': 'application/json', Accept: 'application/json' }),
+      body: JSON.stringify(input),
+      signal,
+    });
+    return (await response.json()) as IssuedToken;
+  }
+
+  async revokeToken(id: string, signal?: AbortSignal): Promise<void> {
+    await this.send(`/me/tokens/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+      headers: this.headers({}),
+      signal,
+    });
   }
 
   /** Requests as they happen (server-sent events). Ends when the signal aborts or the server closes. */

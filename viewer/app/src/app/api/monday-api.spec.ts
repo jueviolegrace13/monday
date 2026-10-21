@@ -237,3 +237,51 @@ describe('MondayApi requests', () => {
     await expect(api.projects()).rejects.toMatchObject({ status: 502 });
   });
 });
+
+describe('MondayApi personal tokens', () => {
+  function apiWith(respond: (url: string, init: RequestInit) => Response) {
+    const calls: { url: string; init: RequestInit }[] = [];
+    const api = new MondayApi({
+      devUser: 'dev',
+      fetch: async (url, init) => {
+        calls.push({ url: String(url), init: init ?? {} });
+        return respond(String(url), init ?? {});
+      },
+    });
+    return { api, calls };
+  }
+
+  it('lists, creates and revokes under /me/tokens', async () => {
+    const token = { id: 't1', name: 'laptop', prefix: 'mpat_abc' };
+    const { api, calls } = apiWith((_, init) =>
+      init.method === 'POST'
+        ? json({ token, plain: 'mpat_abc_secret' }, 201)
+        : init.method === 'DELETE'
+          ? new Response(null, { status: 204 })
+          : json([token]),
+    );
+
+    expect(await api.tokens()).toEqual([token]);
+    const input = { name: 'laptop', scope: 'read' as const, projects: null, lifetimeDays: 90 };
+    expect(await api.createToken(input)).toEqual({ token, plain: 'mpat_abc_secret' });
+    await api.revokeToken('t1');
+
+    expect(calls.map((c) => `${c.init.method} ${c.url}`)).toEqual([
+      'GET /me/tokens/',
+      'POST /me/tokens/',
+      'DELETE /me/tokens/t1',
+    ]);
+    expect(JSON.parse(String(calls[1].init.body))).toEqual(input);
+    expect(new Headers(calls[2].init.headers).get('X-Monday-Dev-User')).toBe('dev');
+  });
+
+  it('turns a refused create into an ApiError with its code', async () => {
+    const { api } = apiWith(() =>
+      json({ title: 'A token can last one year at most.', code: 'token.lifetime_max' }, 400),
+    );
+
+    await expect(
+      api.createToken({ name: 'x', scope: 'read', projects: null, lifetimeDays: 400 }),
+    ).rejects.toMatchObject({ status: 400, code: 'token.lifetime_max' });
+  });
+});

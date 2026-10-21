@@ -91,6 +91,33 @@ p {
   color: var(--text-muted);
 }
 
+.nav {
+  margin-left: auto;
+  color: var(--text-muted);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.role + .nav {
+  margin-left: 0;
+}
+
+.nav:hover {
+  color: var(--accent);
+}
+
+.nav.current {
+  color: var(--text);
+}
+
+/* The outlet is only a marker; the routed screen renders after it, in the workspace's row. */
+router-outlet {
+  display: none;
+}
+
 .workspace {
   position: relative;
   min-height: 0;

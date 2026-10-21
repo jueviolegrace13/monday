@@ -14,58 +14,69 @@
       <span class="role mono">{{ project.role }}</span>
     }
   }
+  <a
+    class="nav"
+    routerLink="/settings/tokens"
+    routerLinkActive="current"
+    ariaCurrentWhenActive="page"
+    >Tokens</a
+  >
 </header>
 
-@switch (load()) {
-  @case ('loading') {
-    <main class="stage">
-      <p class="muted">Loading projects</p>
-    </main>
-  }
-  @case ('failed') {
-    <main class="stage">
-      <section class="empty">
-        <h1>Could not load projects</h1>
-        <p class="muted">{{ error() }}</p>
-        <button type="button" (click)="reload()">Try again</button>
-      </section>
-    </main>
-  }
-  @default {
-    @if (selected(); as project) {
-      <main class="workspace">
-        <h1 class="sr-only">{{ project.name }}</h1>
-        <app-graph-canvas
-          [projectId]="project.id"
-          (engineReady)="engineReady($event)"
-          (selected)="selectedNode.set($event)"
-        />
-        <app-chat-panel
-          [store]="chat"
-          [projectId]="project.id"
-          [open]="chatOpen()"
-          [canAct]="canAct()"
-          [canManageModel]="canManageModel()"
-          [selectedName]="selectedName()"
-          (toggle)="toggleChat()"
-          (showNodes)="showNodes($event)"
-        />
-        <app-node-panel
-          [projectId]="project.id"
-          [nodeId]="selectedNode()"
-          [open]="nodeOpen()"
-          (toggle)="nodeOpen.set(!nodeOpen())"
-          (focusNode)="focusNode($event)"
-          (selectNode)="selectNode($event)"
-        />
+<router-outlet (activate)="routed.set(true)" (deactivate)="routed.set(false)" />
+
+@if (!routed()) {
+  @switch (load()) {
+    @case ('loading') {
+      <main class="stage">
+        <p class="muted">Loading projects</p>
       </main>
-    } @else {
+    }
+    @case ('failed') {
       <main class="stage">
         <section class="empty">
-          <h1>No projects yet</h1>
-          <p class="muted">Projects you are a member of appear here.</p>
+          <h1>Could not load projects</h1>
+          <p class="muted">{{ error() }}</p>
+          <button type="button" (click)="reload()">Try again</button>
         </section>
       </main>
+    }
+    @default {
+      @if (selected(); as project) {
+        <main class="workspace">
+          <h1 class="sr-only">{{ project.name }}</h1>
+          <app-graph-canvas
+            [projectId]="project.id"
+            (engineReady)="engineReady($event)"
+            (selected)="selectedNode.set($event)"
+          />
+          <app-chat-panel
+            [store]="chat"
+            [projectId]="project.id"
+            [open]="chatOpen()"
+            [canAct]="canAct()"
+            [canManageModel]="canManageModel()"
+            [selectedName]="selectedName()"
+            (toggle)="toggleChat()"
+            (showNodes)="showNodes($event)"
+          />
+          <app-node-panel
+            [projectId]="project.id"
+            [nodeId]="selectedNode()"
+            [open]="nodeOpen()"
+            (toggle)="nodeOpen.set(!nodeOpen())"
+            (focusNode)="focusNode($event)"
+            (selectNode)="selectNode($event)"
+          />
+        </main>
+      } @else {
+        <main class="stage">
+          <section class="empty">
+            <h1>No projects yet</h1>
+            <p class="muted">Projects you are a member of appear here.</p>
+          </section>
+        </main>
+      }
     }
   }
 }
