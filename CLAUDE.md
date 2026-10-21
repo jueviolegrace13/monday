@@ -46,6 +46,16 @@ dotnet run --project src/Monday.Indexer -- --root .     # writes .monday/graph.j
 Offline (no NuGet), build the indexer against the SDK's own Roslyn:
 `dotnet build src/Monday.Indexer -p:UseSdkRoslyn=true`.
 
+The domain test project references `Monday.Api` (which uses the MCP SDK), so it needs NuGet too.
+
+Viewer (`viewer/app`, Node >= 22.22.3):
+
+```bash
+npm test -- --watch=false                               # unit tests
+npm run build                                           # builds into src/Monday.Api/wwwroot
+npm run e2e                                             # Playwright against local ng serve, API stubbed
+```
+
 ## Design
 
 Read `design/TASTE.md` before any UI work. It is not optional.
