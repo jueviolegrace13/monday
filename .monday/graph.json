@@ -1,5 +1,5 @@
 {
-  "commit": "018b1825a081",
+  "commit": "0c5bfc26b168",
   "nodes": [
     {
       "id": "app",
@@ -400,7 +400,7 @@
       "parentId": "feature:Monday.Api/Endpoints",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
       "startLine": 28,
-      "endLine": 35,
+      "endLine": 36,
       "guards": []
     },
     {
@@ -449,8 +449,8 @@
       "name": "ProjectEndpoints",
       "parentId": "feature:Monday.Api/Endpoints",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
-      "startLine": 38,
-      "endLine": 123,
+      "startLine": 39,
+      "endLine": 124,
       "guards": []
     },
     {
@@ -919,8 +919,8 @@
       "name": "PersonalTokenRights",
       "parentId": "feature:Monday.Application/Access",
       "file": "src/Monday.Application/Access/PersonalTokenService.cs",
-      "startLine": 132,
-      "endLine": 145,
+      "startLine": 133,
+      "endLine": 146,
       "guards": []
     },
     {
@@ -930,7 +930,7 @@
       "parentId": "feature:Monday.Application/Access",
       "file": "src/Monday.Application/Access/PersonalTokenService.cs",
       "startLine": 34,
-      "endLine": 129,
+      "endLine": 130,
       "guards": []
     },
     {
@@ -1020,7 +1020,7 @@
       "parentId": "feature:Monday.Application/Agent",
       "file": "src/Monday.Application/Agent/AgentService.cs",
       "startLine": 47,
-      "endLine": 519,
+      "endLine": 520,
       "guards": []
     },
     {
@@ -1029,8 +1029,8 @@
       "name": "Run",
       "parentId": "T:Monday.Application.Agent.AgentService",
       "file": "src/Monday.Application/Agent/AgentService.cs",
-      "startLine": 495,
-      "endLine": 509,
+      "startLine": 496,
+      "endLine": 510,
       "guards": []
     },
     {
@@ -1259,8 +1259,8 @@
       "name": "DraftDecisionTool",
       "parentId": "feature:Monday.Application/Agent",
       "file": "src/Monday.Application/Agent/Tools/DecisionTools.cs",
-      "startLine": 41,
-      "endLine": 84,
+      "startLine": 42,
+      "endLine": 85,
       "guards": []
     },
     {
@@ -1310,7 +1310,7 @@
       "parentId": "feature:Monday.Application/Agent",
       "file": "src/Monday.Application/Agent/Tools/DecisionTools.cs",
       "startLine": 8,
-      "endLine": 38,
+      "endLine": 39,
       "guards": []
     },
     {
@@ -1479,8 +1479,8 @@
       "name": "DecisionProposal",
       "parentId": "feature:Monday.Application/Decisions",
       "file": "src/Monday.Application/Decisions/DecisionService.cs",
-      "startLine": 10,
-      "endLine": 10,
+      "startLine": 11,
+      "endLine": 11,
       "guards": []
     },
     {
@@ -1489,8 +1489,8 @@
       "name": "DecisionService",
       "parentId": "feature:Monday.Application/Decisions",
       "file": "src/Monday.Application/Decisions/DecisionService.cs",
-      "startLine": 13,
-      "endLine": 64,
+      "startLine": 14,
+      "endLine": 67,
       "guards": []
     },
     {
@@ -1570,7 +1570,7 @@
       "parentId": "feature:Monday.Application/Traffic",
       "file": "src/Monday.Application/Traffic/TrafficService.cs",
       "startLine": 40,
-      "endLine": 132,
+      "endLine": 133,
       "guards": []
     },
     {
@@ -1610,7 +1610,7 @@
       "parentId": "feature:Monday.Domain/Access",
       "file": "src/Monday.Domain/Access/PersonalToken.cs",
       "startLine": 44,
-      "endLine": 172,
+      "endLine": 185,
       "guards": []
     },
     {
@@ -1769,8 +1769,8 @@
       "name": "ModelSettingsChanged",
       "parentId": "feature:Monday.Domain/Agent",
       "file": "src/Monday.Domain/Agent/ModelSettings.cs",
-      "startLine": 91,
-      "endLine": 91,
+      "startLine": 92,
+      "endLine": 93,
       "guards": []
     },
     {
@@ -1779,8 +1779,8 @@
       "name": "ModelSettingsCleared",
       "parentId": "feature:Monday.Domain/Agent",
       "file": "src/Monday.Domain/Agent/ModelSettings.cs",
-      "startLine": 93,
-      "endLine": 93,
+      "startLine": 95,
+      "endLine": 95,
       "guards": []
     },
     {
@@ -1790,7 +1790,7 @@
       "parentId": "feature:Monday.Domain/Audit",
       "file": "src/Monday.Domain/Audit/AuditEntry.cs",
       "startLine": 11,
-      "endLine": 29,
+      "endLine": 37,
       "guards": []
     },
     {
@@ -1999,8 +1999,8 @@
       "name": "AccessDeniedException",
       "parentId": "feature:Monday.Domain/Projects",
       "file": "src/Monday.Domain/Projects/Project.cs",
-      "startLine": 289,
-      "endLine": 293,
+      "startLine": 290,
+      "endLine": 294,
       "guards": []
     },
     {
@@ -2120,7 +2120,7 @@
       "parentId": "feature:Monday.Domain/Projects",
       "file": "src/Monday.Domain/Projects/Project.cs",
       "startLine": 33,
-      "endLine": 287,
+      "endLine": 288,
       "guards": []
     },
     {
@@ -2180,7 +2180,7 @@
       "parentId": "module:Monday.Domain.Tests",
       "file": "tests/Monday.Domain.Tests/AgentLoopTests.cs",
       "startLine": 21,
-      "endLine": 555,
+      "endLine": 564,
       "guards": []
     },
     {
@@ -2260,7 +2260,7 @@
       "parentId": "module:Monday.Domain.Tests",
       "file": "tests/Monday.Domain.Tests/AgentToolTests.cs",
       "startLine": 25,
-      "endLine": 343,
+      "endLine": 356,
       "guards": []
     },
     {
@@ -2389,8 +2389,8 @@
       "name": "DecisionDraftTests",
       "parentId": "module:Monday.Domain.Tests",
       "file": "tests/Monday.Domain.Tests/DecisionDraftTests.cs",
-      "startLine": 8,
-      "endLine": 42,
+      "startLine": 9,
+      "endLine": 54,
       "guards": []
     },
     {
@@ -2409,8 +2409,8 @@
       "name": "McpTests",
       "parentId": "module:Monday.Domain.Tests",
       "file": "tests/Monday.Domain.Tests/McpTests.cs",
-      "startLine": 29,
-      "endLine": 296,
+      "startLine": 31,
+      "endLine": 312,
       "guards": []
     },
     {
@@ -2419,8 +2419,8 @@
       "name": "Host",
       "parentId": "T:Monday.Domain.Tests.McpTests",
       "file": "tests/Monday.Domain.Tests/McpTests.cs",
-      "startLine": 41,
-      "endLine": 109,
+      "startLine": 43,
+      "endLine": 111,
       "guards": []
     },
     {
@@ -2429,8 +2429,8 @@
       "name": "MovableClock",
       "parentId": "T:Monday.Domain.Tests.McpTests",
       "file": "tests/Monday.Domain.Tests/McpTests.cs",
-      "startLine": 36,
-      "endLine": 39,
+      "startLine": 38,
+      "endLine": 41,
       "guards": []
     },
     {
@@ -2439,8 +2439,8 @@
       "name": "Session",
       "parentId": "T:Monday.Domain.Tests.McpTests",
       "file": "tests/Monday.Domain.Tests/McpTests.cs",
-      "startLine": 111,
-      "endLine": 127,
+      "startLine": 113,
+      "endLine": 129,
       "guards": []
     },
     {
@@ -2520,7 +2520,7 @@
       "parentId": "module:Monday.Domain.Tests",
       "file": "tests/Monday.Domain.Tests/ModelSettingsTests.cs",
       "startLine": 10,
-      "endLine": 120,
+      "endLine": 134,
       "guards": []
     },
     {
@@ -2530,7 +2530,7 @@
       "parentId": "module:Monday.Domain.Tests",
       "file": "tests/Monday.Domain.Tests/PersonalTokenTests.cs",
       "startLine": 13,
-      "endLine": 290,
+      "endLine": 332,
       "guards": []
     },
     {
@@ -2549,8 +2549,8 @@
       "name": "World",
       "parentId": "T:Monday.Domain.Tests.PersonalTokenTests",
       "file": "tests/Monday.Domain.Tests/PersonalTokenTests.cs",
-      "startLine": 124,
-      "endLine": 154,
+      "startLine": 149,
+      "endLine": 179,
       "guards": []
     },
     {
@@ -3359,10 +3359,10 @@
       "name": "Of",
       "parentId": "T:Monday.Api.Endpoints.DecisionView",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
-      "startLine": 32,
-      "endLine": 34,
-      "code": "public static DecisionView Of(Decision d) =\u003E new(\n        d.Id.Value, d.Area, d.Title, d.Context, d.Options, d.RecommendedKey, d.Supersedes?.Value, d.Status, d.ChosenKey,\n        d.ResolvedBy?.Value, d.ProposedAt, d.ResolvedAt, d.Note);",
-      "codeHash": "52F2E0A83051C748",
+      "startLine": 33,
+      "endLine": 35,
+      "code": "public static DecisionView Of(Decision d) =\u003E new(\n        d.Id.Value, d.Area, d.Title, d.Context, d.Options, d.RecommendedKey, d.Supersedes?.Value, d.Status, d.ChosenKey,\n        d.ResolvedBy?.Value, d.ProposedAt, d.ResolvedAt, d.Note, d.DraftedBy?.Value);",
+      "codeHash": "43DB47DDE74DB781",
       "guards": []
     },
     {
@@ -3565,8 +3565,8 @@
       "file": "src/Monday.Api/Endpoints/ModelEndpoints.cs",
       "startLine": 11,
       "endLine": 20,
-      "code": "public static IEndpointRouteBuilder MapModel(this IEndpointRouteBuilder app)\n    {\n        var model = app.MapGroup(\u0022/projects/{id:guid}/model\u0022).WithTags(\u0022Model\u0022).RequireAuthorization();\n        model.MapGet(\u0022/\u0022, GetSettings);\n        model.MapPut(\u0022/\u0022, SaveSettings);\n        model.MapDelete(\u0022/\u0022, ClearSettings);\n        model.MapPost(\u0022/test\u0022, TestConnection);\n        model.MapGet(\u0022/usage\u0022, GetUsage);\n        return app;\n    }",
-      "codeHash": "80F4763467AD180D",
+      "code": "public static IEndpointRouteBuilder MapModel(this IEndpointRouteBuilder app)\n    {\n        var model = app.MapGroup(\u0022/projects/{id:guid}/model\u0022).WithTags(\u0022Model\u0022).RequireAuthorization();\n        model.MapGet(\u0022/\u0022, GetSettings);\n        model.MapPut(\u0022/\u0022, SaveSettings);\n        model.MapDelete(\u0022/\u0022, ClearSettings);\n        model.MapPost(\u0022/test\u0022, TestConnection).RequireRateLimiting(ChatEndpoints.RateLimitPolicy); // spends a call on the key\n        model.MapGet(\u0022/usage\u0022, GetUsage);\n        return app;\n    }",
+      "codeHash": "C6B2ADDD46C0A79D",
       "guards": []
     },
     {
@@ -3599,8 +3599,8 @@
       "name": "AddEnvironment",
       "parentId": "T:Monday.Api.Endpoints.ProjectEndpoints",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
-      "startLine": 75,
-      "endLine": 76,
+      "startLine": 76,
+      "endLine": 77,
       "code": "private static async Task\u003CIResult\u003E AddEnvironment(Guid id, AddEnvironmentRequest request, ClaimsPrincipal user, ProjectService projects, CancellationToken ct) =\u003E\n        Results.Ok(await projects.AddEnvironmentAsync(new ProjectId(id), request.Name, request.Kind, user.UserIdOf(), ct));",
       "codeHash": "14745C36F1FA9DDB",
       "guards": []
@@ -3611,8 +3611,8 @@
       "name": "Approve",
       "parentId": "T:Monday.Api.Endpoints.ProjectEndpoints",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
-      "startLine": 118,
-      "endLine": 119,
+      "startLine": 119,
+      "endLine": 120,
       "code": "private static async Task\u003CIResult\u003E Approve(Guid id, Guid decisionId, ApproveRequest request, ClaimsPrincipal user, DecisionService decisions, CancellationToken ct) =\u003E\n        Results.Ok(DecisionView.Of(await decisions.ApproveAsync(new ProjectId(id), new DecisionId(decisionId), request.OptionKey, request.Note, user.UserIdOf(), ct)));",
       "codeHash": "F90D8C2AB629125F",
       "guards": []
@@ -3623,8 +3623,8 @@
       "name": "CreateProject",
       "parentId": "T:Monday.Api.Endpoints.ProjectEndpoints",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
-      "startLine": 69,
-      "endLine": 73,
+      "startLine": 70,
+      "endLine": 74,
       "code": "private static async Task\u003CIResult\u003E CreateProject(CreateProjectRequest request, ClaimsPrincipal user, ProjectService projects, CancellationToken ct)\n    {\n        var created = await projects.CreateAsync(request.Name, user.UserIdOf(), ct);\n        return Results.Created($\u0022/projects/{created.Id}\u0022, created);\n    }",
       "codeHash": "C1654834BD4B789F",
       "guards": []
@@ -3635,8 +3635,8 @@
       "name": "GetActivity",
       "parentId": "T:Monday.Api.Endpoints.ProjectEndpoints",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
-      "startLine": 112,
-      "endLine": 113,
+      "startLine": 113,
+      "endLine": 114,
       "code": "private static async Task\u003CIResult\u003E GetActivity(Guid id, DateTimeOffset from, DateTimeOffset to, ClaimsPrincipal user, ActivityService activity, CancellationToken ct) =\u003E\n        Results.Ok(await activity.RangeAsync(new ProjectId(id), from, to, user.UserIdOf(), ct));",
       "codeHash": "2014BAA6D9997D33",
       "guards": []
@@ -3647,8 +3647,8 @@
       "name": "GetGraph",
       "parentId": "T:Monday.Api.Endpoints.ProjectEndpoints",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
-      "startLine": 106,
-      "endLine": 107,
+      "startLine": 107,
+      "endLine": 108,
       "code": "private static async Task\u003CIResult\u003E GetGraph(Guid id, ClaimsPrincipal user, GraphService graphs, CancellationToken ct) =\u003E\n        await graphs.GetAsync(new ProjectId(id), user.UserIdOf(), ct) is { } view ? Results.Ok(view) : Results.NoContent();",
       "codeHash": "D72E72592920C159",
       "guards": []
@@ -3659,8 +3659,8 @@
       "name": "GetNode",
       "parentId": "T:Monday.Api.Endpoints.ProjectEndpoints",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
-      "startLine": 109,
-      "endLine": 110,
+      "startLine": 110,
+      "endLine": 111,
       "code": "private static async Task\u003CIResult\u003E GetNode(Guid id, string nodeId, ClaimsPrincipal user, GraphService graphs, CancellationToken ct) =\u003E\n        Results.Ok(await graphs.GetNodeAsync(new ProjectId(id), nodeId, user.UserIdOf(), ct));",
       "codeHash": "AC609FF36157AF22",
       "guards": []
@@ -3671,8 +3671,8 @@
       "name": "IssueKey",
       "parentId": "T:Monday.Api.Endpoints.ProjectEndpoints",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
-      "startLine": 88,
-      "endLine": 89,
+      "startLine": 89,
+      "endLine": 90,
       "code": "private static async Task\u003CIResult\u003E IssueKey(Guid id, Guid environmentId, ClaimsPrincipal user, ProjectService projects, CancellationToken ct) =\u003E\n        Results.Ok(new { key = await projects.IssueKeyAsync(new ProjectId(id), new EnvironmentId(environmentId), user.UserIdOf(), ct) });",
       "codeHash": "779B7DA9CD020FFA",
       "guards": []
@@ -3683,8 +3683,8 @@
       "name": "ListDecisions",
       "parentId": "T:Monday.Api.Endpoints.ProjectEndpoints",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
-      "startLine": 115,
-      "endLine": 116,
+      "startLine": 116,
+      "endLine": 117,
       "code": "private static async Task\u003CIResult\u003E ListDecisions(Guid id, ClaimsPrincipal user, DecisionService decisions, CancellationToken ct) =\u003E\n        Results.Ok((await decisions.ListAsync(new ProjectId(id), user.UserIdOf(), ct)).Select(DecisionView.Of));",
       "codeHash": "83761B1F5FB2D94C",
       "guards": []
@@ -3695,8 +3695,8 @@
       "name": "ListKeys",
       "parentId": "T:Monday.Api.Endpoints.ProjectEndpoints",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
-      "startLine": 84,
-      "endLine": 85,
+      "startLine": 85,
+      "endLine": 86,
       "code": "private static async Task\u003CIResult\u003E ListKeys(Guid id, ClaimsPrincipal user, ProjectService projects, CancellationToken ct) =\u003E\n        Results.Ok(await projects.ListKeysAsync(new ProjectId(id), user.UserIdOf(), ct));",
       "codeHash": "6E1936DDCB336004",
       "guards": []
@@ -3707,8 +3707,8 @@
       "name": "ListProjects",
       "parentId": "T:Monday.Api.Endpoints.ProjectEndpoints",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
-      "startLine": 66,
-      "endLine": 67,
+      "startLine": 67,
+      "endLine": 68,
       "code": "private static async Task\u003CIResult\u003E ListProjects(ClaimsPrincipal user, ProjectService projects, CancellationToken ct) =\u003E\n        Results.Ok(await projects.ListAsync(user.UserIdOf(), ct));",
       "codeHash": "04FF4149917A8632",
       "guards": []
@@ -3719,8 +3719,8 @@
       "name": "MapProjects",
       "parentId": "T:Monday.Api.Endpoints.ProjectEndpoints",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
-      "startLine": 40,
-      "endLine": 64,
+      "startLine": 41,
+      "endLine": 65,
       "code": "public static IEndpointRouteBuilder MapProjects(this IEndpointRouteBuilder app)\n    {\n        var projects = app.MapGroup(\u0022/projects\u0022).WithTags(\u0022Projects\u0022).RequireAuthorization();\n\n        projects.MapGet(\u0022/\u0022, ListProjects);\n        projects.MapPost(\u0022/\u0022, CreateProject);\n        projects.MapPost(\u0022/{id:guid}/environments\u0022, AddEnvironment);\n        projects.MapPut(\u0022/{id:guid}/environments/{environmentId:guid}/kind\u0022, SetEnvironmentKind);\n\n        projects.MapGet(\u0022/{id:guid}/keys\u0022, ListKeys);\n        projects.MapPost(\u0022/{id:guid}/environments/{environmentId:guid}/keys\u0022, IssueKey);\n        projects.MapPost(\u0022/{id:guid}/keys/{keyId:guid}/rotate\u0022, RotateKey);\n        projects.MapDelete(\u0022/{id:guid}/keys/{keyId:guid}\u0022, RevokeKey);\n\n        projects.MapPut(\u0022/{id:guid}/members/{member}\u0022, SetMember);\n\n        projects.MapGet(\u0022/{id:guid}/graph\u0022, GetGraph);\n        projects.MapGet(\u0022/{id:guid}/graph/node\u0022, GetNode);\n        projects.MapGet(\u0022/{id:guid}/activity\u0022, GetActivity);\n\n        projects.MapGet(\u0022/{id:guid}/decisions\u0022, ListDecisions);\n        projects.MapPost(\u0022/{id:guid}/decisions/{decisionId:guid}/approve\u0022, Approve);\n        projects.MapPost(\u0022/{id:guid}/decisions/{decisionId:guid}/reject\u0022, Reject);\n        return app;\n    }",
       "codeHash": "AB3A86FDC62BAA74",
       "guards": []
@@ -3731,8 +3731,8 @@
       "name": "Reject",
       "parentId": "T:Monday.Api.Endpoints.ProjectEndpoints",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
-      "startLine": 121,
-      "endLine": 122,
+      "startLine": 122,
+      "endLine": 123,
       "code": "private static async Task\u003CIResult\u003E Reject(Guid id, Guid decisionId, RejectRequest request, ClaimsPrincipal user, DecisionService decisions, CancellationToken ct) =\u003E\n        Results.Ok(DecisionView.Of(await decisions.RejectAsync(new ProjectId(id), new DecisionId(decisionId), request.Note, user.UserIdOf(), ct)));",
       "codeHash": "9DAB08157AAEAA39",
       "guards": []
@@ -3743,8 +3743,8 @@
       "name": "RevokeKey",
       "parentId": "T:Monday.Api.Endpoints.ProjectEndpoints",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
-      "startLine": 94,
-      "endLine": 98,
+      "startLine": 95,
+      "endLine": 99,
       "code": "private static async Task\u003CIResult\u003E RevokeKey(Guid id, Guid keyId, ClaimsPrincipal user, ProjectService projects, CancellationToken ct)\n    {\n        await projects.RevokeKeyAsync(new ProjectId(id), new ApiKeyId(keyId), user.UserIdOf(), ct);\n        return Results.NoContent();\n    }",
       "codeHash": "6AF5A23DCC10ACE1",
       "guards": []
@@ -3755,8 +3755,8 @@
       "name": "RotateKey",
       "parentId": "T:Monday.Api.Endpoints.ProjectEndpoints",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
-      "startLine": 91,
-      "endLine": 92,
+      "startLine": 92,
+      "endLine": 93,
       "code": "private static async Task\u003CIResult\u003E RotateKey(Guid id, Guid keyId, RotateKeyRequest request, ClaimsPrincipal user, ProjectService projects, CancellationToken ct) =\u003E\n        Results.Ok(new { key = await projects.RotateKeyAsync(new ProjectId(id), new ApiKeyId(keyId), TimeSpan.FromHours(request.OverlapHours), user.UserIdOf(), ct) });",
       "codeHash": "0874E659BEBCCE71",
       "guards": []
@@ -3767,8 +3767,8 @@
       "name": "SetEnvironmentKind",
       "parentId": "T:Monday.Api.Endpoints.ProjectEndpoints",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
-      "startLine": 78,
-      "endLine": 82,
+      "startLine": 79,
+      "endLine": 83,
       "code": "private static async Task\u003CIResult\u003E SetEnvironmentKind(Guid id, Guid environmentId, SetKindRequest request, ClaimsPrincipal user, ProjectService projects, CancellationToken ct)\n    {\n        await projects.SetEnvironmentKindAsync(new ProjectId(id), new EnvironmentId(environmentId), request.Kind, user.UserIdOf(), ct);\n        return Results.NoContent();\n    }",
       "codeHash": "056D3F5D906833FF",
       "guards": []
@@ -3779,8 +3779,8 @@
       "name": "SetMember",
       "parentId": "T:Monday.Api.Endpoints.ProjectEndpoints",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
-      "startLine": 100,
-      "endLine": 104,
+      "startLine": 101,
+      "endLine": 105,
       "code": "private static async Task\u003CIResult\u003E SetMember(Guid id, string member, SetMemberRequest request, ClaimsPrincipal user, ProjectService projects, CancellationToken ct)\n    {\n        await projects.SetMemberAsync(new ProjectId(id), new UserId(member), request.Role, user.UserIdOf(), ct);\n        return Results.NoContent();\n    }",
       "codeHash": "A5C23416452C233E",
       "guards": []
@@ -4487,8 +4487,8 @@
       "name": "Allows",
       "parentId": "T:Monday.Application.Access.PersonalTokenRights",
       "file": "src/Monday.Application/Access/PersonalTokenService.cs",
-      "startLine": 135,
-      "endLine": 144,
+      "startLine": 136,
+      "endLine": 145,
       "code": "public static bool Allows(this PersonalToken token, ProjectId project, ToolKind kind)\n    {\n        ArgumentNullException.ThrowIfNull(token);\n        return token.AllowsProject(project) \u0026\u0026 kind switch\n        {\n            ToolKind.Read =\u003E true,\n            ToolKind.Proposal =\u003E token.AllowsProposals,\n            _ =\u003E false,\n        };\n    }",
       "codeHash": "59D72CCD6FCBB189",
       "guards": []
@@ -4499,8 +4499,8 @@
       "name": "AuditAsync",
       "parentId": "T:Monday.Application.Access.PersonalTokenService",
       "file": "src/Monday.Application/Access/PersonalTokenService.cs",
-      "startLine": 117,
-      "endLine": 124,
+      "startLine": 118,
+      "endLine": 125,
       "code": "private async Task AuditAsync(PersonalToken token, IEnumerable\u003CProjectId\u003E reach, string action, DateTimeOffset at, CancellationToken ct)\n    {\n        var detail = $\u0022{token.Name} (mpat_{token.Prefix})\u0022;\n        foreach (var project in reach)\n        {\n            await audit.AppendAsync(new AuditEntry(project, token.UserId, action, detail, at), ct).ConfigureAwait(false);\n        }\n    }",
       "codeHash": "6A25B0646F31830D",
       "guards": []
@@ -4511,8 +4511,8 @@
       "name": "AuthenticateAsync",
       "parentId": "T:Monday.Application.Access.PersonalTokenService",
       "file": "src/Monday.Application/Access/PersonalTokenService.cs",
-      "startLine": 93,
-      "endLine": 114,
+      "startLine": 94,
+      "endLine": 115,
       "code": "public async Task\u003CPersonalToken?\u003E AuthenticateAsync(string? presented, CancellationToken ct)\n    {\n        var prefix = PersonalToken.PrefixOf(presented);\n        if (prefix is null)\n        {\n            return null;\n        }\n\n        var token = await tokens.FindByPrefixAsync(prefix, ct).ConfigureAwait(false);\n        var now = clock.Now;\n        if (token is null || !token.Matches(presented!, now))\n        {\n            return null;\n        }\n\n        if (token.Touch(now))\n        {\n            await tokens.SaveUsedAsync(token, ct).ConfigureAwait(false);\n        }\n\n        return token;\n    }",
       "codeHash": "CFC7778979E1B7A4",
       "guards": []
@@ -4524,9 +4524,9 @@
       "parentId": "T:Monday.Application.Access.PersonalTokenService",
       "file": "src/Monday.Application/Access/PersonalTokenService.cs",
       "startLine": 39,
-      "endLine": 63,
-      "code": "public async Task\u003CIssuedPersonalToken\u003E IssueAsync(UserId user, PersonalTokenInput input, CancellationToken ct)\n    {\n        ArgumentNullException.ThrowIfNull(input);\n        var member = await projects.ListForMemberAsync(user, ct).ConfigureAwait(false);\n\n        IReadOnlyList\u003CProjectId\u003E? limited = null;\n        if (input.Projects is { } requested)\n        {\n            var ids = requested.Select(g =\u003E new ProjectId(g)).ToList();\n            if (ids.Any(id =\u003E member.All(p =\u003E p.Id != id)))\n            {\n                throw new NotFoundException(\u0022project\u0022);\n            }\n\n            limited = ids;\n        }\n\n        var lifetime = input.LifetimeDays is { } days ? TimeSpan.FromDays(Math.Clamp(days, -1, DaysCeiling)) : (TimeSpan?)null;\n        var now = clock.Now;\n        var (token, plain) = PersonalToken.Issue(user, input.Name, TokenScopes.Parse(input.Scope), limited, lifetime, now);\n        await tokens.AddAsync(token, ct).ConfigureAwait(false);\n\n        await AuditAsync(token, token.Projects ?? member.Select(p =\u003E p.Id).ToList(), \u0022token.issued\u0022, now, ct).ConfigureAwait(false);\n        return new IssuedPersonalToken(ViewOf(token, now), plain);\n    }",
-      "codeHash": "6C5CB8BA0E350352",
+      "endLine": 64,
+      "code": "public async Task\u003CIssuedPersonalToken\u003E IssueAsync(UserId user, PersonalTokenInput input, CancellationToken ct)\n    {\n        ArgumentNullException.ThrowIfNull(input);\n        var member = await projects.ListForMemberAsync(user, ct).ConfigureAwait(false);\n\n        IReadOnlyList\u003CProjectId\u003E? limited = null;\n        if (input.Projects is { } requested)\n        {\n            var ids = requested.Select(g =\u003E new ProjectId(g)).ToList();\n            if (ids.Any(id =\u003E member.All(p =\u003E p.Id != id)))\n            {\n                throw new NotFoundException(\u0022project\u0022);\n            }\n\n            limited = ids;\n        }\n\n        var lifetime = input.LifetimeDays is { } days ? TimeSpan.FromDays(Math.Clamp(days, -1, DaysCeiling)) : (TimeSpan?)null;\n        var now = clock.Now;\n        PersonalToken.EnsureRoomForAnother(await tokens.ListForUserAsync(user, ct).ConfigureAwait(false), now);\n        var (token, plain) = PersonalToken.Issue(user, input.Name, TokenScopes.Parse(input.Scope), limited, lifetime, now);\n        await tokens.AddAsync(token, ct).ConfigureAwait(false);\n\n        await AuditAsync(token, token.Projects ?? member.Select(p =\u003E p.Id).ToList(), \u0022token.issued\u0022, now, ct).ConfigureAwait(false);\n        return new IssuedPersonalToken(ViewOf(token, now), plain);\n    }",
+      "codeHash": "CF1892ACE118E1F7",
       "guards": []
     },
     {
@@ -4535,8 +4535,8 @@
       "name": "ListAsync",
       "parentId": "T:Monday.Application.Access.PersonalTokenService",
       "file": "src/Monday.Application/Access/PersonalTokenService.cs",
-      "startLine": 65,
-      "endLine": 70,
+      "startLine": 66,
+      "endLine": 71,
       "code": "public async Task\u003CIReadOnlyList\u003CPersonalTokenView\u003E\u003E ListAsync(UserId user, CancellationToken ct)\n    {\n        var now = clock.Now;\n        var all = await tokens.ListForUserAsync(user, ct).ConfigureAwait(false);\n        return all.Select(t =\u003E ViewOf(t, now)).ToList();\n    }",
       "codeHash": "23077BCF9C7DEE60",
       "guards": []
@@ -4547,8 +4547,8 @@
       "name": "RevokeAsync",
       "parentId": "T:Monday.Application.Access.PersonalTokenService",
       "file": "src/Monday.Application/Access/PersonalTokenService.cs",
-      "startLine": 73,
-      "endLine": 87,
+      "startLine": 74,
+      "endLine": 88,
       "code": "public async Task RevokeAsync(UserId user, PersonalTokenId id, CancellationToken ct)\n    {\n        var token = await tokens.GetAsync(id, ct).ConfigureAwait(false);\n        if (token is null || token.UserId != user)\n        {\n            throw new NotFoundException(\u0022token\u0022);\n        }\n\n        var now = clock.Now;\n        token.Revoke(now);\n        await tokens.SaveRevokedAsync(token, ct).ConfigureAwait(false);\n\n        var reach = token.Projects ?? (await projects.ListForMemberAsync(user, ct).ConfigureAwait(false)).Select(p =\u003E p.Id).ToList();\n        await AuditAsync(token, reach, \u0022token.revoked\u0022, now, ct).ConfigureAwait(false);\n    }",
       "codeHash": "2A1D04986D27CBCC",
       "guards": []
@@ -4559,8 +4559,8 @@
       "name": "ViewOf",
       "parentId": "T:Monday.Application.Access.PersonalTokenService",
       "file": "src/Monday.Application/Access/PersonalTokenService.cs",
-      "startLine": 126,
-      "endLine": 128,
+      "startLine": 127,
+      "endLine": 129,
       "code": "private static PersonalTokenView ViewOf(PersonalToken t, DateTimeOffset now) =\u003E\n        new(t.Id.Value, t.Name, $\u0022mpat_{t.Prefix}\u0022, t.Scope.ToWire(), t.Projects?.Select(p =\u003E p.Value).ToList(),\n            t.CreatedAt, t.ExpiresAt, t.RevokedAt, t.LastUsedAt, t.IsActive(now));",
       "codeHash": "EF24D2C917F21226",
       "guards": []
@@ -4619,8 +4619,8 @@
       "name": "CapReachedAsync",
       "parentId": "T:Monday.Application.Agent.AgentService",
       "file": "src/Monday.Application/Agent/AgentService.cs",
-      "startLine": 308,
-      "endLine": 320,
+      "startLine": 309,
+      "endLine": 321,
       "code": "private async Task\u003CAgentError?\u003E CapReachedAsync(Project project, CancellationToken ct)\n    {\n        if (project.Model?.MonthlyTokenCap is { } cap)\n        {\n            var used = await usage.MonthAsync(project.Id, ModelSettingsService.MonthOf(clock.Now), ct).ConfigureAwait(false);\n            if ((long)used.InputTokens \u002B used.OutputTokens \u003E= cap)\n            {\n                return new AgentError(\u0022model.cap_reached\u0022, \u0022This project has used its model tokens for the month.\u0022);\n            }\n        }\n\n        return null;\n    }",
       "codeHash": "FD27A73370FB4EE5",
       "guards": []
@@ -4643,8 +4643,8 @@
       "name": "CloseTurn",
       "parentId": "T:Monday.Application.Agent.AgentService",
       "file": "src/Monday.Application/Agent/AgentService.cs",
-      "startLine": 417,
-      "endLine": 442,
+      "startLine": 418,
+      "endLine": 443,
       "code": "private void CloseTurn(Run run)\n    {\n        if (run.Turn.Count == 0 \u0026\u0026 run.Streaming.Length \u003E 0)\n        {\n            run.Turn.Add(ConversationMessage.Assistant(run.Streaming.ToString().TrimEnd(), null, clock.Now));\n        }\n\n        run.Streaming.Clear();\n        if (run.Turn.Count == 0)\n        {\n            return;\n        }\n\n        var answered = run.Turn.Where(m =\u003E m.ToolResult is not null).Select(m =\u003E m.ToolResult!.CallId).ToHashSet(StringComparer.Ordinal);\n        foreach (var call in run.Turn[0].ToolCalls.Where(c =\u003E !answered.Contains(c.Id)))\n        {\n            run.Turn.Add(ConversationMessage.Tool(Failed(call, \u0022cancelled: The person stopped the answer.\u0022).Item1, clock.Now));\n        }\n\n        foreach (var message in run.Turn)\n        {\n            run.Conversation.Append(message);\n        }\n\n        run.Turn.Clear();\n    }",
       "codeHash": "40F634C266649157",
       "guards": []
@@ -4655,8 +4655,8 @@
       "name": "Failed",
       "parentId": "T:Monday.Application.Agent.AgentService",
       "file": "src/Monday.Application/Agent/AgentService.cs",
-      "startLine": 410,
-      "endLine": 411,
+      "startLine": 411,
+      "endLine": 412,
       "code": "private static (ConversationToolResult, IReadOnlyList\u003Cstring\u003E, ScreenAction?) Failed(ConversationToolCall call, string message) =\u003E\n        (new ConversationToolResult(call.Id, JsonSerializer.SerializeToElement(new Dictionary\u003Cstring, string\u003E { [\u0022error\u0022] = message }), true), [], null);",
       "codeHash": "80327199DFFB57E6",
       "guards": []
@@ -4715,8 +4715,8 @@
       "name": "NextAsync",
       "parentId": "T:Monday.Application.Agent.AgentService",
       "file": "src/Monday.Application/Agent/AgentService.cs",
-      "startLine": 351,
-      "endLine": 366,
+      "startLine": 352,
+      "endLine": 367,
       "code": "private static async Task\u003C(bool More, AgentError? Error)\u003E NextAsync(IAsyncEnumerator\u003CModelEvent\u003E stream)\n    {\n        try\n        {\n            return (await stream.MoveNextAsync().ConfigureAwait(false), null);\n        }\n        catch (ModelException e)\n        {\n            return (false, new AgentError(e.Code, e.Message));\n        }\n        catch (DomainException e)\n        {\n            // For example a base URL that now resolves inside Monday\u0027s network.\n            return (false, new AgentError(e.Code, e.Message));\n        }\n    }",
       "codeHash": "FC8F29986F3077E7",
       "guards": []
@@ -4727,8 +4727,8 @@
       "name": "OpenModel",
       "parentId": "T:Monday.Application.Agent.AgentService",
       "file": "src/Monday.Application/Agent/AgentService.cs",
-      "startLine": 322,
-      "endLine": 336,
+      "startLine": 323,
+      "endLine": 337,
       "code": "private (IChatModel? Model, AgentError? Error) OpenModel(ModelSettings settings)\n    {\n        try\n        {\n            return (models.Create(settings, secrets.Open(settings.KeyCipher)), null);\n        }\n        catch (CryptographicException)\n        {\n            return (null, new AgentError(\u0022model.key_unreadable\u0022, \u0022The saved model key can\u0027t be opened. An Owner or Admin needs to enter it again.\u0022));\n        }\n        catch (ModelException e)\n        {\n            return (null, new AgentError(e.Code, e.Message));\n        }\n    }",
       "codeHash": "3E5FD83B23E26FB0",
       "guards": []
@@ -4740,9 +4740,9 @@
       "parentId": "T:Monday.Application.Agent.AgentService",
       "file": "src/Monday.Application/Agent/AgentService.cs",
       "startLine": 292,
-      "endLine": 305,
-      "code": "private async Task\u003CAgentError?\u003E RefusalAsync(Project project, CancellationToken ct)\n    {\n        if (project.Model is null)\n        {\n            return new AgentError(\u0022model.not_configured\u0022, \u0022No model is set up for this project yet. An Owner or Admin can add one in settings.\u0022);\n        }\n\n        if (!secrets.Enabled)\n        {\n            return new AgentError(\u0022model.keys_disabled\u0022, \u0022Chat is off: Monday has no MONDAY_SECRETS_KEY to open the model key.\u0022);\n        }\n\n        return await CapReachedAsync(project, ct).ConfigureAwait(false);\n    }",
-      "codeHash": "444B831E9C80A01A",
+      "endLine": 306,
+      "code": "private async Task\u003CAgentError?\u003E RefusalAsync(Project project, CancellationToken ct)\n    {\n        // Keys first: without MONDAY_SECRETS_KEY no model can be saved either, so \u0022add one in settings\u0022 would not help.\n        if (!secrets.Enabled)\n        {\n            return new AgentError(\u0022model.keys_disabled\u0022, \u0022Chat is off: Monday has no MONDAY_SECRETS_KEY to open the model key.\u0022);\n        }\n\n        if (project.Model is null)\n        {\n            return new AgentError(\u0022model.not_configured\u0022, \u0022No model is set up for this project yet. An Owner or Admin can add one in settings.\u0022);\n        }\n\n        return await CapReachedAsync(project, ct).ConfigureAwait(false);\n    }",
+      "codeHash": "7B69405D1244E8F5",
       "guards": []
     },
     {
@@ -4751,8 +4751,8 @@
       "name": "Replay",
       "parentId": "T:Monday.Application.Agent.AgentService",
       "file": "src/Monday.Application/Agent/AgentService.cs",
-      "startLine": 483,
-      "endLine": 488,
+      "startLine": 484,
+      "endLine": 489,
       "code": "private static List\u003CChatMessage\u003E Replay(Conversation conversation) =\u003E\n        [.. conversation.Messages\n            .Where(m =\u003E m.Role != ConversationRole.Tool \u0026\u0026 !string.IsNullOrEmpty(m.Text))\n            .Select(m =\u003E new ChatMessage(m.Role == ConversationRole.User ? ChatRole.User : ChatRole.Assistant, m.Text))\n            .TakeLast(MaxHistoryMessages)\n            .SkipWhile(m =\u003E m.Role != ChatRole.User)];",
       "codeHash": "D171589E8BCBC534",
       "guards": []
@@ -4763,8 +4763,8 @@
       "name": "RunToolAsync",
       "parentId": "T:Monday.Application.Agent.AgentService",
       "file": "src/Monday.Application/Agent/AgentService.cs",
-      "startLine": 369,
-      "endLine": 406,
+      "startLine": 370,
+      "endLine": 407,
       "code": "private async Task\u003C(ConversationToolResult Result, IReadOnlyList\u003Cstring\u003E NodeIds, ScreenAction? Action)\u003E RunToolAsync(\n        ConversationToolCall call, ToolContext context, CancellationToken ct)\n    {\n        var tool = tools.Find(call.Name, context.Role, ToolChannel.Chat);\n        if (tool is null)\n        {\n            return Failed(call, \u0022agent.unknown_tool: No such tool is available.\u0022);\n        }\n\n        if (call.Args.ValueKind == JsonValueKind.Object \u0026\u0026 call.Args.TryGetProperty(\u0022_invalid\u0022, out _))\n        {\n            return Failed(call, \u0022agent.input: The arguments were not valid JSON.\u0022);\n        }\n\n        var args = call.Args.ValueKind == JsonValueKind.Object ? call.Args : EmptyObject;\n        try\n        {\n            var result = await tool.RunAsync(context, args, ct).ConfigureAwait(false);\n            return (new ConversationToolResult(call.Id, result.Data, false), result.NodeIds, result.Action);\n        }\n        catch (AccessDeniedException)\n        {\n            return Failed(call, \u0022not allowed\u0022);\n        }\n        catch (NotFoundException e)\n        {\n            return Failed(call, $\u0022not found: {e.What}\u0022);\n        }\n        catch (DomainException e)\n        {\n            return Failed(call, $\u0022{e.Code}: {e.Message}\u0022);\n        }\n        catch (Exception) when (!ct.IsCancellationRequested)\n        {\n            // A bug in a tool must not end the chat or show the model a stack trace.\n            return Failed(call, \u0022agent.tool_failed: The tool failed.\u0022);\n        }\n    }",
       "codeHash": "79459291A869D798",
       "guards": []
@@ -4775,8 +4775,8 @@
       "name": "SaveQuietlyAsync",
       "parentId": "T:Monday.Application.Agent.AgentService",
       "file": "src/Monday.Application/Agent/AgentService.cs",
-      "startLine": 465,
-      "endLine": 476,
+      "startLine": 466,
+      "endLine": 477,
       "code": "private async Task SaveQuietlyAsync(Run run)\n    {\n        try\n        {\n            CloseTurn(run);\n            await TrySaveAsync(run).ConfigureAwait(false);\n        }\n        catch (Exception)\n        {\n            // Swallowed on purpose: the original exception is rethrown by the caller.\n        }\n    }",
       "codeHash": "AABF28185E7C8422",
       "guards": []
@@ -4787,8 +4787,8 @@
       "name": "SelectedNode",
       "parentId": "T:Monday.Application.Agent.AgentService",
       "file": "src/Monday.Application/Agent/AgentService.cs",
-      "startLine": 338,
-      "endLine": 348,
+      "startLine": 339,
+      "endLine": 349,
       "code": "private static string? SelectedNode(string? nodeId)\n    {\n        if (string.IsNullOrWhiteSpace(nodeId))\n        {\n            return null;\n        }\n\n        var id = nodeId.Trim();\n        Guard.That(id.Length \u003C= MaxSelectedNodeLength \u0026\u0026 !id.Any(c =\u003E char.IsControl(c) || c == \u0027\u0060\u0027), \u0022agent.input\u0022, \u0022The selected node id is not valid.\u0022);\n        return id;\n    }",
       "codeHash": "3CC76DD4BE05E70A",
       "guards": []
@@ -4799,8 +4799,8 @@
       "name": "ToChat",
       "parentId": "T:Monday.Application.Agent.AgentService",
       "file": "src/Monday.Application/Agent/AgentService.cs",
-      "startLine": 511,
-      "endLine": 518,
+      "startLine": 512,
+      "endLine": 519,
       "code": "private static ChatMessage ToChat(ConversationMessage m) =\u003E m.Role switch\n    {\n        ConversationRole.User =\u003E new ChatMessage(ChatRole.User, m.Text),\n        ConversationRole.Assistant =\u003E new ChatMessage(ChatRole.Assistant, m.Text,\n            m.ToolCalls.Count == 0 ? null : [.. m.ToolCalls.Select(c =\u003E new ToolCallPart(c.Id, c.Name, c.Args))]),\n        _ =\u003E new ChatMessage(ChatRole.Tool, null, null,\n            m.ToolResult is { } r ? new ToolResultPart(r.CallId, r.Content, r.IsError) : null),\n    };",
       "codeHash": "A1D569C422F3A63F",
       "guards": []
@@ -4811,8 +4811,8 @@
       "name": "TrySaveAsync",
       "parentId": "T:Monday.Application.Agent.AgentService",
       "file": "src/Monday.Application/Agent/AgentService.cs",
-      "startLine": 445,
-      "endLine": 462,
+      "startLine": 446,
+      "endLine": 463,
       "code": "private async Task\u003Cbool\u003E TrySaveAsync(Run run)\n    {\n        if (run.Abandoned || !run.Conversation.HasUnsaved)\n        {\n            return !run.Abandoned;\n        }\n\n        try\n        {\n            await conversations.SaveAsync(run.Conversation, CancellationToken.None).ConfigureAwait(false);\n            return true;\n        }\n        catch (ConversationConflictException)\n        {\n            run.Abandoned = true;\n            return false;\n        }\n    }",
       "codeHash": "BFF47597EF852D34",
       "guards": []
@@ -5075,8 +5075,8 @@
       "name": "RunAsync",
       "parentId": "T:Monday.Application.Agent.Tools.DraftDecisionTool",
       "file": "src/Monday.Application/Agent/Tools/DecisionTools.cs",
-      "startLine": 66,
-      "endLine": 83,
+      "startLine": 67,
+      "endLine": 84,
       "code": "public async Task\u003CToolResult\u003E RunAsync(ToolContext context, JsonElement input, CancellationToken ct)\n    {\n        ArgumentNullException.ThrowIfNull(context);\n        var area = Enum.TryParse\u003CDecisionArea\u003E(ToolInput.RequiredString(input, \u0022area\u0022), true, out var a) ? a : throw ToolInput.Invalid(\u0022\u0027area\u0027 is not a decision area.\u0022);\n        if (!input.TryGetProperty(\u0022options\u0022, out var raw) || raw.ValueKind != JsonValueKind.Array)\n        {\n            throw ToolInput.Invalid(\u0022\u0027options\u0027 must be a list.\u0022);\n        }\n\n        var options = raw.EnumerateArray()\n            .Select(o =\u003E new DecisionOption(ToolInput.RequiredString(o, \u0022key\u0022), ToolInput.RequiredString(o, \u0022title\u0022), ToolInput.RequiredString(o, \u0022tradeOffs\u0022)))\n            .ToList();\n        Guid? supersedes = ToolInput.String(input, \u0022supersedes\u0022) is { } s ? Guid.TryParse(s, out var g) ? g : throw ToolInput.Invalid(\u0022\u0027supersedes\u0027 must be a decision id.\u0022) : null;\n\n        var proposal = new DecisionProposal(area, ToolInput.RequiredString(input, \u0022title\u0022), ToolInput.RequiredString(input, \u0022context\u0022), options, ToolInput.RequiredString(input, \u0022recommendedKey\u0022), supersedes);\n        var decision = await decisions.DraftAsync(context.Project, proposal, context.User, ct).ConfigureAwait(false);\n        return new ToolResult(ToolInput.Data(new { id = decision.Id.Value, decision.Title, decision.Status, decision.RecommendedKey }), []);\n    }",
       "codeHash": "E06826E63958B226",
       "guards": []
@@ -5148,9 +5148,9 @@
       "parentId": "T:Monday.Application.Agent.Tools.ListDecisionsTool",
       "file": "src/Monday.Application/Agent/Tools/DecisionTools.cs",
       "startLine": 24,
-      "endLine": 37,
-      "code": "public async Task\u003CToolResult\u003E RunAsync(ToolContext context, JsonElement input, CancellationToken ct)\n    {\n        ArgumentNullException.ThrowIfNull(context);\n        var status = ToolInput.Enum\u003CDecisionStatus\u003E(input, \u0022status\u0022);\n        var all = await decisions.ListAsync(context.Project, context.User, ct).ConfigureAwait(false);\n        var matches = all.Where(d =\u003E status is null || d.Status == status).OrderByDescending(d =\u003E d.ProposedAt).ToList();\n        var page = matches.Take(ToolInput.MaxItems).ToList();\n        var items = page.Select(d =\u003E new\n        {\n            id = d.Id.Value, d.Area, d.Title, d.Context, d.Options, d.RecommendedKey,\n            supersedes = d.Supersedes?.Value, d.Status, d.ChosenKey, resolvedBy = d.ResolvedBy?.Value, d.ProposedAt, d.ResolvedAt, d.Note,\n        });\n        return new ToolResult(ToolInput.Data(new { decisions = items, total = matches.Count, truncated = matches.Count \u003E page.Count }), []);\n    }",
-      "codeHash": "9268D939C0FC41A7",
+      "endLine": 38,
+      "code": "public async Task\u003CToolResult\u003E RunAsync(ToolContext context, JsonElement input, CancellationToken ct)\n    {\n        ArgumentNullException.ThrowIfNull(context);\n        var status = ToolInput.Enum\u003CDecisionStatus\u003E(input, \u0022status\u0022);\n        var all = await decisions.ListAsync(context.Project, context.User, ct).ConfigureAwait(false);\n        var matches = all.Where(d =\u003E status is null || d.Status == status).OrderByDescending(d =\u003E d.ProposedAt).ToList();\n        var page = matches.Take(ToolInput.MaxItems).ToList();\n        var items = page.Select(d =\u003E new\n        {\n            id = d.Id.Value, d.Area, d.Title, d.Context, d.Options, d.RecommendedKey,\n            supersedes = d.Supersedes?.Value, d.Status, d.ChosenKey, resolvedBy = d.ResolvedBy?.Value, d.ProposedAt, d.ResolvedAt, d.Note,\n            draftedBy = d.DraftedBy?.Value,\n        });\n        return new ToolResult(ToolInput.Data(new { decisions = items, total = matches.Count, truncated = matches.Count \u003E page.Count }), []);\n    }",
+      "codeHash": "FF1BB72EA7A13FF9",
       "guards": []
     },
     {
@@ -5471,8 +5471,8 @@
       "name": "ApproveAsync",
       "parentId": "T:Monday.Application.Decisions.DecisionService",
       "file": "src/Monday.Application/Decisions/DecisionService.cs",
-      "startLine": 42,
-      "endLine": 48,
+      "startLine": 45,
+      "endLine": 51,
       "code": "public async Task\u003CDecision\u003E ApproveAsync(ProjectId id, DecisionId decisionId, string optionKey, string? note, UserId by, CancellationToken ct)\n    {\n        var (project, decision) = await LoadAsync(id, decisionId, by, ct).ConfigureAwait(false);\n        decision.Approve(optionKey, project, by, clock.Now, note);\n        await decisions.SaveAsync(decision, ct).ConfigureAwait(false);\n        return decision;\n    }",
       "codeHash": "EE82EC468E61BEAB",
       "guards": []
@@ -5483,10 +5483,10 @@
       "name": "DraftAsync",
       "parentId": "T:Monday.Application.Decisions.DecisionService",
       "file": "src/Monday.Application/Decisions/DecisionService.cs",
-      "startLine": 25,
-      "endLine": 33,
-      "code": "public async Task\u003CDecision\u003E DraftAsync(ProjectId id, DecisionProposal proposal, UserId by, CancellationToken ct)\n    {\n        ArgumentNullException.ThrowIfNull(proposal);\n        var project = await projects.LoadForMemberAsync(id, by, ct).ConfigureAwait(false);\n        project.EnsureCan(by, Permission.ChatAct);\n        var decision = Decision.Draft(id, proposal.Area, proposal.Title, proposal.Context, proposal.Options, proposal.RecommendedKey, by, clock.Now, proposal.Supersedes is { } s ? new DecisionId(s) : null);\n        await decisions.SaveAsync(decision, ct).ConfigureAwait(false);\n        return decision;\n    }",
-      "codeHash": "08725BDA0F07DC1B",
+      "startLine": 27,
+      "endLine": 36,
+      "code": "public async Task\u003CDecision\u003E DraftAsync(ProjectId id, DecisionProposal proposal, UserId by, CancellationToken ct)\n    {\n        ArgumentNullException.ThrowIfNull(proposal);\n        var project = await projects.LoadForMemberAsync(id, by, ct).ConfigureAwait(false);\n        project.EnsureCan(by, Permission.ChatAct);\n        var decision = Decision.Draft(id, proposal.Area, proposal.Title, proposal.Context, proposal.Options, proposal.RecommendedKey, by, clock.Now, proposal.Supersedes is { } s ? new DecisionId(s) : null);\n        await decisions.SaveAsync(decision, ct).ConfigureAwait(false);\n        await audit.AppendAsync(new AuditEntry(id, by, \u0022decision.drafted\u0022, decision.Title, decision.ProposedAt), ct).ConfigureAwait(false);\n        return decision;\n    }",
+      "codeHash": "C035D35CF1C8502E",
       "guards": []
     },
     {
@@ -5495,8 +5495,8 @@
       "name": "ListAsync",
       "parentId": "T:Monday.Application.Decisions.DecisionService",
       "file": "src/Monday.Application/Decisions/DecisionService.cs",
-      "startLine": 35,
-      "endLine": 40,
+      "startLine": 38,
+      "endLine": 43,
       "code": "public async Task\u003CIReadOnlyList\u003CDecision\u003E\u003E ListAsync(ProjectId id, UserId user, CancellationToken ct)\n    {\n        var project = await projects.LoadForMemberAsync(id, user, ct).ConfigureAwait(false);\n        project.EnsureCan(user, Permission.ViewLiveGraph);\n        return await decisions.ListAsync(id, ct).ConfigureAwait(false);\n    }",
       "codeHash": "84792B7E6840BD9B",
       "guards": []
@@ -5507,8 +5507,8 @@
       "name": "LoadAsync",
       "parentId": "T:Monday.Application.Decisions.DecisionService",
       "file": "src/Monday.Application/Decisions/DecisionService.cs",
-      "startLine": 58,
-      "endLine": 63,
+      "startLine": 61,
+      "endLine": 66,
       "code": "private async Task\u003C(Project, Decision)\u003E LoadAsync(ProjectId id, DecisionId decisionId, UserId user, CancellationToken ct)\n    {\n        var project = await projects.LoadForMemberAsync(id, user, ct).ConfigureAwait(false);\n        var decision = await decisions.GetAsync(decisionId, ct).ConfigureAwait(false);\n        return decision is not null \u0026\u0026 decision.ProjectId == id ? (project, decision) : throw new NotFoundException(\u0022decision\u0022);\n    }",
       "codeHash": "A7190F77EB8794D6",
       "guards": []
@@ -5519,8 +5519,8 @@
       "name": "ProposeAsync",
       "parentId": "T:Monday.Application.Decisions.DecisionService",
       "file": "src/Monday.Application/Decisions/DecisionService.cs",
-      "startLine": 15,
-      "endLine": 23,
+      "startLine": 16,
+      "endLine": 24,
       "code": "public async Task\u003CDecision\u003E ProposeAsync(AppReporter reporter, DecisionProposal proposal, CancellationToken ct)\n    {\n        ArgumentNullException.ThrowIfNull(reporter);\n        ArgumentNullException.ThrowIfNull(proposal);\n        var supersedes = proposal.Supersedes is { } s ? new DecisionId(s) : (DecisionId?)null;\n        var decision = Decision.Propose(reporter.Project.Id, proposal.Area, proposal.Title, proposal.Context, proposal.Options, proposal.RecommendedKey, clock.Now, supersedes);\n        await decisions.SaveAsync(decision, ct).ConfigureAwait(false);\n        return decision;\n    }",
       "codeHash": "BC0AED4AF3809422",
       "guards": []
@@ -5531,8 +5531,8 @@
       "name": "RejectAsync",
       "parentId": "T:Monday.Application.Decisions.DecisionService",
       "file": "src/Monday.Application/Decisions/DecisionService.cs",
-      "startLine": 50,
-      "endLine": 56,
+      "startLine": 53,
+      "endLine": 59,
       "code": "public async Task\u003CDecision\u003E RejectAsync(ProjectId id, DecisionId decisionId, string note, UserId by, CancellationToken ct)\n    {\n        var (project, decision) = await LoadAsync(id, decisionId, by, ct).ConfigureAwait(false);\n        decision.Reject(project, by, clock.Now, note);\n        await decisions.SaveAsync(decision, ct).ConfigureAwait(false);\n        return decision;\n    }",
       "codeHash": "CF8C4A16EAA1BAEF",
       "guards": []
@@ -5783,8 +5783,8 @@
       "name": "LiveAsync",
       "parentId": "T:Monday.Application.Traffic.TrafficService",
       "file": "src/Monday.Application/Traffic/TrafficService.cs",
-      "startLine": 117,
-      "endLine": 123,
+      "startLine": 118,
+      "endLine": 124,
       "code": "public async Task\u003CIAsyncEnumerable\u003CTrafficView\u003E\u003E LiveAsync(ProjectId id, UserId user, CancellationToken ct)\n    {\n        var project = await projects.LoadForMemberAsync(id, user, ct).ConfigureAwait(false);\n        project.EnsureCan(user, Permission.ViewLiveGraph);\n        var withUser = project.Can(user, Permission.ReplayUserTraffic);\n        return Stream(feed.SubscribeAsync(id, ct), withUser);\n    }",
       "codeHash": "C61108CD6955B0DA",
       "guards": []
@@ -5796,9 +5796,9 @@
       "parentId": "T:Monday.Application.Traffic.TrafficService",
       "file": "src/Monday.Application/Traffic/TrafficService.cs",
       "startLine": 103,
-      "endLine": 114,
-      "code": "public async Task\u003CIReadOnlyList\u003CTrafficView\u003E\u003E RecentAsync(ProjectId id, DateTimeOffset since, DateTimeOffset until, int limit, UserId user, CancellationToken ct)\n    {\n        var project = await projects.LoadForMemberAsync(id, user, ct).ConfigureAwait(false);\n        project.EnsureCan(user, Permission.ReplayAppTraffic);\n        Guard.That(since \u003C until \u0026\u0026 until - since \u003C= TimeSpan.FromDays(1), \u0022traffic.range\u0022, \u0022Look at most one day at a time.\u0022);\n        Guard.That(clock.Now - since \u003C= TrafficRetention.Live, \u0022traffic.archived\u0022, \u0022That window is older than 7 days: restore it from the archive first.\u0022);\n        Guard.That(limit is \u003E 0 and \u003C= MaxRange, \u0022traffic.limit\u0022, $\u0022Ask for between 1 and {MaxRange} requests.\u0022);\n\n        var traces = await store.NewestAsync(id, since, until, limit, ct).ConfigureAwait(false);\n        var withUser = project.Can(user, Permission.ReplayUserTraffic);\n        return traces.Select(t =\u003E TrafficView.Of(t, withUser)).ToList();\n    }",
-      "codeHash": "B3B93A9801EBAE69",
+      "endLine": 115,
+      "code": "public async Task\u003CIReadOnlyList\u003CTrafficView\u003E\u003E RecentAsync(ProjectId id, DateTimeOffset since, DateTimeOffset until, int limit, UserId user, CancellationToken ct)\n    {\n        var project = await projects.LoadForMemberAsync(id, user, ct).ConfigureAwait(false);\n        project.EnsureCan(user, Permission.ReplayAppTraffic);\n        project.EnsureCan(user, Permission.InspectRequests);\n        Guard.That(since \u003C until \u0026\u0026 until - since \u003C= TimeSpan.FromDays(1), \u0022traffic.range\u0022, \u0022Look at most one day at a time.\u0022);\n        Guard.That(clock.Now - since \u003C= TrafficRetention.Live, \u0022traffic.archived\u0022, \u0022That window is older than 7 days: restore it from the archive first.\u0022);\n        Guard.That(limit is \u003E 0 and \u003C= MaxRange, \u0022traffic.limit\u0022, $\u0022Ask for between 1 and {MaxRange} requests.\u0022);\n\n        var traces = await store.NewestAsync(id, since, until, limit, ct).ConfigureAwait(false);\n        var withUser = project.Can(user, Permission.ReplayUserTraffic);\n        return traces.Select(t =\u003E TrafficView.Of(t, withUser)).ToList();\n    }",
+      "codeHash": "483582ACF6C12AD9",
       "guards": []
     },
     {
@@ -5831,8 +5831,8 @@
       "name": "Stream",
       "parentId": "T:Monday.Application.Traffic.TrafficService",
       "file": "src/Monday.Application/Traffic/TrafficService.cs",
-      "startLine": 125,
-      "endLine": 131,
+      "startLine": 126,
+      "endLine": 132,
       "code": "private static async IAsyncEnumerable\u003CTrafficView\u003E Stream(IAsyncEnumerable\u003CRequestTrace\u003E source, bool withUser)\n    {\n        await foreach (var t in source.ConfigureAwait(false))\n        {\n            yield return TrafficView.Of(t, withUser);\n        }\n    }",
       "codeHash": "08C451F6A191F905",
       "guards": []
@@ -5855,10 +5855,22 @@
       "name": "AllowsProject",
       "parentId": "T:Monday.Domain.Access.PersonalToken",
       "file": "src/Monday.Domain/Access/PersonalToken.cs",
-      "startLine": 150,
-      "endLine": 150,
+      "startLine": 163,
+      "endLine": 163,
       "code": "public bool AllowsProject(ProjectId project) =\u003E Projects is null || Projects.Contains(project);",
       "codeHash": "AA4C4C31671998D4",
+      "guards": []
+    },
+    {
+      "id": "M:Monday.Domain.Access.PersonalToken.EnsureRoomForAnother(System.Collections.Generic.IEnumerable{Monday.Domain.Access.PersonalToken},System.DateTimeOffset)",
+      "kind": "Method",
+      "name": "EnsureRoomForAnother",
+      "parentId": "T:Monday.Domain.Access.PersonalToken",
+      "file": "src/Monday.Domain/Access/PersonalToken.cs",
+      "startLine": 125,
+      "endLine": 130,
+      "code": "public static void EnsureRoomForAnother(IEnumerable\u003CPersonalToken\u003E held, DateTimeOffset now)\n    {\n        ArgumentNullException.ThrowIfNull(held);\n        Guard.That(held.Count(t =\u003E t.IsActive(now)) \u003C MaxActivePerUser, \u0022token.too_many\u0022,\n            $\u0022You already have {MaxActivePerUser} active tokens. Revoke one you no longer use first.\u0022);\n    }",
+      "codeHash": "41E153C7FD12FD33",
       "guards": []
     },
     {
@@ -5867,8 +5879,8 @@
       "name": "IsActive",
       "parentId": "T:Monday.Domain.Access.PersonalToken",
       "file": "src/Monday.Domain/Access/PersonalToken.cs",
-      "startLine": 97,
-      "endLine": 97,
+      "startLine": 100,
+      "endLine": 100,
       "code": "public bool IsActive(DateTimeOffset now) =\u003E RevokedAt is null \u0026\u0026 now \u003C ExpiresAt;",
       "codeHash": "82763E4F1488D775",
       "guards": []
@@ -5879,8 +5891,8 @@
       "name": "Issue",
       "parentId": "T:Monday.Domain.Access.PersonalToken",
       "file": "src/Monday.Domain/Access/PersonalToken.cs",
-      "startLine": 103,
-      "endLine": 119,
+      "startLine": 106,
+      "endLine": 122,
       "code": "public static (PersonalToken Token, string Plain) Issue(\n        UserId user, string name, TokenScope scope, IReadOnlyList\u003CProjectId\u003E? projects, TimeSpan? lifetime, DateTimeOffset now)\n    {\n        var cleanName = Guard.NotBlank(name, \u0022token.name_required\u0022, \u0022A token name is required\u0022, NameMaxLength);\n        Guard.That(Enum.IsDefined(scope), \u0022token.scope_invalid\u0022, \u0022The scope must be read or read_propose.\u0022);\n        var span = lifetime ?? DefaultLifetime;\n        Guard.That(span \u003E TimeSpan.Zero, \u0022token.lifetime_invalid\u0022, \u0022The lifetime must be longer than zero.\u0022);\n        Guard.That(span \u003C= MaxLifetime, \u0022token.lifetime_max\u0022, \u0022A token can last one year at most.\u0022);\n        Guard.That(projects is null || projects.Count \u003E 0, \u0022token.projects_empty\u0022, \u0022Pick at least one project, or leave the list out for all of them.\u0022);\n\n        var prefix = ApiKey.Base64Url(RandomNumberGenerator.GetBytes(PrefixBytes));\n        var secret = ApiKey.Base64Url(RandomNumberGenerator.GetBytes(SecretBytes));\n        var plain = $\u0022{Scheme}_{prefix}_{secret}\u0022;\n        var token = new PersonalToken(PersonalTokenId.New(), user, cleanName, prefix, ApiKey.HashOf(plain), scope,\n            projects?.Distinct().ToList(), now, now \u002B span);\n        return (token, plain);\n    }",
       "codeHash": "0D2462AF9379C373",
       "guards": []
@@ -5891,8 +5903,8 @@
       "name": "Matches",
       "parentId": "T:Monday.Domain.Access.PersonalToken",
       "file": "src/Monday.Domain/Access/PersonalToken.cs",
-      "startLine": 141,
-      "endLine": 147,
+      "startLine": 154,
+      "endLine": 160,
       "code": "public bool Matches(string presented, DateTimeOffset now)\n    {\n        ArgumentNullException.ThrowIfNull(presented);\n        var presentedHash = Convert.FromHexString(ApiKey.HashOf(presented));\n        var storedHash = Convert.FromHexString(Hash);\n        return CryptographicOperations.FixedTimeEquals(presentedHash, storedHash) \u0026\u0026 IsActive(now);\n    }",
       "codeHash": "E2A1CEA724735D90",
       "guards": []
@@ -5903,10 +5915,10 @@
       "name": "PrefixOf",
       "parentId": "T:Monday.Domain.Access.PersonalToken",
       "file": "src/Monday.Domain/Access/PersonalToken.cs",
-      "startLine": 129,
-      "endLine": 138,
-      "code": "public static string? PrefixOf(string? presented)\n    {\n        if (string.IsNullOrEmpty(presented))\n        {\n            return null;\n        }\n\n        var parts = presented.Split(\u0027_\u0027, 3);\n        return parts.Length == 3 \u0026\u0026 parts[0] == Scheme \u0026\u0026 parts[1].Length \u003E 0 \u0026\u0026 parts[2].Length \u003E 0 ? parts[1] : null;\n    }",
-      "codeHash": "8DBC0DE3697C17F9",
+      "startLine": 140,
+      "endLine": 151,
+      "code": "public static string? PrefixOf(string? presented)\n    {\n        if (string.IsNullOrEmpty(presented))\n        {\n            return null;\n        }\n\n        // Safe because ApiKey.Base64Url never emits \u0027_\u0027 (it maps both \u0027\u002B\u0027 and \u0027/\u0027 to \u0027-\u0027), so neither the\n        // prefix nor the secret can hold the separator. PrefixParsingHoldsForEveryGeneratedToken pins this.\n        var parts = presented.Split(\u0027_\u0027, 3);\n        return parts.Length == 3 \u0026\u0026 parts[0] == Scheme \u0026\u0026 parts[1].Length \u003E 0 \u0026\u0026 parts[2].Length \u003E 0 ? parts[1] : null;\n    }",
+      "codeHash": "590C23B3A85070A9",
       "guards": []
     },
     {
@@ -5915,8 +5927,8 @@
       "name": "Restore",
       "parentId": "T:Monday.Domain.Access.PersonalToken",
       "file": "src/Monday.Domain/Access/PersonalToken.cs",
-      "startLine": 122,
-      "endLine": 126,
+      "startLine": 133,
+      "endLine": 137,
       "code": "public static PersonalToken Restore(\n        PersonalTokenId id, UserId userId, string name, string prefix, string hash, TokenScope scope,\n        IReadOnlyList\u003CProjectId\u003E? projects, DateTimeOffset createdAt, DateTimeOffset expiresAt,\n        DateTimeOffset? revokedAt, DateTimeOffset? lastUsedAt) =\u003E\n        new(id, userId, name, prefix, hash, scope, projects, createdAt, expiresAt) { RevokedAt = revokedAt, LastUsedAt = lastUsedAt };",
       "codeHash": "12921F2AEA6B35A9",
       "guards": []
@@ -5927,8 +5939,8 @@
       "name": "Revoke",
       "parentId": "T:Monday.Domain.Access.PersonalToken",
       "file": "src/Monday.Domain/Access/PersonalToken.cs",
-      "startLine": 155,
-      "endLine": 159,
+      "startLine": 168,
+      "endLine": 172,
       "code": "public void Revoke(DateTimeOffset now)\n    {\n        Guard.That(RevokedAt is null, \u0022token.already_revoked\u0022, \u0022This token is already revoked.\u0022);\n        RevokedAt = now;\n    }",
       "codeHash": "C125E6CCE7A7B319",
       "guards": []
@@ -5939,8 +5951,8 @@
       "name": "Touch",
       "parentId": "T:Monday.Domain.Access.PersonalToken",
       "file": "src/Monday.Domain/Access/PersonalToken.cs",
-      "startLine": 162,
-      "endLine": 171,
+      "startLine": 175,
+      "endLine": 184,
       "code": "public bool Touch(DateTimeOffset now)\n    {\n        if (LastUsedAt is { } last \u0026\u0026 now - last \u003C TouchInterval)\n        {\n            return false;\n        }\n\n        LastUsedAt = now;\n        return true;\n    }",
       "codeHash": "BD4499A1F2FE4A83",
       "guards": []
@@ -6253,8 +6265,8 @@
       "file": "src/Monday.Domain/Audit/AuditEntry.cs",
       "startLine": 13,
       "endLine": 24,
-      "code": "public static AuditEntry For(IDomainEvent domainEvent) =\u003E domainEvent switch\n    {\n        ApiKeyIssued e =\u003E new(e.ProjectId, e.By, \u0022api_key.issued\u0022, $\u0022key {e.KeyId} for environment {e.EnvironmentId}\u0022, e.OccurredAt),\n        ApiKeyRevoked e =\u003E new(e.ProjectId, e.By, \u0022api_key.revoked\u0022, $\u0022key {e.KeyId}\u0022, e.OccurredAt),\n        MemberChanged e =\u003E new(e.ProjectId, e.By, e.Role is null ? \u0022member.removed\u0022 : \u0022member.set\u0022, $\u0022{e.Member} {e.Role}\u0022.Trim(), e.OccurredAt),\n        EnvironmentKindChanged e =\u003E new(e.ProjectId, e.By, \u0022environment.kind_changed\u0022, $\u0022{e.EnvironmentId}: {e.From} -\u003E {e.To}\u0022, e.OccurredAt),\n        ProjectCreated e =\u003E new(e.ProjectId, e.Owner, \u0022project.created\u0022, e.Name, e.OccurredAt),\n        UserHashKeyRevealed e =\u003E new(e.ProjectId, e.By, \u0022user_hash_key.revealed\u0022, \u0022shown to the Owner for app configuration\u0022, e.OccurredAt),\n        ModelSettingsChanged e =\u003E new(e.ProjectId, e.By, \u0022model.settings_changed\u0022, $\u0022{e.Provider} {e.Model}{(e.KeyReplaced ? \u0022, new key\u0022 : string.Empty)}\u0022, e.OccurredAt),\n        ModelSettingsCleared e =\u003E new(e.ProjectId, e.By, \u0022model.settings_cleared\u0022, \u0022model and key removed\u0022, e.OccurredAt),\n        _ =\u003E throw new ArgumentOutOfRangeException(nameof(domainEvent), domainEvent.GetType().Name, \u0022Not an audited event.\u0022),\n    };",
-      "codeHash": "B09D9F60614F09D9",
+      "code": "public static AuditEntry For(IDomainEvent domainEvent) =\u003E domainEvent switch\n    {\n        ApiKeyIssued e =\u003E new(e.ProjectId, e.By, \u0022api_key.issued\u0022, $\u0022key {e.KeyId} for environment {e.EnvironmentId}\u0022, e.OccurredAt),\n        ApiKeyRevoked e =\u003E new(e.ProjectId, e.By, \u0022api_key.revoked\u0022, $\u0022key {e.KeyId}\u0022, e.OccurredAt),\n        MemberChanged e =\u003E new(e.ProjectId, e.By, e.Role is null ? \u0022member.removed\u0022 : \u0022member.set\u0022, $\u0022{e.Member} {e.Role}\u0022.Trim(), e.OccurredAt),\n        EnvironmentKindChanged e =\u003E new(e.ProjectId, e.By, \u0022environment.kind_changed\u0022, $\u0022{e.EnvironmentId}: {e.From} -\u003E {e.To}\u0022, e.OccurredAt),\n        ProjectCreated e =\u003E new(e.ProjectId, e.Owner, \u0022project.created\u0022, e.Name, e.OccurredAt),\n        UserHashKeyRevealed e =\u003E new(e.ProjectId, e.By, \u0022user_hash_key.revealed\u0022, \u0022shown to the Owner for app configuration\u0022, e.OccurredAt),\n        ModelSettingsChanged e =\u003E new(e.ProjectId, e.By, \u0022model.settings_changed\u0022, ModelDetail(e), e.OccurredAt),\n        ModelSettingsCleared e =\u003E new(e.ProjectId, e.By, \u0022model.settings_cleared\u0022, \u0022model and key removed\u0022, e.OccurredAt),\n        _ =\u003E throw new ArgumentOutOfRangeException(nameof(domainEvent), domainEvent.GetType().Name, \u0022Not an audited event.\u0022),\n    };",
+      "codeHash": "83C2233AEBFB009D",
       "guards": []
     },
     {
@@ -6263,10 +6275,22 @@
       "name": "IsAudited",
       "parentId": "T:Monday.Domain.Audit.AuditEntry",
       "file": "src/Monday.Domain/Audit/AuditEntry.cs",
-      "startLine": 26,
-      "endLine": 28,
+      "startLine": 34,
+      "endLine": 36,
       "code": "public static bool IsAudited(IDomainEvent domainEvent) =\u003E\n        domainEvent is ApiKeyIssued or ApiKeyRevoked or MemberChanged or EnvironmentKindChanged or ProjectCreated or UserHashKeyRevealed\n            or ModelSettingsChanged or ModelSettingsCleared;",
       "codeHash": "F92758342C6771AF",
+      "guards": []
+    },
+    {
+      "id": "M:Monday.Domain.Audit.AuditEntry.ModelDetail(Monday.Domain.Agent.ModelSettingsChanged)",
+      "kind": "Method",
+      "name": "ModelDetail",
+      "parentId": "T:Monday.Domain.Audit.AuditEntry",
+      "file": "src/Monday.Domain/Audit/AuditEntry.cs",
+      "startLine": 27,
+      "endLine": 32,
+      "code": "private static string ModelDetail(ModelSettingsChanged e)\n    {\n        static string Cap(long? cap) =\u003E cap?.ToString(System.Globalization.CultureInfo.InvariantCulture) ?? \u0022none\u0022;\n        var host = e.BaseUrlHost is { } h ? $\u0022 at {h}\u0022 : string.Empty;\n        return $\u0022{e.Provider} {e.Model}{host}, cap {Cap(e.OldCap)} -\u003E {Cap(e.NewCap)}{(e.KeyReplaced ? \u0022, new key\u0022 : string.Empty)}\u0022;\n    }",
+      "codeHash": "BE6B362E9FDD97D1",
       "guards": []
     },
     {
@@ -6767,8 +6791,8 @@
       "name": "ClearModel",
       "parentId": "T:Monday.Domain.Projects.Project",
       "file": "src/Monday.Domain/Projects/Project.cs",
-      "startLine": 266,
-      "endLine": 276,
+      "startLine": 267,
+      "endLine": 277,
       "code": "public void ClearModel(UserId by, DateTimeOffset now)\n    {\n        EnsureCan(by, Permission.ManageMembersAndKeys);\n        if (Model is null)\n        {\n            return;\n        }\n\n        (Model, ModelUpdatedBy, ModelUpdatedAt) = (null, by, now);\n        Raise(new ModelSettingsCleared(Id, by, now));\n    }",
       "codeHash": "D07EFE8EB881408B",
       "guards": []
@@ -6815,8 +6839,8 @@
       "name": "EnsureOwnerRemains",
       "parentId": "T:Monday.Domain.Projects.Project",
       "file": "src/Monday.Domain/Projects/Project.cs",
-      "startLine": 278,
-      "endLine": 282,
+      "startLine": 279,
+      "endLine": 283,
       "code": "private void EnsureOwnerRemains(UserId member, Role? newRole)\n    {\n        var ownersAfter = _members.Count(m =\u003E m.Value == Role.Owner \u0026\u0026 m.Key != member) \u002B (newRole == Role.Owner ? 1 : 0);\n        Guard.That(ownersAfter \u003E 0, \u0022member.last_owner\u0022, \u0022A project must keep at least one Owner.\u0022);\n    }",
       "codeHash": "7D2B0DA510F47FD0",
       "guards": []
@@ -6863,8 +6887,8 @@
       "name": "Key",
       "parentId": "T:Monday.Domain.Projects.Project",
       "file": "src/Monday.Domain/Projects/Project.cs",
-      "startLine": 284,
-      "endLine": 286,
+      "startLine": 285,
+      "endLine": 287,
       "code": "private ApiKey Key(ApiKeyId id) =\u003E\n        _apiKeys.FirstOrDefault(k =\u003E k.Id == id)\n        ?? throw new DomainException(\u0022api_key.not_found\u0022, \u0022No such API key in this project.\u0022);",
       "codeHash": "1B58B1DF1C8C76AF",
       "guards": []
@@ -6972,9 +6996,9 @@
       "parentId": "T:Monday.Domain.Projects.Project",
       "file": "src/Monday.Domain/Projects/Project.cs",
       "startLine": 254,
-      "endLine": 263,
-      "code": "public void SetModel(ModelSettings settings, UserId by, DateTimeOffset now)\n    {\n        ArgumentNullException.ThrowIfNull(settings);\n        EnsureCan(by, Permission.ManageMembersAndKeys);\n        Guard.That(Model is null || !Model.MovesKeyElsewhere(settings), \u0022model.key_required\u0022,\n            \u0022Enter the API key again to change the provider or base URL.\u0022);\n        var keyReplaced = !string.Equals(Model?.KeyCipher, settings.KeyCipher, StringComparison.Ordinal);\n        (Model, ModelUpdatedBy, ModelUpdatedAt) = (settings, by, now);\n        Raise(new ModelSettingsChanged(Id, settings.Provider, settings.Model, keyReplaced, by, now));\n    }",
-      "codeHash": "7D99D0DE71A8D1C0",
+      "endLine": 264,
+      "code": "public void SetModel(ModelSettings settings, UserId by, DateTimeOffset now)\n    {\n        ArgumentNullException.ThrowIfNull(settings);\n        EnsureCan(by, Permission.ManageMembersAndKeys);\n        Guard.That(Model is null || !Model.MovesKeyElsewhere(settings), \u0022model.key_required\u0022,\n            \u0022Enter the API key again to change the provider or base URL.\u0022);\n        var keyReplaced = !string.Equals(Model?.KeyCipher, settings.KeyCipher, StringComparison.Ordinal);\n        var oldCap = Model?.MonthlyTokenCap;\n        (Model, ModelUpdatedBy, ModelUpdatedAt) = (settings, by, now);\n        Raise(new ModelSettingsChanged(Id, settings.Provider, settings.Model, settings.BaseUrl?.Host, oldCap, settings.MonthlyTokenCap, keyReplaced, by, now));\n    }",
+      "codeHash": "1A3B1DF91B404869",
       "guards": []
     },
     {
@@ -7225,8 +7249,8 @@
       "file": "tests/Monday.Domain.Tests/AgentToolTests.cs",
       "startLine": 55,
       "endLine": 89,
-      "code": "public static World Build(int extraNodes = 0, int requests = 3)\n        {\n            var w = new World();\n            var clock = new FixedClock();\n            w.ProjectService = new ProjectService(w.Projects, w.Audit, clock);\n            w.Graph = new GraphService(w.Graphs, w.ProjectService, clock);\n            w.TrafficService = new TrafficService(w.Traffic, new TrafficFeed(), w.ProjectService, w.Audit, clock);\n            w.Activity = new ActivityService(w.ActivityStore, w.ProjectService, clock);\n            w.Decisions = new DecisionService(new InMemoryDecisionRepository(), w.ProjectService, clock);\n\n            var summary = w.ProjectService.CreateAsync(\u0022Shop\u0022, w.Owner, default).GetAwaiter().GetResult();\n            w.Project = new ProjectId(summary.Id);\n            w.ProjectService.SetMemberAsync(w.Project, w.Ana, Role.Debugger, w.Owner, default).GetAwaiter().GetResult();\n            w.ProjectService.SetMemberAsync(w.Project, w.Mia, Role.Monitor, w.Owner, default).GetAwaiter().GetResult();\n\n            var code = \u0022return items;\u0022;\n            List\u003CCodeNode\u003E nodes =\n            [\n                new() { Id = \u0022app\u0022, Kind = NodeKind.App, Name = \u0022Shop\u0022 },\n                new() { Id = Method, Kind = NodeKind.Method, Name = \u0022List\u0022, ParentId = \u0022app\u0022, Code = code, CodeHash = CodeNode.HashCode(code) },\n                new() { Id = Endpoint, Kind = NodeKind.Endpoint, Name = \u0022GET /items\u0022, ParentId = \u0022app\u0022, Route = \u0022GET /items\u0022 },\n                .. Enumerable.Range(0, extraNodes).Select(i =\u003E new CodeNode { Id = $\u0022Shop.Extra{i}\u0022, Kind = NodeKind.Method, Name = $\u0022Extra{i}\u0022, ParentId = \u0022app\u0022 }),\n            ];\n            var finding = new SecurityFinding { Rule = \u0022write-without-auth\u0022, Severity = Severity.High, NodeId = Endpoint, Title = \u0022Write without auth\u0022, Why = \u0022Anyone can call it.\u0022, Fix = \u0022Require authorization.\u0022 };\n            w.Graphs.SaveAsync(CodeGraphSnapshot.Create(w.Project, \u0022abc123\u0022, Now, nodes, [new CodeEdge(Endpoint, Method, EdgeKind.HandledBy)], [finding]), default).GetAwaiter().GetResult();\n\n            var project = w.Projects.GetAsync(w.Project, default).GetAwaiter().GetResult()!;\n            var hash = project.HashUser(\u0022customer-1\u0022);\n            var env = EnvironmentId.New();\n            var traces = Enumerable.Range(0, requests)\n                .Select(i =\u003E RequestTrace.Record(w.Project, env, $\u0022{i:x32}\u0022, Now.AddMinutes(-1).AddSeconds(i), \u0022GET\u0022, \u0022/items\u0022, 200, 12, [\u0022RequireAuthorization\u0022], hash, null))\n                .ToList();\n            w.Traffic.AppendAsync(traces, default).GetAwaiter().GetResult();\n            return w;\n        }",
-      "codeHash": "C8361C833B5F96B7",
+      "code": "public static World Build(int extraNodes = 0, int requests = 3)\n        {\n            var w = new World();\n            var clock = new FixedClock();\n            w.ProjectService = new ProjectService(w.Projects, w.Audit, clock);\n            w.Graph = new GraphService(w.Graphs, w.ProjectService, clock);\n            w.TrafficService = new TrafficService(w.Traffic, new TrafficFeed(), w.ProjectService, w.Audit, clock);\n            w.Activity = new ActivityService(w.ActivityStore, w.ProjectService, clock);\n            w.Decisions = new DecisionService(new InMemoryDecisionRepository(), w.ProjectService, w.Audit, clock);\n\n            var summary = w.ProjectService.CreateAsync(\u0022Shop\u0022, w.Owner, default).GetAwaiter().GetResult();\n            w.Project = new ProjectId(summary.Id);\n            w.ProjectService.SetMemberAsync(w.Project, w.Ana, Role.Debugger, w.Owner, default).GetAwaiter().GetResult();\n            w.ProjectService.SetMemberAsync(w.Project, w.Mia, Role.Monitor, w.Owner, default).GetAwaiter().GetResult();\n\n            var code = \u0022return items;\u0022;\n            List\u003CCodeNode\u003E nodes =\n            [\n                new() { Id = \u0022app\u0022, Kind = NodeKind.App, Name = \u0022Shop\u0022 },\n                new() { Id = Method, Kind = NodeKind.Method, Name = \u0022List\u0022, ParentId = \u0022app\u0022, Code = code, CodeHash = CodeNode.HashCode(code) },\n                new() { Id = Endpoint, Kind = NodeKind.Endpoint, Name = \u0022GET /items\u0022, ParentId = \u0022app\u0022, Route = \u0022GET /items\u0022 },\n                .. Enumerable.Range(0, extraNodes).Select(i =\u003E new CodeNode { Id = $\u0022Shop.Extra{i}\u0022, Kind = NodeKind.Method, Name = $\u0022Extra{i}\u0022, ParentId = \u0022app\u0022 }),\n            ];\n            var finding = new SecurityFinding { Rule = \u0022write-without-auth\u0022, Severity = Severity.High, NodeId = Endpoint, Title = \u0022Write without auth\u0022, Why = \u0022Anyone can call it.\u0022, Fix = \u0022Require authorization.\u0022 };\n            w.Graphs.SaveAsync(CodeGraphSnapshot.Create(w.Project, \u0022abc123\u0022, Now, nodes, [new CodeEdge(Endpoint, Method, EdgeKind.HandledBy)], [finding]), default).GetAwaiter().GetResult();\n\n            var project = w.Projects.GetAsync(w.Project, default).GetAwaiter().GetResult()!;\n            var hash = project.HashUser(\u0022customer-1\u0022);\n            var env = EnvironmentId.New();\n            var traces = Enumerable.Range(0, requests)\n                .Select(i =\u003E RequestTrace.Record(w.Project, env, $\u0022{i:x32}\u0022, Now.AddMinutes(-1).AddSeconds(i), \u0022GET\u0022, \u0022/items\u0022, 200, 12, [\u0022RequireAuthorization\u0022], hash, null))\n                .ToList();\n            w.Traffic.AppendAsync(traces, default).GetAwaiter().GetResult();\n            return w;\n        }",
+      "codeHash": "2C42E15E93F4EDBB",
       "guards": []
     },
     {
@@ -7583,8 +7607,8 @@
       "name": "DraftBy",
       "parentId": "T:Monday.Domain.Tests.DecisionDraftTests",
       "file": "tests/Monday.Domain.Tests/DecisionDraftTests.cs",
-      "startLine": 14,
-      "endLine": 18,
+      "startLine": 15,
+      "endLine": 19,
       "code": "private static Decision DraftBy(Project project, UserId by) =\u003E\n        Decision.Draft(\n            project.Id, DecisionArea.Stack, \u0022Live store\u0022, \u0022Where traffic lives for 7 days.\u0022,\n            [new(\u0022neon\u0022, \u0022Postgres on Neon\u0022, \u0022Free; storage-capped\u0022), new(\u0022sqlite\u0022, \u0022SQLite on disk\u0022, \u0022Lost on Render redeploy\u0022)],\n            \u0022neon\u0022, by, Now);",
       "codeHash": "CA6ABAE6A392BCF0",
       "guards": []
@@ -7607,8 +7631,8 @@
       "name": "Connect",
       "parentId": "T:Monday.Domain.Tests.McpTests",
       "file": "tests/Monday.Domain.Tests/McpTests.cs",
-      "startLine": 129,
-      "endLine": 135,
+      "startLine": 131,
+      "endLine": 137,
       "code": "private static Session Connect(Host host, string token) =\u003E\n        new(McpClient.CreateAsync(new HttpClientTransport(new HttpClientTransportOptions\n        {\n            Endpoint = host.Endpoint,\n            TransportMode = HttpTransportMode.StreamableHttp,\n            AdditionalHeaders = new Dictionary\u003Cstring, string\u003E { [\u0022Authorization\u0022] = $\u0022Bearer {token}\u0022 },\n        })).GetAwaiter().GetResult());",
       "codeHash": "2870CEBBAA019C76",
       "guards": []
@@ -7619,8 +7643,8 @@
       "name": "Dispose",
       "parentId": "T:Monday.Domain.Tests.McpTests.Host",
       "file": "tests/Monday.Domain.Tests/McpTests.cs",
-      "startLine": 108,
-      "endLine": 108,
+      "startLine": 110,
+      "endLine": 110,
       "code": "public void Dispose() =\u003E _app.DisposeAsync().AsTask().GetAwaiter().GetResult();",
       "codeHash": "1B40C569787B5739",
       "guards": []
@@ -7631,8 +7655,8 @@
       "name": "Issue",
       "parentId": "T:Monday.Domain.Tests.McpTests.Host",
       "file": "tests/Monday.Domain.Tests/McpTests.cs",
-      "startLine": 101,
-      "endLine": 103,
+      "startLine": 103,
+      "endLine": 105,
       "code": "public IssuedPersonalToken Issue(string scope = \u0022read\u0022, params ProjectId[] projects) =\u003E\n            Use(s =\u003E s.GetRequiredService\u003CPersonalTokenService\u003E().IssueAsync(\n                Ana, new PersonalTokenInput(\u0022Claude Code\u0022, scope, projects.Length == 0 ? null : [.. projects.Select(p =\u003E p.Value)], null), default));",
       "codeHash": "B4CB23F63CB72C1B",
       "guards": []
@@ -7643,8 +7667,8 @@
       "name": "Start",
       "parentId": "T:Monday.Domain.Tests.McpTests.Host",
       "file": "tests/Monday.Domain.Tests/McpTests.cs",
-      "startLine": 64,
-      "endLine": 93,
+      "startLine": 66,
+      "endLine": 95,
       "code": "public static Host Start()\n        {\n            var clock = new MovableClock();\n            var builder = WebApplication.CreateBuilder(new WebApplicationOptions { EnvironmentName = Environments.Development });\n            builder.Configuration[\u0022ConnectionStrings:Monday\u0022] = string.Empty; // always in memory\n            builder.WebHost.UseUrls(\u0022http://127.0.0.1:0\u0022);\n            builder.Logging.ClearProviders();\n            builder.Services.AddMonday(builder.Configuration);\n            builder.Services.AddAgentTools();\n            builder.Services.AddSingleton\u003CIClock\u003E(clock);\n            builder.Services.AddMondayUserAuthentication(builder.Environment);\n            builder.Services.AddMondayPersonalTokenAuthentication();\n            builder.Services.AddMondayMcp();\n\n            var app = builder.Build();\n            app.UseAuthentication();\n            app.UseAuthorization();\n            app.UseRateLimiter();\n            app.MapMondayMcp();\n            app.StartAsync().GetAwaiter().GetResult();\n\n            using var scope = app.Services.CreateScope();\n            var projects = scope.ServiceProvider.GetRequiredService\u003CProjectService\u003E();\n            var shop = new ProjectId(projects.CreateAsync(\u0022Shop\u0022, Owner, default).GetAwaiter().GetResult().Id);\n            var blog = new ProjectId(projects.CreateAsync(\u0022Blog\u0022, Owner, default).GetAwaiter().GetResult().Id);\n            projects.SetMemberAsync(shop, Ana, Role.Debugger, Owner, default).GetAwaiter().GetResult();\n            projects.SetMemberAsync(blog, Ana, Role.Monitor, Owner, default).GetAwaiter().GetResult();\n\n            return new Host(app, clock, new Uri(app.Urls.First().TrimEnd(\u0027/\u0027) \u002B McpEndpoints.Route), shop, blog);\n        }",
       "codeHash": "7479FFCA6A38C115",
       "guards": []
@@ -7655,8 +7679,8 @@
       "name": "ToolNames",
       "parentId": "T:Monday.Domain.Tests.McpTests.Host",
       "file": "tests/Monday.Domain.Tests/McpTests.cs",
-      "startLine": 105,
-      "endLine": 106,
+      "startLine": 107,
+      "endLine": 108,
       "code": "public IReadOnlyList\u003Cstring\u003E ToolNames(Role role) =\u003E\n            Use(s =\u003E Task.FromResult\u003CIReadOnlyList\u003Cstring\u003E\u003E([.. s.GetRequiredService\u003CToolRegistry\u003E().For(role, ToolChannel.Mcp).Select(t =\u003E t.Name)]));",
       "codeHash": "6C7BEA70ED322768",
       "guards": []
@@ -7667,8 +7691,8 @@
       "name": "Use",
       "parentId": "T:Monday.Domain.Tests.McpTests.Host",
       "file": "tests/Monday.Domain.Tests/McpTests.cs",
-      "startLine": 95,
-      "endLine": 99,
+      "startLine": 97,
+      "endLine": 101,
       "code": "public T Use\u003CT\u003E(Func\u003CIServiceProvider, Task\u003CT\u003E\u003E work)\n        {\n            using var scope = _app.Services.CreateScope();\n            return work(scope.ServiceProvider).GetAwaiter().GetResult();\n        }",
       "codeHash": "86A477FFD1CF14EF",
       "guards": []
@@ -7679,8 +7703,8 @@
       "name": "RawStatus",
       "parentId": "T:Monday.Domain.Tests.McpTests",
       "file": "tests/Monday.Domain.Tests/McpTests.cs",
-      "startLine": 138,
-      "endLine": 152,
+      "startLine": 140,
+      "endLine": 154,
       "code": "private static HttpStatusCode RawStatus(Host host, Action\u003CHttpRequestMessage\u003E sign)\n    {\n        using var http = new HttpClient();\n        using var request = new HttpRequestMessage(HttpMethod.Post, host.Endpoint)\n        {\n            Content = new StringContent(\n                \u0022\u0022\u0022{\u0022jsonrpc\u0022:\u00222.0\u0022,\u0022id\u0022:1,\u0022method\u0022:\u0022initialize\u0022,\u0022params\u0022:{\u0022protocolVersion\u0022:\u00222025-06-18\u0022,\u0022capabilities\u0022:{},\u0022clientInfo\u0022:{\u0022name\u0022:\u0022t\u0022,\u0022version\u0022:\u00221\u0022}}}\u0022\u0022\u0022,\n                Encoding.UTF8, \u0022application/json\u0022),\n        };\n        request.Headers.Accept.ParseAdd(\u0022application/json\u0022);\n        request.Headers.Accept.ParseAdd(\u0022text/event-stream\u0022);\n        sign(request);\n        using var response = http.Send(request);\n        return response.StatusCode;\n    }",
       "codeHash": "0E152D1BAA15013F",
       "guards": []
@@ -7691,8 +7715,8 @@
       "name": "Call",
       "parentId": "T:Monday.Domain.Tests.McpTests.Session",
       "file": "tests/Monday.Domain.Tests/McpTests.cs",
-      "startLine": 115,
-      "endLine": 124,
+      "startLine": 117,
+      "endLine": 126,
       "code": "public CallToolResult Call(string tool, ProjectId? project, Dictionary\u003Cstring, object?\u003E? args = null)\n        {\n            args ??= [];\n            if (project is { } p)\n            {\n                args[\u0022project\u0022] = p.Value.ToString();\n            }\n\n            return client.CallToolAsync(tool, args).AsTask().GetAwaiter().GetResult();\n        }",
       "codeHash": "98F5CF8047973A5B",
       "guards": []
@@ -7703,8 +7727,8 @@
       "name": "Dispose",
       "parentId": "T:Monday.Domain.Tests.McpTests.Session",
       "file": "tests/Monday.Domain.Tests/McpTests.cs",
-      "startLine": 126,
-      "endLine": 126,
+      "startLine": 128,
+      "endLine": 128,
       "code": "public void Dispose() =\u003E client.DisposeAsync().AsTask().GetAwaiter().GetResult();",
       "codeHash": "DA8F76ED402DB245",
       "guards": []
@@ -7715,8 +7739,8 @@
       "name": "Tools",
       "parentId": "T:Monday.Domain.Tests.McpTests.Session",
       "file": "tests/Monday.Domain.Tests/McpTests.cs",
-      "startLine": 113,
-      "endLine": 113,
+      "startLine": 115,
+      "endLine": 115,
       "code": "public IList\u003CMcpClientTool\u003E Tools() =\u003E client.ListToolsAsync().AsTask().GetAwaiter().GetResult();",
       "codeHash": "6D9700249A0A424C",
       "guards": []
@@ -7727,8 +7751,8 @@
       "name": "TextOf",
       "parentId": "T:Monday.Domain.Tests.McpTests",
       "file": "tests/Monday.Domain.Tests/McpTests.cs",
-      "startLine": 154,
-      "endLine": 155,
+      "startLine": 156,
+      "endLine": 157,
       "code": "private static string TextOf(CallToolResult result) =\u003E\n        string.Concat(result.Content.OfType\u003CTextContentBlock\u003E().Select(t =\u003E t.Text));",
       "codeHash": "087D6FE31A47A690",
       "guards": []
@@ -7871,8 +7895,8 @@
       "name": "AuditOf",
       "parentId": "T:Monday.Domain.Tests.PersonalTokenTests.World",
       "file": "tests/Monday.Domain.Tests/PersonalTokenTests.cs",
-      "startLine": 151,
-      "endLine": 151,
+      "startLine": 176,
+      "endLine": 176,
       "code": "public IReadOnlyList\u003CDomain.Audit.AuditEntry\u003E AuditOf(ProjectId p) =\u003E Audit.ListAsync(p, default).GetAwaiter().GetResult();",
       "codeHash": "E36F492F1D9881CD",
       "guards": []
@@ -7883,8 +7907,8 @@
       "name": "Authenticate",
       "parentId": "T:Monday.Domain.Tests.PersonalTokenTests.World",
       "file": "tests/Monday.Domain.Tests/PersonalTokenTests.cs",
-      "startLine": 153,
-      "endLine": 153,
+      "startLine": 178,
+      "endLine": 178,
       "code": "public PersonalToken? Authenticate(string? presented) =\u003E Service.AuthenticateAsync(presented, default).GetAwaiter().GetResult();",
       "codeHash": "C64C33E49A9E37CF",
       "guards": []
@@ -7895,8 +7919,8 @@
       "name": "Build",
       "parentId": "T:Monday.Domain.Tests.PersonalTokenTests.World",
       "file": "tests/Monday.Domain.Tests/PersonalTokenTests.cs",
-      "startLine": 136,
-      "endLine": 146,
+      "startLine": 161,
+      "endLine": 171,
       "code": "public static World Build()\n        {\n            var w = new World();\n            var projects = new ProjectService(w.Projects, w.Audit, w.Clock);\n            var other = new UserId(\u0022github:other\u0022);\n            w.Shop = new ProjectId(projects.CreateAsync(\u0022Shop\u0022, Ana, default).GetAwaiter().GetResult().Id);\n            w.Blog = new ProjectId(projects.CreateAsync(\u0022Blog\u0022, Ana, default).GetAwaiter().GetResult().Id);\n            w.Elsewhere = new ProjectId(projects.CreateAsync(\u0022Elsewhere\u0022, other, default).GetAwaiter().GetResult().Id);\n            w.Service = new PersonalTokenService(w.Store, w.Projects, w.Audit, w.Clock);\n            return w;\n        }",
       "codeHash": "CECC024F4C977D7F",
       "guards": []
@@ -7907,8 +7931,8 @@
       "name": "Issue",
       "parentId": "T:Monday.Domain.Tests.PersonalTokenTests.World",
       "file": "tests/Monday.Domain.Tests/PersonalTokenTests.cs",
-      "startLine": 148,
-      "endLine": 149,
+      "startLine": 173,
+      "endLine": 174,
       "code": "public IssuedPersonalToken Issue(string name = \u0022Cursor\u0022, string scope = \u0022read\u0022, IReadOnlyList\u003CGuid\u003E? projects = null, int? days = null) =\u003E\n            Service.IssueAsync(Ana, new PersonalTokenInput(name, scope, projects, days), default).GetAwaiter().GetResult();",
       "codeHash": "72C2DB745B31DA41",
       "guards": []
@@ -10196,8 +10220,8 @@
       "name": "DELETE /projects/{id:guid}/keys/{keyId:guid}",
       "parentId": "group:Monday.Api:/projects",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
-      "startLine": 52,
-      "endLine": 52,
+      "startLine": 53,
+      "endLine": 53,
       "route": "DELETE /projects/{id:guid}/keys/{keyId:guid}",
       "guards": [
         "RequireAuthorization"
@@ -10248,8 +10272,8 @@
       "name": "GET /projects",
       "parentId": "group:Monday.Api:/projects",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
-      "startLine": 44,
-      "endLine": 44,
+      "startLine": 45,
+      "endLine": 45,
       "route": "GET /projects",
       "guards": [
         "RequireAuthorization"
@@ -10261,8 +10285,8 @@
       "name": "GET /projects/{id:guid}/activity",
       "parentId": "group:Monday.Api:/projects",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
-      "startLine": 58,
-      "endLine": 58,
+      "startLine": 59,
+      "endLine": 59,
       "route": "GET /projects/{id:guid}/activity",
       "guards": [
         "RequireAuthorization"
@@ -10300,8 +10324,8 @@
       "name": "GET /projects/{id:guid}/decisions",
       "parentId": "group:Monday.Api:/projects",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
-      "startLine": 60,
-      "endLine": 60,
+      "startLine": 61,
+      "endLine": 61,
       "route": "GET /projects/{id:guid}/decisions",
       "guards": [
         "RequireAuthorization"
@@ -10313,8 +10337,8 @@
       "name": "GET /projects/{id:guid}/graph",
       "parentId": "group:Monday.Api:/projects",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
-      "startLine": 56,
-      "endLine": 56,
+      "startLine": 57,
+      "endLine": 57,
       "route": "GET /projects/{id:guid}/graph",
       "guards": [
         "RequireAuthorization"
@@ -10326,8 +10350,8 @@
       "name": "GET /projects/{id:guid}/graph/node",
       "parentId": "group:Monday.Api:/projects",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
-      "startLine": 57,
-      "endLine": 57,
+      "startLine": 58,
+      "endLine": 58,
       "route": "GET /projects/{id:guid}/graph/node",
       "guards": [
         "RequireAuthorization"
@@ -10339,8 +10363,8 @@
       "name": "GET /projects/{id:guid}/keys",
       "parentId": "group:Monday.Api:/projects",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
-      "startLine": 49,
-      "endLine": 49,
+      "startLine": 50,
+      "endLine": 50,
       "route": "GET /projects/{id:guid}/keys",
       "guards": [
         "RequireAuthorization"
@@ -10505,8 +10529,8 @@
       "name": "POST /projects",
       "parentId": "group:Monday.Api:/projects",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
-      "startLine": 45,
-      "endLine": 45,
+      "startLine": 46,
+      "endLine": 46,
       "route": "POST /projects",
       "guards": [
         "RequireAuthorization"
@@ -10532,8 +10556,8 @@
       "name": "POST /projects/{id:guid}/decisions/{decisionId:guid}/approve",
       "parentId": "group:Monday.Api:/projects",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
-      "startLine": 61,
-      "endLine": 61,
+      "startLine": 62,
+      "endLine": 62,
       "route": "POST /projects/{id:guid}/decisions/{decisionId:guid}/approve",
       "guards": [
         "RequireAuthorization"
@@ -10545,8 +10569,8 @@
       "name": "POST /projects/{id:guid}/decisions/{decisionId:guid}/reject",
       "parentId": "group:Monday.Api:/projects",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
-      "startLine": 62,
-      "endLine": 62,
+      "startLine": 63,
+      "endLine": 63,
       "route": "POST /projects/{id:guid}/decisions/{decisionId:guid}/reject",
       "guards": [
         "RequireAuthorization"
@@ -10558,8 +10582,8 @@
       "name": "POST /projects/{id:guid}/environments",
       "parentId": "group:Monday.Api:/projects",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
-      "startLine": 46,
-      "endLine": 46,
+      "startLine": 47,
+      "endLine": 47,
       "route": "POST /projects/{id:guid}/environments",
       "guards": [
         "RequireAuthorization"
@@ -10571,8 +10595,8 @@
       "name": "POST /projects/{id:guid}/environments/{environmentId:guid}/keys",
       "parentId": "group:Monday.Api:/projects",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
-      "startLine": 50,
-      "endLine": 50,
+      "startLine": 51,
+      "endLine": 51,
       "route": "POST /projects/{id:guid}/environments/{environmentId:guid}/keys",
       "guards": [
         "RequireAuthorization"
@@ -10584,8 +10608,8 @@
       "name": "POST /projects/{id:guid}/keys/{keyId:guid}/rotate",
       "parentId": "group:Monday.Api:/projects",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
-      "startLine": 51,
-      "endLine": 51,
+      "startLine": 52,
+      "endLine": 52,
       "route": "POST /projects/{id:guid}/keys/{keyId:guid}/rotate",
       "guards": [
         "RequireAuthorization"
@@ -10601,7 +10625,8 @@
       "endLine": 17,
       "route": "POST /projects/{id:guid}/model/test",
       "guards": [
-        "RequireAuthorization"
+        "RequireAuthorization",
+        "RequireRateLimiting:chat"
       ]
     },
     {
@@ -10623,8 +10648,8 @@
       "name": "PUT /projects/{id:guid}/environments/{environmentId:guid}/kind",
       "parentId": "group:Monday.Api:/projects",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
-      "startLine": 47,
-      "endLine": 47,
+      "startLine": 48,
+      "endLine": 48,
       "route": "PUT /projects/{id:guid}/environments/{environmentId:guid}/kind",
       "guards": [
         "RequireAuthorization"
@@ -10636,8 +10661,8 @@
       "name": "PUT /projects/{id:guid}/members/{member}",
       "parentId": "group:Monday.Api:/projects",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
-      "startLine": 54,
-      "endLine": 54,
+      "startLine": 55,
+      "endLine": 55,
       "route": "PUT /projects/{id:guid}/members/{member}",
       "guards": [
         "RequireAuthorization"
@@ -10686,8 +10711,8 @@
       "name": "CapIsCheckedAgainBeforeEachStep",
       "parentId": "T:Monday.Domain.Tests.AgentLoopTests",
       "file": "tests/Monday.Domain.Tests/AgentLoopTests.cs",
-      "startLine": 485,
-      "endLine": 493,
+      "startLine": 494,
+      "endLine": 502,
       "code": "public static void CapIsCheckedAgainBeforeEachStep()\n    {\n        var w = World.Build(new ScriptedChatModel(Call(\u0022c1\u0022, \u0022set_lens\u0022, \u0022\u0022\u0022{\u0022lens\u0022:\u0022security\u0022}\u0022\u0022\u0022, 60, 40), Answer(\u0022Never.\u0022)), cap: 100);\n\n        var events = w.Chat(w.Ana, \u0022Show security\u0022);\n\n        Assert.Equal(1, w.Model.Requests.Count);\n        Assert.Equal(\u0022model.cap_reached\u0022, ((AgentError)events[^1]).Code);\n    }",
       "codeHash": "1FA64F92EFB0C43C",
       "guards": []
@@ -10710,8 +10735,8 @@
       "name": "ConcurrentAppendEndsWithBusy",
       "parentId": "T:Monday.Domain.Tests.AgentLoopTests",
       "file": "tests/Monday.Domain.Tests/AgentLoopTests.cs",
-      "startLine": 461,
-      "endLine": 483,
+      "startLine": 470,
+      "endLine": 492,
       "code": "public static void ConcurrentAppendEndsWithBusy()\n    {\n        var w = World.Build(new ScriptedChatModel(Answer(\u0022First.\u0022), Answer(\u0022From B.\u0022), Answer(\u0022From A.\u0022)));\n        var id = ((AgentDone)w.Chat(w.Ana, \u0022Start\u0022)[^1]).ConversationId;\n\n        // A is mid-answer when B, in another tab, appends to the same conversation.\n        var a = w.Agent.ChatAsync(w.Project, w.Ana, new ChatInput(id, \u0022From tab A\u0022, null), default).GetAsyncEnumerator();\n        Assert.True(a.MoveNextAsync().AsTask().GetAwaiter().GetResult() \u0026\u0026 a.Current is AgentStarted, \u0022A has started.\u0022);\n        Assert.True(w.Chat(w.Ana, \u0022From tab B\u0022, id)[^1] is AgentDone, \u0022B finishes first.\u0022);\n\n        var rest = new List\u003CAgentEvent\u003E();\n        while (a.MoveNextAsync().AsTask().GetAwaiter().GetResult())\n        {\n            rest.Add(a.Current);\n        }\n\n        a.DisposeAsync().AsTask().GetAwaiter().GetResult();\n        Assert.Equal(\u0022agent.busy\u0022, ((AgentError)rest[^1]).Code);\n\n        var stored = w.Conversations.GetAsync(new ConversationId(id), default).GetAwaiter().GetResult()!;\n        Assert.True(stored.Messages.All(m =\u003E m.Text != \u0022From A.\u0022), \u0022The losing turn is not mixed into the winner\u0027s history.\u0022);\n        Assert.Equal(\u0022From B.\u0022, stored.Messages[^1].Text);\n    }",
       "codeHash": "5A9E1CD5397F6FA7",
       "guards": []
@@ -10722,8 +10747,8 @@
       "name": "ContinuingReplaysOnlyTextUnderTheCurrentRole",
       "parentId": "T:Monday.Domain.Tests.AgentLoopTests",
       "file": "tests/Monday.Domain.Tests/AgentLoopTests.cs",
-      "startLine": 421,
-      "endLine": 439,
+      "startLine": 430,
+      "endLine": 448,
       "code": "public static void ContinuingReplaysOnlyTextUnderTheCurrentRole()\n    {\n        var w = World.Build(new ScriptedChatModel(Answer(\u0022No code for you.\u0022)));\n        var earlier = Conversation.Start(w.Project, w.Ana, \u0022Show me List\u0022, Now);\n        earlier.Append(ConversationMessage.Assistant(\u0022Here it is.\u0022, [new ConversationToolCall(\u0022c1\u0022, \u0022node_detail\u0022, Json(\u0022\u0022\u0022{\u0022nodeId\u0022:\u0022Shop.Items.List\u0022}\u0022\u0022\u0022))], Now));\n        earlier.Append(ConversationMessage.Tool(new ConversationToolResult(\u0022c1\u0022, Json(\u0022\u0022\u0022{\u0022node\u0022:{\u0022code\u0022:\u0022return SECRETCODE;\u0022}}\u0022\u0022\u0022), false), Now));\n        earlier.Append(ConversationMessage.Assistant(\u0022It returns SECRET items.\u0022, null, Now));\n        w.Conversations.SaveAsync(earlier, default).GetAwaiter().GetResult();\n        w.ProjectService.SetMemberAsync(w.Project, w.Ana, Role.Monitor, w.Owner, default).GetAwaiter().GetResult();\n\n        w.Chat(w.Ana, \u0022And again?\u0022, earlier.Id.Value);\n\n        var sent = w.Model.Requests.Single().Messages;\n        Assert.True(sent.All(m =\u003E m.Role != ChatRole.Tool \u0026\u0026 m.ToolCalls is null \u0026\u0026 m.ToolResult is null), \u0022No stored tool call or result is replayed.\u0022);\n        Assert.True(sent.All(m =\u003E m.Text?.Contains(\u0022SECRETCODE\u0022, StringComparison.Ordinal) != true), \u0022Stored tool data never reaches the model.\u0022);\n        Assert.Equal(4, sent.Count);\n        Assert.Equal(\u0022Here it is.\u0022, sent[1].Text);\n        Assert.True(w.Model.Requests[0].Instructions.Contains(\u0022Monitor\u0022, StringComparison.Ordinal), \u0022Tools run under the current role.\u0022);\n    }",
       "codeHash": "14EB7473A626CF17",
       "guards": []
@@ -10734,8 +10759,8 @@
       "name": "ConversationVisibleOnlyToOwner",
       "parentId": "T:Monday.Domain.Tests.AgentLoopTests",
       "file": "tests/Monday.Domain.Tests/AgentLoopTests.cs",
-      "startLine": 372,
-      "endLine": 388,
+      "startLine": 381,
+      "endLine": 397,
       "code": "public static void ConversationVisibleOnlyToOwner()\n    {\n        var w = World.Build(new ScriptedChatModel(Answer(\u0022First.\u0022), Answer(\u0022Second.\u0022)));\n        var done = (AgentDone)w.Chat(w.Ana, \u0022Remember this\u0022)[^1];\n\n        Assert.Equal(1, w.Agent.ListConversationsAsync(w.Project, w.Ana, default).GetAwaiter().GetResult().Count);\n        Assert.Equal(0, w.Agent.ListConversationsAsync(w.Project, w.Owner, default).GetAwaiter().GetResult().Count);\n        Assert.Throws\u003CNotFoundException\u003E(() =\u003E w.Agent.GetConversationAsync(w.Project, done.ConversationId, w.Owner, default).GetAwaiter().GetResult());\n        Assert.Throws\u003CNotFoundException\u003E(() =\u003E w.Chat(w.Owner, \u0022Let me in\u0022, done.ConversationId));\n\n        // The owner continues it, and the model sees the earlier turn.\n        w.Chat(w.Ana, \u0022And now?\u0022, done.ConversationId);\n        Assert.Equal(3, w.Model.Requests[1].Messages.Count);\n        var view = w.Agent.GetConversationAsync(w.Project, done.ConversationId, w.Ana, default).GetAwaiter().GetResult();\n        Assert.Equal(\u0022Remember this\u0022, view.Title);\n        Assert.Equal(4, view.Messages.Count);\n    }",
       "codeHash": "5A41F7FD1508D1A9",
       "guards": []
@@ -10746,8 +10771,8 @@
       "name": "FailingFinalSaveDoesNotHideTheCancellation",
       "parentId": "T:Monday.Domain.Tests.AgentLoopTests",
       "file": "tests/Monday.Domain.Tests/AgentLoopTests.cs",
-      "startLine": 530,
-      "endLine": 554,
+      "startLine": 539,
+      "endLine": 563,
       "code": "public static void FailingFinalSaveDoesNotHideTheCancellation()\n    {\n        var w = World.Build(new ScriptedChatModel([new TextDelta(\u0022Partial \u0022), new TextDelta(\u0022rest\u0022), new Finished(StopReason.EndTurn, new Usage(1, 1))]));\n        w.Conversations.FailAfter = 1;\n        using var cts = new CancellationTokenSource();\n\n        Assert.Throws\u003COperationCanceledException\u003E(() =\u003E\n        {\n            var e = w.Agent.ChatAsync(w.Project, w.Ana, new ChatInput(null, \u0022Tell me\u0022, null), cts.Token).GetAsyncEnumerator();\n            try\n            {\n                while (e.MoveNextAsync().AsTask().GetAwaiter().GetResult())\n                {\n                    if (e.Current is AgentText)\n                    {\n                        cts.Cancel();\n                    }\n                }\n            }\n            finally\n            {\n                e.DisposeAsync().AsTask().GetAwaiter().GetResult();\n            }\n        });\n    }",
       "codeHash": "22E66F76E0843FD2",
       "guards": []
@@ -10770,8 +10795,8 @@
       "name": "HistorySentIsAtMostTheLastTwentyTextMessages",
       "parentId": "T:Monday.Domain.Tests.AgentLoopTests",
       "file": "tests/Monday.Domain.Tests/AgentLoopTests.cs",
-      "startLine": 441,
-      "endLine": 459,
+      "startLine": 450,
+      "endLine": 468,
       "code": "public static void HistorySentIsAtMostTheLastTwentyTextMessages()\n    {\n        var w = World.Build(new ScriptedChatModel(Answer(\u0022Done.\u0022)));\n        var earlier = Conversation.Start(w.Project, w.Ana, \u0022m0\u0022, Now);\n        for (var i = 1; i \u003C 30; i\u002B\u002B)\n        {\n            earlier.Append(i % 2 == 1 ? ConversationMessage.Assistant($\u0022m{i}\u0022, null, Now) : ConversationMessage.User($\u0022m{i}\u0022, Now));\n        }\n\n        w.Conversations.SaveAsync(earlier, default).GetAwaiter().GetResult();\n\n        w.Chat(w.Ana, \u0022latest\u0022, earlier.Id.Value);\n\n        var sent = w.Model.Requests.Single().Messages;\n        Assert.True(sent.Count \u003C= AgentService.MaxHistoryMessages, $\u0022At most {AgentService.MaxHistoryMessages} messages are sent, got {sent.Count}.\u0022);\n        Assert.True(sent.Count \u003E= AgentService.MaxHistoryMessages - 1, \u0022The window is not cut further than needed.\u0022);\n        Assert.Equal(ChatRole.User, sent[0].Role);\n        Assert.Equal(\u0022latest\u0022, sent[^1].Text);\n    }",
       "codeHash": "EDED127B075D256F",
       "guards": []
@@ -10786,6 +10811,18 @@
       "endLine": 258,
       "code": "public static void InvalidArgumentsAndToolFailuresBecomeToolErrors()\n    {\n        var w = World.Build(new ScriptedChatModel(\n            Call(\u0022c1\u0022, \u0022find_nodes\u0022, \u0022\u0022\u0022{\u0022_invalid\u0022:\u0022{\\\u0022query\\\u0022: \\\u0022it\u0022}\u0022\u0022\u0022),\n            Call(\u0022c2\u0022, \u0022focus_node\u0022, \u0022\u0022\u0022{\u0022nodeId\u0022:\u0022Nope\u0022}\u0022\u0022\u0022),\n            Call(\u0022c3\u0022, \u0022set_lens\u0022, \u0022\u0022\u0022{\u0022lens\u0022:\u0022sparkles\u0022}\u0022\u0022\u0022),\n            Answer(\u0022Sorry.\u0022)));\n\n        var events = w.Chat(w.Ana, \u0022Try things\u0022);\n\n        Assert.True(events.OfType\u003CAgentTool\u003E().All(t =\u003E t.IsError), \u0022Every failed call is a tool error.\u0022);\n        var results = w.Model.Requests[3].Messages.Where(m =\u003E m.ToolResult is not null).Select(m =\u003E m.ToolResult!).ToList();\n        Assert.Equal(3, results.Count);\n        Assert.True(results.All(r =\u003E r.IsError), \u0022Each result is marked as an error.\u0022);\n        Assert.True(results[1].Content.GetRawText().Contains(\u0022not found\u0022, StringComparison.Ordinal), \u0022Not found is short.\u0022);\n        Assert.True(results[2].Content.GetRawText().Contains(\u0022agent.input\u0022, StringComparison.Ordinal), \u0022Input errors carry their code.\u0022);\n        Assert.True(results.All(r =\u003E !r.Content.GetRawText().Contains(\u0022 at Monday.\u0022, StringComparison.Ordinal)), \u0022No stack trace reaches the model.\u0022);\n    }",
       "codeHash": "8FC69D853CDA72DA",
+      "guards": []
+    },
+    {
+      "id": "M:Monday.Domain.Tests.AgentLoopTests.KeysDisabledIsReportedBeforeMissingSettings",
+      "kind": "Test",
+      "name": "KeysDisabledIsReportedBeforeMissingSettings",
+      "parentId": "T:Monday.Domain.Tests.AgentLoopTests",
+      "file": "tests/Monday.Domain.Tests/AgentLoopTests.cs",
+      "startLine": 320,
+      "endLine": 327,
+      "code": "public static void KeysDisabledIsReportedBeforeMissingSettings()\n    {\n        // With no MONDAY_SECRETS_KEY, saving a model is impossible too, so \u0022add a model\u0022 would send people in a circle.\n        var w = World.Build(new ScriptedChatModel(Answer(\u0022Never.\u0022)), configured: false, secrets: false);\n\n        Assert.Equal(\u0022model.keys_disabled\u0022, ((AgentError)w.Chat(w.Ana, \u0022Hi\u0022).Single()).Code);\n        Assert.Equal(0, w.Model.Requests.Count);\n    }",
+      "codeHash": "4E287758F99C29E9",
       "guards": []
     },
     {
@@ -10806,8 +10843,8 @@
       "name": "ModelFailureEndsTheTurnWithAnError",
       "parentId": "T:Monday.Domain.Tests.AgentLoopTests",
       "file": "tests/Monday.Domain.Tests/AgentLoopTests.cs",
-      "startLine": 329,
-      "endLine": 342,
+      "startLine": 338,
+      "endLine": 351,
       "code": "public static void ModelFailureEndsTheTurnWithAnError()\n    {\n        var w = World.Build(new ScriptedChatModel(Answer(\u0022Never.\u0022)));\n        var failing = new FailingModel();\n        var agent = new AgentService(w.Projects, w.Conversations, w.Usage, w.Box, new FakeFactory(failing), new ToolRegistry([]), new FixedClock());\n\n        var events = Collect(agent.ChatAsync(w.Project, w.Ana, new ChatInput(null, \u0022Hi\u0022, null), default));\n\n        Assert.True(events[0] is AgentStarted, \u0022The turn starts with its conversation id.\u0022);\n        Assert.Equal(\u0022Partial\u0022, ((AgentText)events[1]).Text);\n        var error = (AgentError)events[^1];\n        Assert.Equal(\u0022model.rate_limited\u0022, error.Code);\n        Assert.Equal(3, events.Count);\n    }",
       "codeHash": "7132BCF6052E995A",
       "guards": []
@@ -10818,8 +10855,8 @@
       "name": "ModelStoppingOnAnErrorEndsTheTurnWithAPlainError",
       "parentId": "T:Monday.Domain.Tests.AgentLoopTests",
       "file": "tests/Monday.Domain.Tests/AgentLoopTests.cs",
-      "startLine": 344,
-      "endLine": 356,
+      "startLine": 353,
+      "endLine": 365,
       "code": "public static void ModelStoppingOnAnErrorEndsTheTurnWithAPlainError()\n    {\n        var w = World.Build(new ScriptedChatModel([new Finished(StopReason.Error, new Usage(12, 0))]));\n\n        var events = w.Chat(w.Ana, \u0022Hi\u0022);\n\n        Assert.Equal(2, events.Count);\n        Assert.True(events[0] is AgentStarted, \u0022The turn starts with its conversation id.\u0022);\n        var error = (AgentError)events[1];\n        Assert.Equal(\u0022model.stopped\u0022, error.Code);\n        Assert.Equal(\u0022The model stopped before it could answer. Ask again, or put the question another way.\u0022, error.Message);\n        Assert.Equal(new Usage(12, 0), w.MonthUsage());\n    }",
       "codeHash": "C639D533B0FEBFE6",
       "guards": []
@@ -10830,8 +10867,8 @@
       "name": "ModelStoppingOnAnErrorKeepsTheTextAndRunsNoTools",
       "parentId": "T:Monday.Domain.Tests.AgentLoopTests",
       "file": "tests/Monday.Domain.Tests/AgentLoopTests.cs",
-      "startLine": 358,
-      "endLine": 370,
+      "startLine": 367,
+      "endLine": 379,
       "code": "public static void ModelStoppingOnAnErrorKeepsTheTextAndRunsNoTools()\n    {\n        var w = World.Build(new ScriptedChatModel(\n            [new TextDelta(\u0022Partial\u0022), new ToolCall(\u0022c1\u0022, \u0022find_nodes\u0022, Json(\u0022\u0022\u0022{\u0022query\u0022:\u0022items\u0022}\u0022\u0022\u0022)), new Finished(StopReason.Error, new Usage(5, 3))]));\n\n        var events = w.Chat(w.Ana, \u0022Hi\u0022);\n\n        Assert.Equal(\u0022Partial\u0022, ((AgentText)events[1]).Text);\n        Assert.Equal(\u0022model.stopped\u0022, ((AgentError)events[^1]).Code);\n        Assert.Equal(3, events.Count);\n        Assert.Equal(1, w.Model.Requests.Count);\n        Assert.Equal(new Usage(5, 3), w.MonthUsage());\n    }",
       "codeHash": "96209AE13A31E23E",
       "guards": []
@@ -10842,8 +10879,8 @@
       "name": "NonMemberIsRefusedBeforeModelCall",
       "parentId": "T:Monday.Domain.Tests.AgentLoopTests",
       "file": "tests/Monday.Domain.Tests/AgentLoopTests.cs",
-      "startLine": 320,
-      "endLine": 327,
+      "startLine": 329,
+      "endLine": 336,
       "code": "public static void NonMemberIsRefusedBeforeModelCall()\n    {\n        var w = World.Build(new ScriptedChatModel(Answer(\u0022Never.\u0022)));\n\n        Assert.Throws\u003CNotFoundException\u003E(() =\u003E w.Chat(w.Stranger, \u0022Hi\u0022));\n        Assert.Throws\u003CDomainException\u003E(() =\u003E w.Chat(w.Ana, new string(\u0027x\u0027, 4001)), \u0022conversation.message_too_long\u0022);\n        Assert.Equal(0, w.Model.Requests.Count);\n    }",
       "codeHash": "7035AB4161EB16C9",
       "guards": []
@@ -10866,8 +10903,8 @@
       "name": "ScreenActionEmittedAsAction",
       "parentId": "T:Monday.Domain.Tests.AgentLoopTests",
       "file": "tests/Monday.Domain.Tests/AgentLoopTests.cs",
-      "startLine": 390,
-      "endLine": 403,
+      "startLine": 399,
+      "endLine": 412,
       "code": "public static void ScreenActionEmittedAsAction()\n    {\n        var w = World.Build(new ScriptedChatModel(\n            Call(\u0022c1\u0022, \u0022set_lens\u0022, \u0022\u0022\u0022{\u0022lens\u0022:\u0022security\u0022}\u0022\u0022\u0022),\n            Answer(\u0022Switched.\u0022)));\n\n        var events = w.Chat(w.Ana, \u0022Show security\u0022, selected: Endpoint);\n\n        var action = events.OfType\u003CAgentAction\u003E().Single();\n        Assert.Equal(\u0022set_lens\u0022, action.Action.Type);\n        Assert.Equal(\u0022security\u0022, action.Action.Args.GetProperty(\u0022lens\u0022).GetString());\n        Assert.True(events.IndexOf(action) \u003E events.FindIndex(e =\u003E e is AgentTool), \u0022The action follows its tool event.\u0022);\n        Assert.True(w.Model.Requests[0].Instructions.Contains(Endpoint, StringComparison.Ordinal), \u0022The selected node is in the instructions.\u0022);\n    }",
       "codeHash": "A3EABCBB104B9233",
       "guards": []
@@ -10878,8 +10915,8 @@
       "name": "StartedComesFirstAndItsIdCanBeContinued",
       "parentId": "T:Monday.Domain.Tests.AgentLoopTests",
       "file": "tests/Monday.Domain.Tests/AgentLoopTests.cs",
-      "startLine": 405,
-      "endLine": 419,
+      "startLine": 414,
+      "endLine": 428,
       "code": "public static void StartedComesFirstAndItsIdCanBeContinued()\n    {\n        var turns = Enumerable.Range(0, 8).Select(i =\u003E Call($\u0022c{i}\u0022, \u0022set_lens\u0022, \u0022\u0022\u0022{\u0022lens\u0022:\u0022security\u0022}\u0022\u0022\u0022)).Append(Answer(\u0022Carrying on.\u0022)).ToArray();\n        var w = World.Build(new ScriptedChatModel(turns));\n\n        // A new conversation that ends in an error still tells the viewer its id, first.\n        var first = w.Chat(w.Ana, \u0022Loop\u0022);\n        var started = (AgentStarted)first[0];\n        Assert.Equal(\u0022agent.step_cap\u0022, ((AgentError)first[^1]).Code);\n        Assert.Equal(1, first.OfType\u003CAgentStarted\u003E().Count());\n\n        var next = w.Chat(w.Ana, \u0022Go on\u0022, started.ConversationId);\n        Assert.Equal(started.ConversationId, ((AgentStarted)next[0]).ConversationId);\n        Assert.Equal(started.ConversationId, ((AgentDone)next[^1]).ConversationId);\n    }",
       "codeHash": "7AEA48D59F0FA04A",
       "guards": []
@@ -10890,8 +10927,8 @@
       "name": "StopMidStreamKeepsThePartialAnswer",
       "parentId": "T:Monday.Domain.Tests.AgentLoopTests",
       "file": "tests/Monday.Domain.Tests/AgentLoopTests.cs",
-      "startLine": 495,
-      "endLine": 528,
+      "startLine": 504,
+      "endLine": 537,
       "code": "public static void StopMidStreamKeepsThePartialAnswer()\n    {\n        var w = World.Build(new ScriptedChatModel([new TextDelta(\u0022Partial \u0022), new TextDelta(\u0022rest\u0022), new Finished(StopReason.EndTurn, new Usage(1, 1))]));\n        using var cts = new CancellationTokenSource();\n        Guid id = default;\n\n        Assert.Throws\u003COperationCanceledException\u003E(() =\u003E\n        {\n            var e = w.Agent.ChatAsync(w.Project, w.Ana, new ChatInput(null, \u0022Tell me\u0022, null), cts.Token).GetAsyncEnumerator();\n            try\n            {\n                while (e.MoveNextAsync().AsTask().GetAwaiter().GetResult())\n                {\n                    if (e.Current is AgentStarted s)\n                    {\n                        id = s.ConversationId;\n                    }\n\n                    if (e.Current is AgentText)\n                    {\n                        cts.Cancel();\n                    }\n                }\n            }\n            finally\n            {\n                e.DisposeAsync().AsTask().GetAwaiter().GetResult();\n            }\n        });\n\n        var stored = w.Conversations.GetAsync(new ConversationId(id), default).GetAwaiter().GetResult()!;\n        Assert.Equal(2, stored.Messages.Count);\n        Assert.Equal(\u0022Partial\u0022, stored.Messages[1].Text);\n    }",
       "codeHash": "C7C2A07291ADFA02",
       "guards": []
@@ -10975,9 +11012,9 @@
       "parentId": "T:Monday.Domain.Tests.AgentToolTests",
       "file": "tests/Monday.Domain.Tests/AgentToolTests.cs",
       "startLine": 147,
-      "endLine": 162,
-      "code": "public static void DraftDecisionLandsAsProposed()\n    {\n        var w = World.Build();\n        const string input = \u0022\u0022\u0022\n            {\u0022area\u0022:\u0022Stack\u0022,\u0022title\u0022:\u0022Live store\u0022,\u0022context\u0022:\u0022Where traffic lives.\u0022,\n             \u0022options\u0022:[{\u0022key\u0022:\u0022neon\u0022,\u0022title\u0022:\u0022Neon\u0022,\u0022tradeOffs\u0022:\u0022Free\u0022},{\u0022key\u0022:\u0022sqlite\u0022,\u0022title\u0022:\u0022SQLite\u0022,\u0022tradeOffs\u0022:\u0022Lost on redeploy\u0022}],\n             \u0022recommendedKey\u0022:\u0022neon\u0022}\n            \u0022\u0022\u0022;\n\n        var result = Run(new DraftDecisionTool(w.Decisions), w.As(w.Ana, Role.Debugger), input);\n\n        Assert.Equal(\u0022Proposed\u0022, result.Data.GetProperty(\u0022status\u0022).GetString());\n        var stored = w.Decisions.ListAsync(w.Project, w.Owner, default).GetAwaiter().GetResult();\n        Assert.Equal(1, stored.Count);\n        Assert.Equal(w.Ana, stored[0].DraftedBy!.Value);\n    }",
-      "codeHash": "740D42A37789DD7F",
+      "endLine": 166,
+      "code": "public static void DraftDecisionLandsAsProposed()\n    {\n        var w = World.Build();\n        const string input = \u0022\u0022\u0022\n            {\u0022area\u0022:\u0022Stack\u0022,\u0022title\u0022:\u0022Live store\u0022,\u0022context\u0022:\u0022Where traffic lives.\u0022,\n             \u0022options\u0022:[{\u0022key\u0022:\u0022neon\u0022,\u0022title\u0022:\u0022Neon\u0022,\u0022tradeOffs\u0022:\u0022Free\u0022},{\u0022key\u0022:\u0022sqlite\u0022,\u0022title\u0022:\u0022SQLite\u0022,\u0022tradeOffs\u0022:\u0022Lost on redeploy\u0022}],\n             \u0022recommendedKey\u0022:\u0022neon\u0022}\n            \u0022\u0022\u0022;\n\n        var result = Run(new DraftDecisionTool(w.Decisions), w.As(w.Ana, Role.Debugger), input);\n\n        Assert.Equal(\u0022Proposed\u0022, result.Data.GetProperty(\u0022status\u0022).GetString());\n        var stored = w.Decisions.ListAsync(w.Project, w.Owner, default).GetAwaiter().GetResult();\n        Assert.Equal(1, stored.Count);\n        Assert.Equal(w.Ana, stored[0].DraftedBy!.Value);\n\n        var drafted = w.Audit.ListAsync(w.Project, default).GetAwaiter().GetResult().Single(e =\u003E e.Action == \u0022decision.drafted\u0022);\n        Assert.Equal(w.Ana, drafted.Actor);\n        Assert.Equal(\u0022Live store\u0022, drafted.Detail);\n    }",
+      "codeHash": "BB5150985F544B87",
       "guards": []
     },
     {
@@ -10986,8 +11023,8 @@
       "name": "DraftWithSupersedesStoresIt",
       "parentId": "T:Monday.Domain.Tests.AgentToolTests",
       "file": "tests/Monday.Domain.Tests/AgentToolTests.cs",
-      "startLine": 288,
-      "endLine": 301,
+      "startLine": 292,
+      "endLine": 305,
       "code": "public static void DraftWithSupersedesStoresIt()\n    {\n        var w = World.Build();\n        var earlier = w.Decisions.DraftAsync(w.Project, new DecisionProposal(DecisionArea.Stack, \u0022Old\u0022, \u0022Old call.\u0022, [new(\u0022a\u0022, \u0022A\u0022, \u0022x\u0022), new(\u0022b\u0022, \u0022B\u0022, \u0022y\u0022)], \u0022a\u0022, null), w.Ana, default).GetAwaiter().GetResult();\n        var input = $$\u0022\u0022\u0022\n            {\u0022area\u0022:\u0022Stack\u0022,\u0022title\u0022:\u0022New\u0022,\u0022context\u0022:\u0022Changed our mind.\u0022,\u0022supersedes\u0022:\u0022{{earlier.Id.Value}}\u0022,\n             \u0022options\u0022:[{\u0022key\u0022:\u0022a\u0022,\u0022title\u0022:\u0022A\u0022,\u0022tradeOffs\u0022:\u0022x\u0022},{\u0022key\u0022:\u0022b\u0022,\u0022title\u0022:\u0022B\u0022,\u0022tradeOffs\u0022:\u0022y\u0022}],\u0022recommendedKey\u0022:\u0022b\u0022}\n            \u0022\u0022\u0022;\n\n        Run(new DraftDecisionTool(w.Decisions), w.As(w.Ana, Role.Debugger), input);\n\n        var stored = w.Decisions.ListAsync(w.Project, w.Owner, default).GetAwaiter().GetResult().Single(d =\u003E d.Title == \u0022New\u0022);\n        Assert.Equal(earlier.Id, stored.Supersedes!.Value);\n    }",
       "codeHash": "0D966B8288DE7A45",
       "guards": []
@@ -10998,10 +11035,10 @@
       "name": "ListDecisionsReturnsTheApiFields",
       "parentId": "T:Monday.Domain.Tests.AgentToolTests",
       "file": "tests/Monday.Domain.Tests/AgentToolTests.cs",
-      "startLine": 303,
-      "endLine": 316,
-      "code": "public static void ListDecisionsReturnsTheApiFields()\n    {\n        var w = World.Build();\n        w.Decisions.DraftAsync(w.Project, new DecisionProposal(DecisionArea.Stack, \u0022Old\u0022, \u0022Old call.\u0022, [new(\u0022a\u0022, \u0022A\u0022, \u0022x\u0022), new(\u0022b\u0022, \u0022B\u0022, \u0022y\u0022)], \u0022a\u0022, null), w.Ana, default).GetAwaiter().GetResult();\n\n        var item = Run(new ListDecisionsTool(w.Decisions), w.As(w.Mia, Role.Monitor)).Data.GetProperty(\u0022decisions\u0022)[0];\n\n        foreach (var field in new[] { \u0022supersedes\u0022, \u0022resolvedBy\u0022, \u0022resolvedAt\u0022 })\n        {\n            Assert.True(item.TryGetProperty(field, out _), $\u0022{field} is returned.\u0022);\n        }\n\n        Assert.True(!item.TryGetProperty(\u0022draftedBy\u0022, out _), \u0022draftedBy is not part of the view.\u0022);\n    }",
-      "codeHash": "027AA462DB483187",
+      "startLine": 307,
+      "endLine": 320,
+      "code": "public static void ListDecisionsReturnsTheApiFields()\n    {\n        var w = World.Build();\n        w.Decisions.DraftAsync(w.Project, new DecisionProposal(DecisionArea.Stack, \u0022Old\u0022, \u0022Old call.\u0022, [new(\u0022a\u0022, \u0022A\u0022, \u0022x\u0022), new(\u0022b\u0022, \u0022B\u0022, \u0022y\u0022)], \u0022a\u0022, null), w.Ana, default).GetAwaiter().GetResult();\n\n        var item = Run(new ListDecisionsTool(w.Decisions), w.As(w.Mia, Role.Monitor)).Data.GetProperty(\u0022decisions\u0022)[0];\n\n        foreach (var field in new[] { \u0022supersedes\u0022, \u0022resolvedBy\u0022, \u0022resolvedAt\u0022 })\n        {\n            Assert.True(item.TryGetProperty(field, out _), $\u0022{field} is returned.\u0022);\n        }\n\n        Assert.Equal(\u0022github:ana\u0022, item.GetProperty(\u0022draftedBy\u0022).GetString());\n    }",
+      "codeHash": "3E33B7EDC998094B",
       "guards": []
     },
     {
@@ -11010,8 +11047,8 @@
       "name": "ListProjectsIsMcpOnlyAndListsMine",
       "parentId": "T:Monday.Domain.Tests.AgentToolTests",
       "file": "tests/Monday.Domain.Tests/AgentToolTests.cs",
-      "startLine": 238,
-      "endLine": 247,
+      "startLine": 242,
+      "endLine": 251,
       "code": "public static void ListProjectsIsMcpOnlyAndListsMine()\n    {\n        var w = World.Build();\n        var tool = new ListProjectsTool(w.ProjectService);\n        Assert.Equal(ToolChannel.Mcp, tool.OnlyOn!.Value);\n        Assert.Equal(0, tool.Requires.Count);\n\n        var result = Run(tool, new ToolContext(default, w.Mia, Role.Monitor, ToolChannel.Mcp));\n        Assert.Equal(1, result.Data.GetProperty(\u0022projects\u0022).GetArrayLength());\n    }",
       "codeHash": "DD4C4209E575DC45",
       "guards": []
@@ -11022,8 +11059,8 @@
       "name": "ListsCappedAtFifty",
       "parentId": "T:Monday.Domain.Tests.AgentToolTests",
       "file": "tests/Monday.Domain.Tests/AgentToolTests.cs",
-      "startLine": 183,
-      "endLine": 194,
+      "startLine": 187,
+      "endLine": 198,
       "code": "public static void ListsCappedAtFifty()\n    {\n        var w = World.Build(extraNodes: 80, requests: 80);\n\n        var nodes = Run(new FindNodesTool(w.Graph), w.As(w.Mia, Role.Monitor), \u0022\u0022\u0022{\u0022query\u0022:\u0022Extra\u0022}\u0022\u0022\u0022);\n        Assert.Equal(50, nodes.Data.GetProperty(\u0022nodes\u0022).GetArrayLength());\n        Assert.Equal(50, nodes.NodeIds.Count);\n        Assert.True(nodes.Data.GetProperty(\u0022truncated\u0022).GetBoolean(), \u0022The result says it was cut.\u0022);\n\n        var requests = Run(new RecentRequestsTool(w.TrafficService, new FixedClock()), w.As(w.Ana, Role.Debugger));\n        Assert.Equal(50, requests.Data.GetProperty(\u0022requests\u0022).GetArrayLength());\n    }",
       "codeHash": "BE34C6E74FDB5EBA",
       "guards": []
@@ -11034,8 +11071,8 @@
       "name": "MonitorCannotDraftDecision",
       "parentId": "T:Monday.Domain.Tests.AgentToolTests",
       "file": "tests/Monday.Domain.Tests/AgentToolTests.cs",
-      "startLine": 164,
-      "endLine": 172,
+      "startLine": 168,
+      "endLine": 176,
       "code": "public static void MonitorCannotDraftDecision()\n    {\n        var w = World.Build();\n        var proposal = new DecisionProposal(DecisionArea.Stack, \u0022Live store\u0022, \u0022Where traffic lives.\u0022,\n            [new(\u0022neon\u0022, \u0022Neon\u0022, \u0022Free\u0022), new(\u0022sqlite\u0022, \u0022SQLite\u0022, \u0022Lost\u0022)], \u0022neon\u0022, null);\n\n        Assert.Throws\u003CAccessDeniedException\u003E(\n            () =\u003E w.Decisions.DraftAsync(w.Project, proposal, w.Mia, default).GetAwaiter().GetResult(), \u0022access.denied\u0022);\n    }",
       "codeHash": "156518DFC4CA9AA5",
       "guards": []
@@ -11058,8 +11095,8 @@
       "name": "NodeCodeIsCappedAt4000Characters",
       "parentId": "T:Monday.Domain.Tests.AgentToolTests",
       "file": "tests/Monday.Domain.Tests/AgentToolTests.cs",
-      "startLine": 196,
-      "endLine": 208,
+      "startLine": 200,
+      "endLine": 212,
       "code": "public static void NodeCodeIsCappedAt4000Characters()\n    {\n        var w = World.Build();\n        var big = new string(\u0027x\u0027, 9000);\n        var node = new CodeNode { Id = \u0022Shop.Big\u0022, Kind = NodeKind.Method, Name = \u0022Big\u0022, ParentId = \u0022app\u0022, Code = big, CodeHash = CodeNode.HashCode(big) };\n        var snapshot = w.Graphs.LatestAsync(w.Project, default).GetAwaiter().GetResult()!;\n        w.Graphs.SaveAsync(CodeGraphSnapshot.Create(w.Project, \u0022def456\u0022, Now, [.. snapshot.Nodes, node], snapshot.Edges, snapshot.Findings), default).GetAwaiter().GetResult();\n\n        var result = Run(new NodeDetailTool(w.Graph), w.As(w.Ana, Role.Debugger), \u0022\u0022\u0022{\u0022nodeId\u0022:\u0022Shop.Big\u0022}\u0022\u0022\u0022);\n\n        Assert.Equal(4000, result.Data.GetProperty(\u0022node\u0022).GetProperty(\u0022code\u0022).GetString()!.Length);\n        Assert.True(result.Data.GetProperty(\u0022codeTruncated\u0022).GetBoolean(), \u0022The result says the code was cut.\u0022);\n    }",
       "codeHash": "FF0E00A43C4E2FBE",
       "guards": []
@@ -11070,8 +11107,8 @@
       "name": "NodeDetailShapeOnlyDropsCodeEvenForARealDebugger",
       "parentId": "T:Monday.Domain.Tests.AgentToolTests",
       "file": "tests/Monday.Domain.Tests/AgentToolTests.cs",
-      "startLine": 278,
-      "endLine": 286,
+      "startLine": 282,
+      "endLine": 290,
       "code": "public static void NodeDetailShapeOnlyDropsCodeEvenForARealDebugger()\n    {\n        var w = World.Build();\n\n        // Ana really is a Debugger, so the service would hand over source; a Monitor context must not.\n        var result = Run(new NodeDetailTool(w.Graph), w.As(w.Ana, Role.Monitor), $$\u0022\u0022\u0022{\u0022nodeId\u0022:\u0022{{Method}}\u0022}\u0022\u0022\u0022);\n\n        Assert.Equal(JsonValueKind.Null, result.Data.GetProperty(\u0022node\u0022).GetProperty(\u0022code\u0022).ValueKind);\n    }",
       "codeHash": "E6890AE8EA43BA5B",
       "guards": []
@@ -11082,8 +11119,8 @@
       "name": "RecentActivityListsNodesTouched",
       "parentId": "T:Monday.Domain.Tests.AgentToolTests",
       "file": "tests/Monday.Domain.Tests/AgentToolTests.cs",
-      "startLine": 249,
-      "endLine": 258,
+      "startLine": 253,
+      "endLine": 262,
       "code": "public static void RecentActivityListsNodesTouched()\n    {\n        var w = World.Build();\n        w.ActivityStore.AppendAsync([ActivityEvent.Record(w.Project, \u0022s1\u0022, Now.AddMinutes(-5), ActivityKind.Edit, \u0022Edited List\u0022, [Method])], default).GetAwaiter().GetResult();\n\n        var result = Run(new RecentActivityTool(w.Activity, new FixedClock()), w.As(w.Mia, Role.Monitor));\n\n        Assert.Equal(1, result.Data.GetProperty(\u0022events\u0022).GetArrayLength());\n        Assert.True(result.NodeIds.SequenceEqual([Method]), \u0022The event\u0027s nodes light up.\u0022);\n    }",
       "codeHash": "3D262E342E769E69",
       "guards": []
@@ -11106,10 +11143,22 @@
       "name": "RecentRequestsReturnsTheNewestFiftyOfABusyWindow",
       "parentId": "T:Monday.Domain.Tests.AgentToolTests",
       "file": "tests/Monday.Domain.Tests/AgentToolTests.cs",
-      "startLine": 260,
-      "endLine": 276,
+      "startLine": 264,
+      "endLine": 280,
       "code": "public static void RecentRequestsReturnsTheNewestFiftyOfABusyWindow()\n    {\n        var w = World.Build(requests: 80);\n\n        var result = Run(new RecentRequestsTool(w.TrafficService, new FixedClock()), w.As(w.Ana, Role.Debugger));\n\n        var requests = result.Data.GetProperty(\u0022requests\u0022);\n        Assert.Equal(50, requests.GetArrayLength());\n        Assert.True(result.Data.GetProperty(\u0022truncated\u0022).GetBoolean(), \u0022The window held more than 50.\u0022);\n\n        // Fixture traces run one second apart from -1 minute, and the window ends at Now, so offsets 0..60 are in it;\n        // the 11 oldest (0..10) must be the ones dropped.\n        var first = requests[0].GetProperty(\u0022at\u0022).GetDateTimeOffset();\n        var last = requests[49].GetProperty(\u0022at\u0022).GetDateTimeOffset();\n        Assert.Equal(Now.AddMinutes(-1).AddSeconds(11), first);\n        Assert.Equal(Now.AddMinutes(-1).AddSeconds(60), last);\n    }",
       "codeHash": "7B7DF097FD7D26E4",
+      "guards": []
+    },
+    {
+      "id": "M:Monday.Domain.Tests.AgentToolTests.RecentRequestsServiceNeedsInspectRequests",
+      "kind": "Test",
+      "name": "RecentRequestsServiceNeedsInspectRequests",
+      "parentId": "T:Monday.Domain.Tests.AgentToolTests",
+      "file": "tests/Monday.Domain.Tests/AgentToolTests.cs",
+      "startLine": 322,
+      "endLine": 329,
+      "code": "public static void RecentRequestsServiceNeedsInspectRequests()\n    {\n        var w = World.Build();\n\n        Assert.Throws\u003CAccessDeniedException\u003E(\n            () =\u003E w.TrafficService.RecentAsync(w.Project, Now.AddHours(-1), Now, 10, w.Mia, default).GetAwaiter().GetResult(), \u0022access.denied\u0022);\n        Assert.Equal(3, w.TrafficService.RecentAsync(w.Project, Now.AddHours(-1), Now, 10, w.Ana, default).GetAwaiter().GetResult().Count);\n    }",
+      "codeHash": "5704BC3F046E6600",
       "guards": []
     },
     {
@@ -11118,8 +11167,8 @@
       "name": "RegistrationOffersTheSpecTable",
       "parentId": "T:Monday.Domain.Tests.AgentToolTests",
       "file": "tests/Monday.Domain.Tests/AgentToolTests.cs",
-      "startLine": 328,
-      "endLine": 342,
+      "startLine": 341,
+      "endLine": 355,
       "code": "public static void RegistrationOffersTheSpecTable()\n    {\n        var services = new ServiceCollection();\n        services.AddMonday(new ConfigurationBuilder().Build());\n        services.AddAgentTools();\n        using var provider = services.BuildServiceProvider();\n        using var scope = provider.CreateScope();\n        var registry = scope.ServiceProvider.GetRequiredService\u003CToolRegistry\u003E();\n\n        Assert.Equal(6, registry.For(Role.Monitor, ToolChannel.Chat).Count);\n        Assert.Equal(13, registry.For(Role.Debugger, ToolChannel.Chat).Count);\n        Assert.Equal(10, registry.For(Role.Debugger, ToolChannel.Mcp).Count);\n        Assert.True(registry.Find(\u0022list_projects\u0022, Role.Monitor, ToolChannel.Chat) is null, \u0022list_projects is not offered in chat.\u0022);\n        Assert.True(registry.For(Role.Owner, ToolChannel.Chat).All(t =\u003E t.Requires.Contains(Permission.ChatAsk) || t.Requires.Contains(Permission.ChatAct)), \u0022Every chat tool needs chat rights.\u0022);\n    }",
       "codeHash": "D035A907008A78C3",
       "guards": []
@@ -11130,8 +11179,8 @@
       "name": "ScreenToolsRejectUnknownNodes",
       "parentId": "T:Monday.Domain.Tests.AgentToolTests",
       "file": "tests/Monday.Domain.Tests/AgentToolTests.cs",
-      "startLine": 223,
-      "endLine": 236,
+      "startLine": 227,
+      "endLine": 240,
       "code": "public static void ScreenToolsRejectUnknownNodes()\n    {\n        var w = World.Build();\n        var ctx = w.As(w.Ana, Role.Debugger);\n\n        var focus = Run(new FocusNodeTool(w.Graph), ctx, $$\u0022\u0022\u0022{\u0022nodeId\u0022:\u0022{{Endpoint}}\u0022}\u0022\u0022\u0022);\n        Assert.Equal(\u0022focus_node\u0022, focus.Action!.Type);\n        Assert.True(focus.NodeIds.SequenceEqual([Endpoint]), \u0022Focus names its node.\u0022);\n\n        Assert.Throws\u003CNotFoundException\u003E(() =\u003E Run(new FocusNodeTool(w.Graph), ctx, \u0022\u0022\u0022{\u0022nodeId\u0022:\u0022Nope\u0022}\u0022\u0022\u0022));\n        Assert.Throws\u003CNotFoundException\u003E(() =\u003E Run(new HighlightPathTool(w.Graph), ctx, $$\u0022\u0022\u0022{\u0022nodeIds\u0022:[\u0022{{Endpoint}}\u0022,\u0022Nope\u0022]}\u0022\u0022\u0022));\n        Assert.Throws\u003CDomainException\u003E(() =\u003E Run(new SetLensTool(), ctx, \u0022\u0022\u0022{\u0022lens\u0022:\u0022sparkles\u0022}\u0022\u0022\u0022), \u0022agent.input\u0022);\n        Assert.Equal(\u0022set_lens\u0022, Run(new SetLensTool(), ctx, \u0022\u0022\u0022{\u0022lens\u0022:\u0022security\u0022}\u0022\u0022\u0022).Action!.Type);\n    }",
       "codeHash": "67165E614744EE02",
       "guards": []
@@ -11142,8 +11191,8 @@
       "name": "SecurityFindingsHiddenFromMonitorServiceView",
       "parentId": "T:Monday.Domain.Tests.AgentToolTests",
       "file": "tests/Monday.Domain.Tests/AgentToolTests.cs",
-      "startLine": 210,
-      "endLine": 221,
+      "startLine": 214,
+      "endLine": 225,
       "code": "public static void SecurityFindingsHiddenFromMonitorServiceView()\n    {\n        var w = World.Build();\n        var tool = new SecurityFindingsTool(w.Graph);\n\n        var debugger = Run(tool, w.As(w.Ana, Role.Debugger));\n        Assert.Equal(1, debugger.Data.GetProperty(\u0022findings\u0022).GetArrayLength());\n        Assert.True(debugger.NodeIds.Contains(Endpoint), \u0022A finding lights up its node.\u0022);\n\n        var monitor = Run(tool, w.As(w.Mia, Role.Monitor));\n        Assert.Equal(0, monitor.Data.GetProperty(\u0022findings\u0022).GetArrayLength());\n    }",
       "codeHash": "99F5C5F401C53AEE",
       "guards": []
@@ -11166,8 +11215,8 @@
       "name": "ToolResultsCarryNodeIds",
       "parentId": "T:Monday.Domain.Tests.AgentToolTests",
       "file": "tests/Monday.Domain.Tests/AgentToolTests.cs",
-      "startLine": 174,
-      "endLine": 181,
+      "startLine": 178,
+      "endLine": 185,
       "code": "public static void ToolResultsCarryNodeIds()\n    {\n        var w = World.Build();\n        var result = Run(new FindNodesTool(w.Graph), w.As(w.Mia, Role.Monitor), \u0022\u0022\u0022{\u0022query\u0022:\u0022items\u0022}\u0022\u0022\u0022);\n\n        Assert.True(result.NodeIds.Contains(Endpoint), \u0022find_nodes returns the ids of its matches.\u0022);\n        Assert.Equal(result.NodeIds.Count, result.Data.GetProperty(\u0022nodes\u0022).GetArrayLength());\n    }",
       "codeHash": "8CA11135DA88B699",
       "guards": []
@@ -11178,8 +11227,8 @@
       "name": "UnknownFilterValuesAreToolErrors",
       "parentId": "T:Monday.Domain.Tests.AgentToolTests",
       "file": "tests/Monday.Domain.Tests/AgentToolTests.cs",
-      "startLine": 318,
-      "endLine": 326,
+      "startLine": 331,
+      "endLine": 339,
       "code": "public static void UnknownFilterValuesAreToolErrors()\n    {\n        var w = World.Build();\n        var ctx = w.As(w.Ana, Role.Debugger);\n\n        Assert.Throws\u003CDomainException\u003E(() =\u003E Run(new ListDecisionsTool(w.Decisions), ctx, \u0022\u0022\u0022{\u0022status\u0022:\u0022Maybe\u0022}\u0022\u0022\u0022), \u0022agent.input\u0022);\n        Assert.Throws\u003CDomainException\u003E(() =\u003E Run(new FindNodesTool(w.Graph), ctx, \u0022\u0022\u0022{\u0022query\u0022:\u0022x\u0022,\u0022kind\u0022:\u0022Widget\u0022}\u0022\u0022\u0022), \u0022agent.input\u0022);\n        Assert.Throws\u003CDomainException\u003E(() =\u003E Run(new SecurityFindingsTool(w.Graph), ctx, \u0022\u0022\u0022{\u0022severity\u0022:\u0022Dire\u0022}\u0022\u0022\u0022), \u0022agent.input\u0022);\n    }",
       "codeHash": "4760D66E97F6A235",
       "guards": []
@@ -11797,13 +11846,25 @@
       "guards": []
     },
     {
+      "id": "M:Monday.Domain.Tests.DecisionDraftTests.DecisionViewShowsWhoDraftedIt",
+      "kind": "Test",
+      "name": "DecisionViewShowsWhoDraftedIt",
+      "parentId": "T:Monday.Domain.Tests.DecisionDraftTests",
+      "file": "tests/Monday.Domain.Tests/DecisionDraftTests.cs",
+      "startLine": 44,
+      "endLine": 53,
+      "code": "public static void DecisionViewShowsWhoDraftedIt()\n    {\n        var project = Project.Create(\u0022Monday\u0022, Owner, Now);\n        project.SetMember(Ana, Role.Debugger, Owner, Now);\n\n        Assert.Equal(\u0022github:ana\u0022, DecisionView.Of(DraftBy(project, Ana)).DraftedBy);\n\n        var proposed = Decision.Propose(project.Id, DecisionArea.Stack, \u0022Live store\u0022, \u0022Why.\u0022, [new(\u0022a\u0022, \u0022A\u0022, \u0022x\u0022), new(\u0022b\u0022, \u0022B\u0022, \u0022y\u0022)], \u0022a\u0022, Now);\n        Assert.True(DecisionView.Of(proposed).DraftedBy is null, \u0022A session\u0027s proposal has no drafter.\u0022);\n    }",
+      "codeHash": "4EB6EA7C41A3C428",
+      "guards": []
+    },
+    {
       "id": "M:Monday.Domain.Tests.DecisionDraftTests.DraftRecordsWhoAsked",
       "kind": "Test",
       "name": "DraftRecordsWhoAsked",
       "parentId": "T:Monday.Domain.Tests.DecisionDraftTests",
       "file": "tests/Monday.Domain.Tests/DecisionDraftTests.cs",
-      "startLine": 20,
-      "endLine": 29,
+      "startLine": 21,
+      "endLine": 30,
       "code": "public static void DraftRecordsWhoAsked()\n    {\n        var project = Project.Create(\u0022Monday\u0022, Owner, Now);\n        project.SetMember(Ana, Role.Debugger, Owner, Now);\n\n        var decision = DraftBy(project, Ana);\n\n        Assert.Equal(Ana, decision.DraftedBy);\n        Assert.Equal(DecisionStatus.Proposed, decision.Status);\n    }",
       "codeHash": "539A382DCB8A17FB",
       "guards": []
@@ -11814,8 +11875,8 @@
       "name": "DrafterWhoIsNotOwnerCannotApproveOwnDraft",
       "parentId": "T:Monday.Domain.Tests.DecisionDraftTests",
       "file": "tests/Monday.Domain.Tests/DecisionDraftTests.cs",
-      "startLine": 31,
-      "endLine": 41,
+      "startLine": 32,
+      "endLine": 42,
       "code": "public static void DrafterWhoIsNotOwnerCannotApproveOwnDraft()\n    {\n        var project = Project.Create(\u0022Monday\u0022, Owner, Now);\n        project.SetMember(Ana, Role.Admin, Owner, Now);\n        var decision = DraftBy(project, Ana);\n\n        Assert.Throws\u003CAccessDeniedException\u003E(() =\u003E decision.Approve(\u0022neon\u0022, project, Ana, Now), \u0022access.denied\u0022);\n        Assert.Throws\u003CAccessDeniedException\u003E(() =\u003E decision.Reject(project, Ana, Now, \u0022no\u0022), \u0022access.denied\u0022);\n        decision.Approve(\u0022neon\u0022, project, Owner, Now);\n        Assert.Equal(DecisionStatus.Approved, decision.Status);\n    }",
       "codeHash": "84D0B02F7FE998A3",
       "guards": []
@@ -11826,8 +11887,8 @@
       "name": "CallOnUnlistedProjectRefused",
       "parentId": "T:Monday.Domain.Tests.McpTests",
       "file": "tests/Monday.Domain.Tests/McpTests.cs",
-      "startLine": 229,
-      "endLine": 245,
+      "startLine": 231,
+      "endLine": 247,
       "code": "public static void CallOnUnlistedProjectRefused()\n    {\n        using var host = Host.Start();\n        using var session = Connect(host, host.Issue(\u0022read\u0022, host.Shop).Plain);\n        Assert.True(session.Call(\u0022graph_overview\u0022, host.Shop).IsError != true, \u0022Its own project works.\u0022);\n\n        var refused = session.Call(\u0022graph_overview\u0022, host.Blog);\n        Assert.True(refused.IsError == true, \u0022A project the token is not limited to is refused.\u0022);\n        Assert.True(TextOf(refused).Contains(\u0022not found\u0022, StringComparison.Ordinal), $\u0022Plain message: {TextOf(refused)}\u0022);\n\n        Assert.True(session.Call(\u0022graph_overview\u0022, ProjectId.New()).IsError == true, \u0022An unknown project is refused.\u0022);\n        Assert.True(session.Call(\u0022graph_overview\u0022, null).IsError == true, \u0022A missing project is refused.\u0022);\n\n        var listed = JsonDocument.Parse(TextOf(session.Call(\u0022list_projects\u0022, null))).RootElement.GetProperty(\u0022projects\u0022);\n        Assert.Equal(1, listed.GetArrayLength());\n        Assert.Equal(host.Shop.Value, listed[0].GetProperty(\u0022id\u0022).GetGuid());\n    }",
       "codeHash": "96C9649E9909258F",
       "guards": []
@@ -11838,8 +11899,8 @@
       "name": "DevHeaderAloneCannotReachMcp",
       "parentId": "T:Monday.Domain.Tests.McpTests",
       "file": "tests/Monday.Domain.Tests/McpTests.cs",
-      "startLine": 289,
-      "endLine": 295,
+      "startLine": 291,
+      "endLine": 297,
       "code": "public static void DevHeaderAloneCannotReachMcp()\n    {\n        using var host = Host.Start();\n        Assert.Equal(HttpStatusCode.Unauthorized, RawStatus(host, r =\u003E r.Headers.Add(UserAuthentication.DevHeader, Ana.Value)));\n        Assert.Equal(HttpStatusCode.Unauthorized, RawStatus(host, _ =\u003E { }));\n        Assert.Equal(HttpStatusCode.Unauthorized, RawStatus(host, r =\u003E r.Headers.Authorization = new(\u0022Bearer\u0022, \u0022mpat_nope_nope\u0022)));\n    }",
       "codeHash": "4C058F62F0C6AE82",
       "guards": []
@@ -11850,8 +11911,8 @@
       "name": "ExpiredTokenGets401",
       "parentId": "T:Monday.Domain.Tests.McpTests",
       "file": "tests/Monday.Domain.Tests/McpTests.cs",
-      "startLine": 281,
-      "endLine": 287,
+      "startLine": 283,
+      "endLine": 289,
       "code": "public static void ExpiredTokenGets401()\n    {\n        using var host = Host.Start();\n        var issued = host.Issue();\n        host.Clock.Now = Now.AddDays(90);\n        Assert.Equal(HttpStatusCode.Unauthorized, RawStatus(host, r =\u003E r.Headers.Authorization = new(\u0022Bearer\u0022, issued.Plain)));\n    }",
       "codeHash": "19CDB356BF71E3D8",
       "guards": []
@@ -11862,8 +11923,8 @@
       "name": "ListsOnlyRoleToolsWithoutScreenActions",
       "parentId": "T:Monday.Domain.Tests.McpTests",
       "file": "tests/Monday.Domain.Tests/McpTests.cs",
-      "startLine": 157,
-      "endLine": 190,
+      "startLine": 159,
+      "endLine": 192,
       "code": "public static void ListsOnlyRoleToolsWithoutScreenActions()\n    {\n        using var host = Host.Start();\n        using var session = Connect(host, host.Issue(\u0022read_propose\u0022).Plain);\n        var tools = session.Tools();\n        var names = tools.Select(t =\u003E t.Name).ToHashSet();\n\n        var expected = host.ToolNames(Role.Debugger).Union(host.ToolNames(Role.Monitor)).ToHashSet();\n        Assert.True(names.SetEquals(expected), $\u0022tools/list is the union of the roles\u0027 MCP tools: got {string.Join(\u0022,\u0022, names)}.\u0022);\n        Assert.True(!names.Overlaps(ScreenTools), \u0022No screen actions over MCP.\u0022);\n        Assert.True(names.Contains(\u0022list_projects\u0022) \u0026\u0026 names.Contains(\u0022draft_decision\u0022) \u0026\u0026 names.Contains(\u0022security_findings\u0022), \u0022Role tools are there.\u0022);\n        Assert.Equal(names.Count, tools.Count); // each tool once\n\n        foreach (var tool in tools.Where(t =\u003E t.Name != \u0022list_projects\u0022))\n        {\n            var schema = tool.ProtocolTool.InputSchema;\n            Assert.True(schema.GetProperty(\u0022properties\u0022).TryGetProperty(\u0022project\u0022, out var project) \u0026\u0026 project.GetProperty(\u0022type\u0022).GetString() == \u0022string\u0022,\n                $\u0022{tool.Name} takes a project.\u0022);\n            Assert.True(schema.GetProperty(\u0022required\u0022).EnumerateArray().Any(r =\u003E r.GetString() == \u0022project\u0022), $\u0022{tool.Name} requires the project.\u0022);\n        }\n\n        // Only the Monitor project, through a limited token: no ViewCode tools, no drafting (Monitor has no ChatAct).\n        using var monitor = Connect(host, host.Issue(\u0022read_propose\u0022, host.Blog).Plain);\n        var monitorNames = monitor.Tools().Select(t =\u003E t.Name).ToHashSet();\n        Assert.True(monitorNames.SetEquals(host.ToolNames(Role.Monitor).Where(n =\u003E n != \u0022draft_decision\u0022)), \u0022A Monitor-only token sees Monitor tools.\u0022);\n        Assert.True(!monitorNames.Contains(\u0022security_findings\u0022) \u0026\u0026 !monitorNames.Contains(\u0022draft_decision\u0022), \u0022Nothing above the role.\u0022);\n\n        var overview = session.Call(\u0022graph_overview\u0022, host.Shop);\n        Assert.True(overview.IsError != true, $\u0022A read tool runs: {TextOf(overview)}\u0022);\n        Assert.True(JsonDocument.Parse(TextOf(overview)).RootElement.TryGetProperty(\u0022indexed\u0022, out _), \u0022The result is the tool\u0027s JSON.\u0022);\n\n        var screen = session.Call(\u0022focus_node\u0022, host.Shop, new() { [\u0022nodeId\u0022] = \u0022x\u0022 });\n        Assert.True(screen.IsError == true, \u0022A screen action cannot be called over MCP.\u0022);\n    }",
       "codeHash": "78F00A9275087532",
       "guards": []
@@ -11874,10 +11935,22 @@
       "name": "MemberRemovedAfterTokenCreationRefused",
       "parentId": "T:Monday.Domain.Tests.McpTests",
       "file": "tests/Monday.Domain.Tests/McpTests.cs",
-      "startLine": 247,
-      "endLine": 265,
+      "startLine": 249,
+      "endLine": 267,
       "code": "public static void MemberRemovedAfterTokenCreationRefused()\n    {\n        using var host = Host.Start();\n        using var session = Connect(host, host.Issue(\u0022read\u0022).Plain);\n        Assert.True(session.Call(\u0022graph_overview\u0022, host.Blog).IsError != true, \u0022Works while a member.\u0022);\n\n        host.Use(async s =\u003E\n        {\n            var repo = s.GetRequiredService\u003CIProjectRepository\u003E();\n            var blog = (await repo.GetAsync(host.Blog, default))!;\n            blog.RemoveMember(Ana, Owner, Now);\n            await repo.SaveAsync(blog, default);\n            return true;\n        });\n\n        Assert.True(session.Call(\u0022graph_overview\u0022, host.Blog).IsError == true, \u0022Membership is checked on every call.\u0022);\n        Assert.True(session.Call(\u0022graph_overview\u0022, host.Shop).IsError != true, \u0022The other project still works.\u0022);\n        Assert.True(session.Tools().Select(t =\u003E t.Name).ToHashSet().SetEquals(host.ToolNames(Role.Debugger).Where(n =\u003E n != \u0022draft_decision\u0022)), \u0022The list follows real membership.\u0022);\n    }",
       "codeHash": "5F21048F6C0BE104",
+      "guards": []
+    },
+    {
+      "id": "M:Monday.Domain.Tests.McpTests.ModelTestUsesThePerUserChatRateLimit",
+      "kind": "Test",
+      "name": "ModelTestUsesThePerUserChatRateLimit",
+      "parentId": "T:Monday.Domain.Tests.McpTests",
+      "file": "tests/Monday.Domain.Tests/McpTests.cs",
+      "startLine": 299,
+      "endLine": 311,
+      "code": "public static void ModelTestUsesThePerUserChatRateLimit()\n    {\n        // Each test call spends a request on the project\u0027s model key, so it shares chat\u0027s per-person bucket.\n        var builder = WebApplication.CreateBuilder();\n        builder.Configuration[\u0022ConnectionStrings:Monday\u0022] = string.Empty;\n        builder.Services.AddMonday(builder.Configuration);\n        var app = builder.Build();\n        app.MapModel();\n        var endpoints = ((IEndpointRouteBuilder)app).DataSources.SelectMany(d =\u003E d.Endpoints).OfType\u003CRouteEndpoint\u003E().ToList();\n\n        var test = endpoints.Single(e =\u003E e.RoutePattern.RawText!.EndsWith(\u0022/test\u0022, StringComparison.Ordinal));\n        Assert.Equal(ChatEndpoints.RateLimitPolicy, test.Metadata.GetMetadata\u003CEnableRateLimitingAttribute\u003E()?.PolicyName);\n    }",
+      "codeHash": "E27553153F0658A9",
       "guards": []
     },
     {
@@ -11886,8 +11959,8 @@
       "name": "ReadProposeTokenDraftsAsProposed",
       "parentId": "T:Monday.Domain.Tests.McpTests",
       "file": "tests/Monday.Domain.Tests/McpTests.cs",
-      "startLine": 208,
-      "endLine": 227,
+      "startLine": 210,
+      "endLine": 229,
       "code": "public static void ReadProposeTokenDraftsAsProposed()\n    {\n        using var host = Host.Start();\n        using var session = Connect(host, host.Issue(\u0022read_propose\u0022).Plain);\n        var draft = session.Call(\u0022draft_decision\u0022, host.Shop, new()\n        {\n            [\u0022area\u0022] = \u0022Stack\u0022, [\u0022title\u0022] = \u0022Pick a cache\u0022, [\u0022context\u0022] = \u0022Why\u0022, [\u0022recommendedKey\u0022] = \u0022a\u0022,\n            [\u0022options\u0022] = new[] { new { key = \u0022a\u0022, title = \u0022A\u0022, tradeOffs = \u0022x\u0022 }, new { key = \u0022b\u0022, title = \u0022B\u0022, tradeOffs = \u0022y\u0022 } },\n        });\n        Assert.True(draft.IsError != true, $\u0022A read_propose Debugger drafts: {TextOf(draft)}\u0022);\n        var decisions = host.Use(s =\u003E s.GetRequiredService\u003CIDecisionRepository\u003E().ListAsync(host.Shop, default));\n        Assert.Equal(Domain.Decisions.DecisionStatus.Proposed, decisions.Single().Status);\n\n        var onBlog = session.Call(\u0022draft_decision\u0022, host.Blog, new()\n        {\n            [\u0022area\u0022] = \u0022Stack\u0022, [\u0022title\u0022] = \u0022Pick a cache\u0022, [\u0022context\u0022] = \u0022Why\u0022, [\u0022recommendedKey\u0022] = \u0022a\u0022,\n            [\u0022options\u0022] = new[] { new { key = \u0022a\u0022, title = \u0022A\u0022, tradeOffs = \u0022x\u0022 }, new { key = \u0022b\u0022, title = \u0022B\u0022, tradeOffs = \u0022y\u0022 } },\n        });\n        Assert.True(onBlog.IsError == true, \u0022Not where the role has no ChatAct (Monitor).\u0022);\n    }",
       "codeHash": "0EA59F95326E6E35",
       "guards": []
@@ -11898,8 +11971,8 @@
       "name": "ReadTokenHidesDraftDecision",
       "parentId": "T:Monday.Domain.Tests.McpTests",
       "file": "tests/Monday.Domain.Tests/McpTests.cs",
-      "startLine": 192,
-      "endLine": 206,
+      "startLine": 194,
+      "endLine": 208,
       "code": "public static void ReadTokenHidesDraftDecision()\n    {\n        using var host = Host.Start();\n        using var session = Connect(host, host.Issue(\u0022read\u0022).Plain);\n        Assert.True(session.Tools().All(t =\u003E t.Name != \u0022draft_decision\u0022), \u0022A read token does not list draft_decision.\u0022);\n\n        var draft = session.Call(\u0022draft_decision\u0022, host.Shop, new()\n        {\n            [\u0022area\u0022] = \u0022Stack\u0022, [\u0022title\u0022] = \u0022Pick a cache\u0022, [\u0022context\u0022] = \u0022Why\u0022, [\u0022recommendedKey\u0022] = \u0022a\u0022,\n            [\u0022options\u0022] = new[] { new { key = \u0022a\u0022, title = \u0022A\u0022, tradeOffs = \u0022x\u0022 }, new { key = \u0022b\u0022, title = \u0022B\u0022, tradeOffs = \u0022y\u0022 } },\n        });\n        Assert.True(draft.IsError == true, \u0022A read token cannot call draft_decision.\u0022);\n        var decisions = host.Use(s =\u003E s.GetRequiredService\u003CIDecisionRepository\u003E().ListAsync(host.Shop, default));\n        Assert.Equal(0, decisions.Count);\n    }",
       "codeHash": "D8FEE335E7C4D5FB",
       "guards": []
@@ -11910,8 +11983,8 @@
       "name": "RevokedTokenGets401",
       "parentId": "T:Monday.Domain.Tests.McpTests",
       "file": "tests/Monday.Domain.Tests/McpTests.cs",
-      "startLine": 267,
-      "endLine": 279,
+      "startLine": 269,
+      "endLine": 281,
       "code": "public static void RevokedTokenGets401()\n    {\n        using var host = Host.Start();\n        var issued = host.Issue();\n        Assert.Equal(HttpStatusCode.OK, RawStatus(host, r =\u003E r.Headers.Authorization = new(\u0022Bearer\u0022, issued.Plain)));\n\n        host.Use(async s =\u003E\n        {\n            await s.GetRequiredService\u003CPersonalTokenService\u003E().RevokeAsync(Ana, new PersonalTokenId(issued.Token.Id), default);\n            return true;\n        });\n        Assert.Equal(HttpStatusCode.Unauthorized, RawStatus(host, r =\u003E r.Headers.Authorization = new(\u0022Bearer\u0022, issued.Plain)));\n    }",
       "codeHash": "A284DA6423CD582E",
       "guards": []
@@ -12133,6 +12206,18 @@
       "guards": []
     },
     {
+      "id": "M:Monday.Domain.Tests.ModelSettingsTests.ModelAuditNamesTheHostAndTheCapChange",
+      "kind": "Test",
+      "name": "ModelAuditNamesTheHostAndTheCapChange",
+      "parentId": "T:Monday.Domain.Tests.ModelSettingsTests",
+      "file": "tests/Monday.Domain.Tests/ModelSettingsTests.cs",
+      "startLine": 121,
+      "endLine": 133,
+      "code": "public static void ModelAuditNamesTheHostAndTheCapChange()\n    {\n        var project = Project.Create(\u0022Monday\u0022, Owner, Now);\n        project.ClearDomainEvents();\n        project.SetModel(ModelSettings.Create(ModelProvider.OpenAiCompatible, \u0022gpt-4o\u0022, new Uri(\u0022https://api.example.com/v1/secret-path\u0022), \u0022v1:SECRET:b:c\u0022, \u0022wxyz\u0022, 1000), Owner, Now);\n        project.SetModel(ModelSettings.Create(ModelProvider.OpenAiCompatible, \u0022gpt-4o\u0022, new Uri(\u0022https://api.example.com/v1/secret-path\u0022), \u0022v1:SECRET:b:c\u0022, \u0022wxyz\u0022, 2000), Owner, Now);\n        project.SetModel(Anthropic(), Owner, Now);\n\n        var details = project.DomainEvents.Where(AuditEntry.IsAudited).Select(e =\u003E AuditEntry.For(e).Detail).ToList();\n        Assert.Equal(\u0022OpenAiCompatible gpt-4o at api.example.com, cap none -\u003E 1000, new key\u0022, details[0]);\n        Assert.Equal(\u0022OpenAiCompatible gpt-4o at api.example.com, cap 1000 -\u003E 2000\u0022, details[1]);\n        Assert.Equal(\u0022Anthropic claude-sonnet-4-5, cap 2000 -\u003E none, new key\u0022, details[2]);\n    }",
+      "codeHash": "35E89E02EA6A5E5B",
+      "guards": []
+    },
+    {
       "id": "M:Monday.Domain.Tests.ModelSettingsTests.ModelChangesAreAuditedWithoutTheKey",
       "kind": "Test",
       "name": "ModelChangesAreAuditedWithoutTheKey",
@@ -12193,13 +12278,25 @@
       "guards": []
     },
     {
+      "id": "M:Monday.Domain.Tests.PersonalTokenTests.AtMostTwentyActiveTokensPerUser",
+      "kind": "Test",
+      "name": "AtMostTwentyActiveTokensPerUser",
+      "parentId": "T:Monday.Domain.Tests.PersonalTokenTests",
+      "file": "tests/Monday.Domain.Tests/PersonalTokenTests.cs",
+      "startLine": 124,
+      "endLine": 135,
+      "code": "public static void AtMostTwentyActiveTokensPerUser()\n    {\n        var active = Enumerable.Range(0, 20).Select(_ =\u003E Issue().Token).ToList();\n        Assert.Throws\u003CDomainException\u003E(() =\u003E PersonalToken.EnsureRoomForAnother(active, Now), \u0022token.too_many\u0022);\n\n        active[0].Revoke(Now);\n        PersonalToken.EnsureRoomForAnother(active, Now);\n\n        var expiring = Enumerable.Range(0, 20).Select(_ =\u003E Issue(lifetime: TimeSpan.FromDays(1)).Token).ToList();\n        Assert.Throws\u003CDomainException\u003E(() =\u003E PersonalToken.EnsureRoomForAnother(expiring, Now), \u0022token.too_many\u0022);\n        PersonalToken.EnsureRoomForAnother(expiring, Now.AddDays(1));\n    }",
+      "codeHash": "561297AECFA9BCC6",
+      "guards": []
+    },
+    {
       "id": "M:Monday.Domain.Tests.PersonalTokenTests.AuthenticationRecordsLastUsedOncePerMinute",
       "kind": "Test",
       "name": "AuthenticationRecordsLastUsedOncePerMinute",
       "parentId": "T:Monday.Domain.Tests.PersonalTokenTests",
       "file": "tests/Monday.Domain.Tests/PersonalTokenTests.cs",
-      "startLine": 261,
-      "endLine": 276,
+      "startLine": 286,
+      "endLine": 301,
       "code": "public static void AuthenticationRecordsLastUsedOncePerMinute()\n    {\n        var w = World.Build();\n        var issued = w.Issue();\n        DateTimeOffset? LastUsed() =\u003E w.Service.ListAsync(Ana, default).GetAwaiter().GetResult().Single().LastUsedAt;\n        Assert.Equal\u003CDateTimeOffset?\u003E(null, LastUsed());\n\n        w.Authenticate(issued.Plain);\n        Assert.Equal\u003CDateTimeOffset?\u003E(Now, LastUsed());\n        w.Clock.Now = Now.AddSeconds(30);\n        w.Authenticate(issued.Plain);\n        Assert.Equal\u003CDateTimeOffset?\u003E(Now, LastUsed());\n        w.Clock.Now = Now.AddSeconds(61);\n        w.Authenticate(issued.Plain);\n        Assert.Equal\u003CDateTimeOffset?\u003E(Now.AddSeconds(61), LastUsed());\n    }",
       "codeHash": "55AE17F8FE7EB1FF",
       "guards": []
@@ -12210,8 +12307,8 @@
       "name": "AuthenticationRejectsBadRevokedAndExpiredTokens",
       "parentId": "T:Monday.Domain.Tests.PersonalTokenTests",
       "file": "tests/Monday.Domain.Tests/PersonalTokenTests.cs",
-      "startLine": 241,
-      "endLine": 259,
+      "startLine": 266,
+      "endLine": 284,
       "code": "public static void AuthenticationRejectsBadRevokedAndExpiredTokens()\n    {\n        var w = World.Build();\n        var issued = w.Issue(days: 1);\n        Assert.True(w.Authenticate(issued.Plain) is { } found \u0026\u0026 found.UserId == Ana, \u0022A good token signs in as its user.\u0022);\n        Assert.True(w.Authenticate(null) is null \u0026\u0026 w.Authenticate(\u0022\u0022) is null \u0026\u0026 w.Authenticate(\u0022Bearer x\u0022) is null, \u0022Garbage is refused.\u0022);\n        Assert.True(w.Authenticate($\u0022mpat_{issued.Token.Prefix[5..]}_x\u0022) is null, \u0022An unknown prefix is refused.\u0022);\n        Assert.True(w.Authenticate(issued.Plain \u002B \u0022x\u0022) is null, \u0022A wrong secret is refused.\u0022);\n        Assert.True(w.Authenticate(issued.Plain.Replace(\u0022mpat_\u0022, \u0022mon_\u0022, StringComparison.Ordinal)) is null, \u0022Another key scheme is refused.\u0022);\n\n        w.Clock.Now = Now.AddDays(1);\n        Assert.True(w.Authenticate(issued.Plain) is null, \u0022An expired token is refused.\u0022);\n\n        w.Clock.Now = Now;\n        var second = w.Issue();\n        w.Service.RevokeAsync(Ana, new PersonalTokenId(second.Token.Id), default).GetAwaiter().GetResult();\n        Assert.True(w.Authenticate(second.Plain) is null, \u0022A revoked token is refused.\u0022);\n        Assert.True(!w.Service.ListAsync(Ana, default).GetAwaiter().GetResult().Single(t =\u003E t.Id == second.Token.Id).Active, \u0022The list shows it inactive.\u0022);\n    }",
       "codeHash": "E8745986512B6ED5",
       "guards": []
@@ -12246,8 +12343,8 @@
       "name": "IssueAndRevokeAuditEachReachableProject",
       "parentId": "T:Monday.Domain.Tests.PersonalTokenTests",
       "file": "tests/Monday.Domain.Tests/PersonalTokenTests.cs",
-      "startLine": 190,
-      "endLine": 216,
+      "startLine": 215,
+      "endLine": 241,
       "code": "public static void IssueAndRevokeAuditEachReachableProject()\n    {\n        var w = World.Build();\n        var all = w.Issue(name: \u0022Everything\u0022);\n        Assert.Equal(1, w.AuditOf(w.Shop).Count(a =\u003E a.Action == \u0022token.issued\u0022));\n        Assert.Equal(1, w.AuditOf(w.Blog).Count(a =\u003E a.Action == \u0022token.issued\u0022));\n        Assert.Equal(0, w.AuditOf(w.Elsewhere).Count(a =\u003E a.Action == \u0022token.issued\u0022));\n\n        var limited = w.Issue(name: \u0022Shop only\u0022, projects: [w.Shop.Value]);\n        Assert.Equal(2, w.AuditOf(w.Shop).Count(a =\u003E a.Action == \u0022token.issued\u0022));\n        Assert.Equal(1, w.AuditOf(w.Blog).Count(a =\u003E a.Action == \u0022token.issued\u0022));\n\n        var entry = w.AuditOf(w.Shop).Last(a =\u003E a.Action == \u0022token.issued\u0022);\n        Assert.Equal(Ana, entry.Actor);\n        Assert.Equal($\u0022Shop only ({limited.Token.Prefix})\u0022, entry.Detail);\n\n        w.Service.RevokeAsync(Ana, new PersonalTokenId(limited.Token.Id), default).GetAwaiter().GetResult();\n        Assert.Equal(1, w.AuditOf(w.Shop).Count(a =\u003E a.Action == \u0022token.revoked\u0022));\n        Assert.Equal(0, w.AuditOf(w.Blog).Count(a =\u003E a.Action == \u0022token.revoked\u0022));\n        w.Service.RevokeAsync(Ana, new PersonalTokenId(all.Token.Id), default).GetAwaiter().GetResult();\n        Assert.Equal(2, w.AuditOf(w.Shop).Count(a =\u003E a.Action == \u0022token.revoked\u0022));\n        Assert.Equal(1, w.AuditOf(w.Blog).Count(a =\u003E a.Action == \u0022token.revoked\u0022));\n\n        var everything = w.Audit.ListAsync(w.Shop, default).GetAwaiter().GetResult().Concat(w.AuditOf(w.Blog));\n        var secret = all.Plain[(all.Plain.LastIndexOf(\u0027_\u0027) \u002B 1)..];\n        Assert.True(everything.All(a =\u003E !a.Detail.Contains(secret, StringComparison.Ordinal)), \u0022The audit never holds the secret.\u0022);\n    }",
       "codeHash": "1AF459B9F23814BF",
       "guards": []
@@ -12289,6 +12386,18 @@
       "guards": []
     },
     {
+      "id": "M:Monday.Domain.Tests.PersonalTokenTests.PrefixParsingHoldsForEveryGeneratedToken",
+      "kind": "Test",
+      "name": "PrefixParsingHoldsForEveryGeneratedToken",
+      "parentId": "T:Monday.Domain.Tests.PersonalTokenTests",
+      "file": "tests/Monday.Domain.Tests/PersonalTokenTests.cs",
+      "startLine": 112,
+      "endLine": 122,
+      "code": "public static void PrefixParsingHoldsForEveryGeneratedToken()\n    {\n        // PrefixOf splits on \u0027_\u0027, so the generator must never put one in the prefix or the secret.\n        for (var i = 0; i \u003C 500; i\u002B\u002B)\n        {\n            var (token, plain) = Issue();\n            Assert.True(!token.Prefix.Contains(\u0027_\u0027, StringComparison.Ordinal), \u0022A prefix never holds \u0027_\u0027.\u0022);\n            Assert.Equal(token.Prefix, PersonalToken.PrefixOf(plain)!);\n            Assert.True(token.Matches(plain, Now), \u0022The parsed token still matches.\u0022);\n        }\n    }",
+      "codeHash": "C0684A74A2C648A4",
+      "guards": []
+    },
+    {
       "id": "M:Monday.Domain.Tests.PersonalTokenTests.ProjectLimitRespected",
       "kind": "Test",
       "name": "ProjectLimitRespected",
@@ -12306,8 +12415,8 @@
       "name": "ProjectListMustBeProjectsTheUserBelongsTo",
       "parentId": "T:Monday.Domain.Tests.PersonalTokenTests",
       "file": "tests/Monday.Domain.Tests/PersonalTokenTests.cs",
-      "startLine": 175,
-      "endLine": 188,
+      "startLine": 200,
+      "endLine": 213,
       "code": "public static void ProjectListMustBeProjectsTheUserBelongsTo()\n    {\n        var w = World.Build();\n        Assert.Throws\u003CNotFoundException\u003E(() =\u003E w.Issue(projects: [w.Elsewhere.Value]));\n        Assert.Throws\u003CNotFoundException\u003E(() =\u003E w.Issue(projects: [Guid.NewGuid()]));\n        Assert.Throws\u003CDomainException\u003E(() =\u003E w.Issue(scope: \u0022admin\u0022), \u0022token.scope_invalid\u0022);\n        Assert.Throws\u003CDomainException\u003E(() =\u003E w.Issue(days: 400), \u0022token.lifetime_max\u0022);\n        Assert.Throws\u003CDomainException\u003E(() =\u003E w.Issue(days: int.MaxValue), \u0022token.lifetime_max\u0022);\n        Assert.Throws\u003CDomainException\u003E(() =\u003E w.Issue(days: 0), \u0022token.lifetime_invalid\u0022);\n        Assert.Equal(0, w.Service.ListAsync(Ana, default).GetAwaiter().GetResult().Count);\n\n        var ok = w.Issue(projects: [w.Shop.Value]);\n        Assert.Equal(w.Shop.Value, ok.Token.Projects![0]);\n    }",
       "codeHash": "F52BCF948EE318AB",
       "guards": []
@@ -12330,8 +12439,8 @@
       "name": "RepeatedProjectIdIsAuditedOnce",
       "parentId": "T:Monday.Domain.Tests.PersonalTokenTests",
       "file": "tests/Monday.Domain.Tests/PersonalTokenTests.cs",
-      "startLine": 218,
-      "endLine": 226,
+      "startLine": 243,
+      "endLine": 251,
       "code": "public static void RepeatedProjectIdIsAuditedOnce()\n    {\n        var w = World.Build();\n        var issued = w.Issue(projects: [w.Shop.Value, w.Shop.Value]);\n        Assert.Equal(1, w.AuditOf(w.Shop).Count(a =\u003E a.Action == \u0022token.issued\u0022));\n\n        w.Service.RevokeAsync(Ana, new PersonalTokenId(issued.Token.Id), default).GetAwaiter().GetResult();\n        Assert.Equal(1, w.AuditOf(w.Shop).Count(a =\u003E a.Action == \u0022token.revoked\u0022));\n    }",
       "codeHash": "B5657D4EE4E41625",
       "guards": []
@@ -12342,8 +12451,8 @@
       "name": "RevokeIsForTheOwnerOnly",
       "parentId": "T:Monday.Domain.Tests.PersonalTokenTests",
       "file": "tests/Monday.Domain.Tests/PersonalTokenTests.cs",
-      "startLine": 228,
-      "endLine": 239,
+      "startLine": 253,
+      "endLine": 264,
       "code": "public static void RevokeIsForTheOwnerOnly()\n    {\n        var w = World.Build();\n        var issued = w.Issue();\n        var id = new PersonalTokenId(issued.Token.Id);\n        Assert.Throws\u003CNotFoundException\u003E(() =\u003E w.Service.RevokeAsync(w.Owner, id, default).GetAwaiter().GetResult());\n        Assert.Throws\u003CNotFoundException\u003E(() =\u003E w.Service.RevokeAsync(Ana, PersonalTokenId.New(), default).GetAwaiter().GetResult());\n        Assert.True(w.Authenticate(issued.Plain) is not null, \u0022A refused revoke leaves the token working.\u0022);\n\n        w.Service.RevokeAsync(Ana, id, default).GetAwaiter().GetResult();\n        Assert.Throws\u003CDomainException\u003E(() =\u003E w.Service.RevokeAsync(Ana, id, default).GetAwaiter().GetResult(), \u0022token.already_revoked\u0022);\n    }",
       "codeHash": "4F095B8B8293768F",
       "guards": []
@@ -12361,13 +12470,25 @@
       "guards": []
     },
     {
+      "id": "M:Monday.Domain.Tests.PersonalTokenTests.ServiceRefusesTheTwentyFirstActiveToken",
+      "kind": "Test",
+      "name": "ServiceRefusesTheTwentyFirstActiveToken",
+      "parentId": "T:Monday.Domain.Tests.PersonalTokenTests",
+      "file": "tests/Monday.Domain.Tests/PersonalTokenTests.cs",
+      "startLine": 316,
+      "endLine": 331,
+      "code": "public static void ServiceRefusesTheTwentyFirstActiveToken()\n    {\n        var w = World.Build();\n        var first = w.Issue();\n        for (var i = 1; i \u003C 20; i\u002B\u002B)\n        {\n            w.Issue($\u0022Agent {i}\u0022);\n        }\n\n        Assert.Throws\u003CDomainException\u003E(() =\u003E w.Issue(\u0022One too many\u0022), \u0022token.too_many\u0022);\n        Assert.Equal(20, w.Service.ListAsync(Ana, default).GetAwaiter().GetResult().Count);\n\n        w.Service.RevokeAsync(Ana, new PersonalTokenId(first.Token.Id), default).GetAwaiter().GetResult();\n        w.Issue(\u0022Room again\u0022);\n        Assert.Equal(21, w.Service.ListAsync(Ana, default).GetAwaiter().GetResult().Count);\n    }",
+      "codeHash": "07A9FE180BA16B5A",
+      "guards": []
+    },
+    {
       "id": "M:Monday.Domain.Tests.PersonalTokenTests.ServiceStoresOnlyTheHashAndListNeverReturnsThePlainToken",
       "kind": "Test",
       "name": "ServiceStoresOnlyTheHashAndListNeverReturnsThePlainToken",
       "parentId": "T:Monday.Domain.Tests.PersonalTokenTests",
       "file": "tests/Monday.Domain.Tests/PersonalTokenTests.cs",
-      "startLine": 156,
-      "endLine": 173,
+      "startLine": 181,
+      "endLine": 198,
       "code": "public static void ServiceStoresOnlyTheHashAndListNeverReturnsThePlainToken()\n    {\n        var w = World.Build();\n        var issued = w.Issue();\n        Assert.True(issued.Plain.StartsWith(\u0022mpat_\u0022, StringComparison.Ordinal), \u0022Issue returns the plain token once.\u0022);\n\n        var stored = w.Store.FindByPrefixAsync(PersonalToken.PrefixOf(issued.Plain)!, default).GetAwaiter().GetResult()!;\n        Assert.True(stored.Hash != issued.Plain, \u0022Only the hash is stored.\u0022);\n\n        var list = w.Service.ListAsync(Ana, default).GetAwaiter().GetResult();\n        var shown = System.Text.Json.JsonSerializer.Serialize(list) \u002B issued.Token \u002B issued;\n        var secret = issued.Plain[(issued.Plain.LastIndexOf(\u0027_\u0027) \u002B 1)..];\n        Assert.True(!shown.Contains(secret, StringComparison.Ordinal) \u0026\u0026 !shown.Contains(stored.Hash, StringComparison.Ordinal),\n            \u0022The list, views and ToString hold neither the secret nor the hash.\u0022);\n        Assert.Equal(1, list.Count);\n        Assert.True(list[0].Active, \u0022A new token is active.\u0022);\n        Assert.Equal(0, w.Service.ListAsync(w.Owner, default).GetAwaiter().GetResult().Count);\n    }",
       "codeHash": "9927B31E4BB8FE75",
       "guards": []
@@ -12378,8 +12499,8 @@
       "name": "TouchRecordsLastUsedAtMostOncePerMinute",
       "parentId": "T:Monday.Domain.Tests.PersonalTokenTests",
       "file": "tests/Monday.Domain.Tests/PersonalTokenTests.cs",
-      "startLine": 112,
-      "endLine": 120,
+      "startLine": 137,
+      "endLine": 145,
       "code": "public static void TouchRecordsLastUsedAtMostOncePerMinute()\n    {\n        var (token, _) = Issue();\n        Assert.True(token.Touch(Now), \u0022The first use is recorded.\u0022);\n        Assert.True(!token.Touch(Now.AddSeconds(59)), \u0022A use within the minute is not.\u0022);\n        Assert.Equal\u003CDateTimeOffset?\u003E(Now, token.LastUsedAt);\n        Assert.True(token.Touch(Now.AddSeconds(60)), \u0022A minute later it is.\u0022);\n        Assert.Equal\u003CDateTimeOffset?\u003E(Now.AddSeconds(60), token.LastUsedAt);\n    }",
       "codeHash": "1CB1A391AC1B8825",
       "guards": []
@@ -12390,8 +12511,8 @@
       "name": "UseRacingARevokeCannotUndoIt",
       "parentId": "T:Monday.Domain.Tests.PersonalTokenTests",
       "file": "tests/Monday.Domain.Tests/PersonalTokenTests.cs",
-      "startLine": 278,
-      "endLine": 289,
+      "startLine": 303,
+      "endLine": 314,
       "code": "public static void UseRacingARevokeCannotUndoIt()\n    {\n        var w = World.Build();\n        var issued = w.Issue();\n        var stale = w.Authenticate(issued.Plain)!; // loaded before the revoke\n        w.Service.RevokeAsync(Ana, new PersonalTokenId(issued.Token.Id), default).GetAwaiter().GetResult();\n\n        w.Clock.Now = Now.AddMinutes(5);\n        stale.Touch(w.Clock.Now);\n        w.Store.SaveUsedAsync(stale, default).GetAwaiter().GetResult();\n        Assert.True(w.Authenticate(issued.Plain) is null, \u0022The late last-used save did not bring the token back.\u0022);\n    }",
       "codeHash": "19A7E898B999BF2B",
       "guards": []
@@ -12877,7 +12998,7 @@
       "name": "/projects",
       "parentId": "T:Monday.Api.Endpoints.ProjectEndpoints",
       "file": "src/Monday.Api/Endpoints/ProjectEndpoints.cs",
-      "startLine": 44,
+      "startLine": 45,
       "route": "/projects",
       "guards": [
         "RequireAuthorization"
@@ -13468,6 +13589,11 @@
     },
     {
       "from": "M:Monday.Application.Access.PersonalTokenService.IssueAsync(Monday.Domain.Common.UserId,Monday.Application.Access.PersonalTokenInput,System.Threading.CancellationToken)",
+      "to": "M:Monday.Application.Abstractions.IPersonalTokenStore.ListForUserAsync(Monday.Domain.Common.UserId,System.Threading.CancellationToken)",
+      "kind": "Calls"
+    },
+    {
+      "from": "M:Monday.Application.Access.PersonalTokenService.IssueAsync(Monday.Domain.Common.UserId,Monday.Application.Access.PersonalTokenInput,System.Threading.CancellationToken)",
       "to": "M:Monday.Application.Abstractions.IProjectRepository.ListForMemberAsync(Monday.Domain.Common.UserId,System.Threading.CancellationToken)",
       "kind": "Calls"
     },
@@ -13479,6 +13605,11 @@
     {
       "from": "M:Monday.Application.Access.PersonalTokenService.IssueAsync(Monday.Domain.Common.UserId,Monday.Application.Access.PersonalTokenInput,System.Threading.CancellationToken)",
       "to": "M:Monday.Application.Access.PersonalTokenService.ViewOf(Monday.Domain.Access.PersonalToken,System.DateTimeOffset)",
+      "kind": "Calls"
+    },
+    {
+      "from": "M:Monday.Application.Access.PersonalTokenService.IssueAsync(Monday.Domain.Common.UserId,Monday.Application.Access.PersonalTokenInput,System.Threading.CancellationToken)",
+      "to": "M:Monday.Domain.Access.PersonalToken.EnsureRoomForAnother(System.Collections.Generic.IEnumerable{Monday.Domain.Access.PersonalToken},System.DateTimeOffset)",
       "kind": "Calls"
     },
     {
@@ -14463,6 +14594,11 @@
     },
     {
       "from": "M:Monday.Application.Decisions.DecisionService.DraftAsync(Monday.Domain.Projects.ProjectId,Monday.Application.Decisions.DecisionProposal,Monday.Domain.Common.UserId,System.Threading.CancellationToken)",
+      "to": "M:Monday.Application.Abstractions.IAuditLog.AppendAsync(Monday.Domain.Audit.AuditEntry,System.Threading.CancellationToken)",
+      "kind": "Calls"
+    },
+    {
+      "from": "M:Monday.Application.Decisions.DecisionService.DraftAsync(Monday.Domain.Projects.ProjectId,Monday.Application.Decisions.DecisionProposal,Monday.Domain.Common.UserId,System.Threading.CancellationToken)",
       "to": "M:Monday.Application.Abstractions.IDecisionRepository.SaveAsync(Monday.Domain.Decisions.Decision,System.Threading.CancellationToken)",
       "kind": "Calls"
     },
@@ -14857,6 +14993,16 @@
       "kind": "Calls"
     },
     {
+      "from": "M:Monday.Domain.Access.PersonalToken.EnsureRoomForAnother(System.Collections.Generic.IEnumerable{Monday.Domain.Access.PersonalToken},System.DateTimeOffset)",
+      "to": "M:Monday.Domain.Access.PersonalToken.IsActive(System.DateTimeOffset)",
+      "kind": "Calls"
+    },
+    {
+      "from": "M:Monday.Domain.Access.PersonalToken.EnsureRoomForAnother(System.Collections.Generic.IEnumerable{Monday.Domain.Access.PersonalToken},System.DateTimeOffset)",
+      "to": "M:Monday.Domain.Common.Guard.That(System.Boolean,System.String,System.String)",
+      "kind": "Calls"
+    },
+    {
       "from": "M:Monday.Domain.Access.PersonalToken.Issue(Monday.Domain.Common.UserId,System.String,Monday.Domain.Access.TokenScope,System.Collections.Generic.IReadOnlyList{Monday.Domain.Projects.ProjectId},System.Nullable{System.TimeSpan},System.DateTimeOffset)",
       "to": "M:Monday.Domain.Access.PersonalTokenId.New",
       "kind": "Calls"
@@ -14969,6 +15115,11 @@
     {
       "from": "M:Monday.Domain.Agent.ModelSettings.LastFourOf(System.String)",
       "to": "M:Monday.Domain.Common.Guard.That(System.Boolean,System.String,System.String)",
+      "kind": "Calls"
+    },
+    {
+      "from": "M:Monday.Domain.Audit.AuditEntry.For(Monday.Domain.Common.IDomainEvent)",
+      "to": "M:Monday.Domain.Audit.AuditEntry.ModelDetail(Monday.Domain.Agent.ModelSettingsChanged)",
       "kind": "Calls"
     },
     {
@@ -15767,6 +15918,26 @@
       "kind": "Covers"
     },
     {
+      "from": "M:Monday.Domain.Tests.AgentLoopTests.KeysDisabledIsReportedBeforeMissingSettings",
+      "to": "M:Monday.Domain.Tests.AgentLoopTests.Answer(System.String,System.Int32,System.Int32)",
+      "kind": "Covers"
+    },
+    {
+      "from": "M:Monday.Domain.Tests.AgentLoopTests.KeysDisabledIsReportedBeforeMissingSettings",
+      "to": "M:Monday.Domain.Tests.AgentLoopTests.World.Build(Monday.Domain.Tests.Fakes.ScriptedChatModel,System.Boolean,System.Boolean,System.Nullable{System.Int64})",
+      "kind": "Covers"
+    },
+    {
+      "from": "M:Monday.Domain.Tests.AgentLoopTests.KeysDisabledIsReportedBeforeMissingSettings",
+      "to": "M:Monday.Domain.Tests.AgentLoopTests.World.Chat(Monday.Domain.Common.UserId,System.String,System.Nullable{System.Guid},System.String)",
+      "kind": "Covers"
+    },
+    {
+      "from": "M:Monday.Domain.Tests.AgentLoopTests.KeysDisabledIsReportedBeforeMissingSettings",
+      "to": "M:Monday.Domain.Tests.Assert.Equal\u0060\u00601(\u0060\u00600,\u0060\u00600)",
+      "kind": "Covers"
+    },
+    {
       "from": "M:Monday.Domain.Tests.AgentLoopTests.MissingSettingsOrKeysRefuseBeforeModelCall",
       "to": "M:Monday.Domain.Tests.AgentLoopTests.Answer(System.String,System.Int32,System.Int32)",
       "kind": "Covers"
@@ -16227,6 +16398,11 @@
       "kind": "Covers"
     },
     {
+      "from": "M:Monday.Domain.Tests.AgentToolTests.DraftDecisionLandsAsProposed",
+      "to": "M:Monday.Infrastructure.InMemory.InMemoryAuditLog.ListAsync(Monday.Domain.Projects.ProjectId,System.Threading.CancellationToken)",
+      "kind": "Covers"
+    },
+    {
       "from": "M:Monday.Domain.Tests.AgentToolTests.DraftWithSupersedesStoresIt",
       "to": "M:Monday.Application.Decisions.DecisionService.DraftAsync(Monday.Domain.Projects.ProjectId,Monday.Application.Decisions.DecisionProposal,Monday.Domain.Common.UserId,System.Threading.CancellationToken)",
       "kind": "Covers"
@@ -16274,6 +16450,11 @@
     {
       "from": "M:Monday.Domain.Tests.AgentToolTests.ListDecisionsReturnsTheApiFields",
       "to": "M:Monday.Domain.Tests.AgentToolTests.World.Build(System.Int32,System.Int32)",
+      "kind": "Covers"
+    },
+    {
+      "from": "M:Monday.Domain.Tests.AgentToolTests.ListDecisionsReturnsTheApiFields",
+      "to": "M:Monday.Domain.Tests.Assert.Equal\u0060\u00601(\u0060\u00600,\u0060\u00600)",
       "kind": "Covers"
     },
     {
@@ -16509,6 +16690,26 @@
     {
       "from": "M:Monday.Domain.Tests.AgentToolTests.RecentRequestsReturnsTheNewestFiftyOfABusyWindow",
       "to": "M:Monday.Domain.Tests.Assert.True(System.Boolean,System.String)",
+      "kind": "Covers"
+    },
+    {
+      "from": "M:Monday.Domain.Tests.AgentToolTests.RecentRequestsServiceNeedsInspectRequests",
+      "to": "M:Monday.Application.Traffic.TrafficService.RecentAsync(Monday.Domain.Projects.ProjectId,System.DateTimeOffset,System.DateTimeOffset,System.Int32,Monday.Domain.Common.UserId,System.Threading.CancellationToken)",
+      "kind": "Covers"
+    },
+    {
+      "from": "M:Monday.Domain.Tests.AgentToolTests.RecentRequestsServiceNeedsInspectRequests",
+      "to": "M:Monday.Domain.Tests.AgentToolTests.World.Build(System.Int32,System.Int32)",
+      "kind": "Covers"
+    },
+    {
+      "from": "M:Monday.Domain.Tests.AgentToolTests.RecentRequestsServiceNeedsInspectRequests",
+      "to": "M:Monday.Domain.Tests.Assert.Equal\u0060\u00601(\u0060\u00600,\u0060\u00600)",
+      "kind": "Covers"
+    },
+    {
+      "from": "M:Monday.Domain.Tests.AgentToolTests.RecentRequestsServiceNeedsInspectRequests",
+      "to": "M:Monday.Domain.Tests.Assert.Throws\u0060\u00601(System.Action,System.String)",
       "kind": "Covers"
     },
     {
@@ -17932,6 +18133,41 @@
       "kind": "Covers"
     },
     {
+      "from": "M:Monday.Domain.Tests.DecisionDraftTests.DecisionViewShowsWhoDraftedIt",
+      "to": "M:Monday.Api.Endpoints.DecisionView.Of(Monday.Domain.Decisions.Decision)",
+      "kind": "Covers"
+    },
+    {
+      "from": "M:Monday.Domain.Tests.DecisionDraftTests.DecisionViewShowsWhoDraftedIt",
+      "to": "M:Monday.Domain.Decisions.Decision.Propose(Monday.Domain.Projects.ProjectId,Monday.Domain.Decisions.DecisionArea,System.String,System.String,System.Collections.Generic.IReadOnlyList{Monday.Domain.Decisions.DecisionOption},System.String,System.DateTimeOffset,System.Nullable{Monday.Domain.Decisions.DecisionId})",
+      "kind": "Covers"
+    },
+    {
+      "from": "M:Monday.Domain.Tests.DecisionDraftTests.DecisionViewShowsWhoDraftedIt",
+      "to": "M:Monday.Domain.Projects.Project.Create(System.String,Monday.Domain.Common.UserId,System.DateTimeOffset)",
+      "kind": "Covers"
+    },
+    {
+      "from": "M:Monday.Domain.Tests.DecisionDraftTests.DecisionViewShowsWhoDraftedIt",
+      "to": "M:Monday.Domain.Projects.Project.SetMember(Monday.Domain.Common.UserId,Monday.Domain.Access.Role,Monday.Domain.Common.UserId,System.DateTimeOffset)",
+      "kind": "Covers"
+    },
+    {
+      "from": "M:Monday.Domain.Tests.DecisionDraftTests.DecisionViewShowsWhoDraftedIt",
+      "to": "M:Monday.Domain.Tests.Assert.Equal\u0060\u00601(\u0060\u00600,\u0060\u00600)",
+      "kind": "Covers"
+    },
+    {
+      "from": "M:Monday.Domain.Tests.DecisionDraftTests.DecisionViewShowsWhoDraftedIt",
+      "to": "M:Monday.Domain.Tests.Assert.True(System.Boolean,System.String)",
+      "kind": "Covers"
+    },
+    {
+      "from": "M:Monday.Domain.Tests.DecisionDraftTests.DecisionViewShowsWhoDraftedIt",
+      "to": "M:Monday.Domain.Tests.DecisionDraftTests.DraftBy(Monday.Domain.Projects.Project,Monday.Domain.Common.UserId)",
+      "kind": "Covers"
+    },
+    {
       "from": "M:Monday.Domain.Tests.DecisionDraftTests.DraftBy(Monday.Domain.Projects.Project,Monday.Domain.Common.UserId)",
       "to": "M:Monday.Domain.Decisions.Decision.Draft(Monday.Domain.Projects.ProjectId,Monday.Domain.Decisions.DecisionArea,System.String,System.String,System.Collections.Generic.IReadOnlyList{Monday.Domain.Decisions.DecisionOption},System.String,Monday.Domain.Common.UserId,System.DateTimeOffset,System.Nullable{Monday.Domain.Decisions.DecisionId})",
       "kind": "Calls"
@@ -18224,6 +18460,21 @@
     {
       "from": "M:Monday.Domain.Tests.McpTests.MemberRemovedAfterTokenCreationRefused",
       "to": "M:Monday.Domain.Tests.McpTests.Session.Tools",
+      "kind": "Covers"
+    },
+    {
+      "from": "M:Monday.Domain.Tests.McpTests.ModelTestUsesThePerUserChatRateLimit",
+      "to": "M:Monday.Api.Endpoints.ModelEndpoints.MapModel(Microsoft.AspNetCore.Routing.IEndpointRouteBuilder)",
+      "kind": "Covers"
+    },
+    {
+      "from": "M:Monday.Domain.Tests.McpTests.ModelTestUsesThePerUserChatRateLimit",
+      "to": "M:Monday.Domain.Tests.Assert.Equal\u0060\u00601(\u0060\u00600,\u0060\u00600)",
+      "kind": "Covers"
+    },
+    {
+      "from": "M:Monday.Domain.Tests.McpTests.ModelTestUsesThePerUserChatRateLimit",
+      "to": "M:Monday.Infrastructure.DependencyInjection.AddMonday(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)",
       "kind": "Covers"
     },
     {
@@ -18797,6 +19048,41 @@
       "kind": "Covers"
     },
     {
+      "from": "M:Monday.Domain.Tests.ModelSettingsTests.ModelAuditNamesTheHostAndTheCapChange",
+      "to": "M:Monday.Domain.Agent.ModelSettings.Create(Monday.Domain.Agent.ModelProvider,System.String,System.Uri,System.String,System.String,System.Nullable{System.Int64})",
+      "kind": "Covers"
+    },
+    {
+      "from": "M:Monday.Domain.Tests.ModelSettingsTests.ModelAuditNamesTheHostAndTheCapChange",
+      "to": "M:Monday.Domain.Audit.AuditEntry.For(Monday.Domain.Common.IDomainEvent)",
+      "kind": "Covers"
+    },
+    {
+      "from": "M:Monday.Domain.Tests.ModelSettingsTests.ModelAuditNamesTheHostAndTheCapChange",
+      "to": "M:Monday.Domain.Common.AggregateRoot\u00601.ClearDomainEvents",
+      "kind": "Covers"
+    },
+    {
+      "from": "M:Monday.Domain.Tests.ModelSettingsTests.ModelAuditNamesTheHostAndTheCapChange",
+      "to": "M:Monday.Domain.Projects.Project.Create(System.String,Monday.Domain.Common.UserId,System.DateTimeOffset)",
+      "kind": "Covers"
+    },
+    {
+      "from": "M:Monday.Domain.Tests.ModelSettingsTests.ModelAuditNamesTheHostAndTheCapChange",
+      "to": "M:Monday.Domain.Projects.Project.SetModel(Monday.Domain.Agent.ModelSettings,Monday.Domain.Common.UserId,System.DateTimeOffset)",
+      "kind": "Covers"
+    },
+    {
+      "from": "M:Monday.Domain.Tests.ModelSettingsTests.ModelAuditNamesTheHostAndTheCapChange",
+      "to": "M:Monday.Domain.Tests.Assert.Equal\u0060\u00601(\u0060\u00600,\u0060\u00600)",
+      "kind": "Covers"
+    },
+    {
+      "from": "M:Monday.Domain.Tests.ModelSettingsTests.ModelAuditNamesTheHostAndTheCapChange",
+      "to": "M:Monday.Domain.Tests.ModelSettingsTests.Anthropic(System.String)",
+      "kind": "Covers"
+    },
+    {
       "from": "M:Monday.Domain.Tests.ModelSettingsTests.ModelChangesAreAuditedWithoutTheKey",
       "to": "M:Monday.Domain.Common.AggregateRoot\u00601.ClearDomainEvents",
       "kind": "Covers"
@@ -18919,6 +19205,26 @@
     {
       "from": "M:Monday.Domain.Tests.ModelSettingsTests.StoredKeyStaysOnlyWithTheSameProviderAndBaseUrl",
       "to": "M:Monday.Domain.Tests.Assert.Throws\u0060\u00601(System.Action,System.String)",
+      "kind": "Covers"
+    },
+    {
+      "from": "M:Monday.Domain.Tests.PersonalTokenTests.AtMostTwentyActiveTokensPerUser",
+      "to": "M:Monday.Domain.Access.PersonalToken.EnsureRoomForAnother(System.Collections.Generic.IEnumerable{Monday.Domain.Access.PersonalToken},System.DateTimeOffset)",
+      "kind": "Covers"
+    },
+    {
+      "from": "M:Monday.Domain.Tests.PersonalTokenTests.AtMostTwentyActiveTokensPerUser",
+      "to": "M:Monday.Domain.Access.PersonalToken.Revoke(System.DateTimeOffset)",
+      "kind": "Covers"
+    },
+    {
+      "from": "M:Monday.Domain.Tests.PersonalTokenTests.AtMostTwentyActiveTokensPerUser",
+      "to": "M:Monday.Domain.Tests.Assert.Throws\u0060\u00601(System.Action,System.String)",
+      "kind": "Covers"
+    },
+    {
+      "from": "M:Monday.Domain.Tests.PersonalTokenTests.AtMostTwentyActiveTokensPerUser",
+      "to": "M:Monday.Domain.Tests.PersonalTokenTests.Issue(Monday.Domain.Access.TokenScope,System.Collections.Generic.IReadOnlyList{Monday.Domain.Projects.ProjectId},System.Nullable{System.TimeSpan},System.String)",
       "kind": "Covers"
     },
     {
@@ -19102,6 +19408,31 @@
       "kind": "Covers"
     },
     {
+      "from": "M:Monday.Domain.Tests.PersonalTokenTests.PrefixParsingHoldsForEveryGeneratedToken",
+      "to": "M:Monday.Domain.Access.PersonalToken.Matches(System.String,System.DateTimeOffset)",
+      "kind": "Covers"
+    },
+    {
+      "from": "M:Monday.Domain.Tests.PersonalTokenTests.PrefixParsingHoldsForEveryGeneratedToken",
+      "to": "M:Monday.Domain.Access.PersonalToken.PrefixOf(System.String)",
+      "kind": "Covers"
+    },
+    {
+      "from": "M:Monday.Domain.Tests.PersonalTokenTests.PrefixParsingHoldsForEveryGeneratedToken",
+      "to": "M:Monday.Domain.Tests.Assert.Equal\u0060\u00601(\u0060\u00600,\u0060\u00600)",
+      "kind": "Covers"
+    },
+    {
+      "from": "M:Monday.Domain.Tests.PersonalTokenTests.PrefixParsingHoldsForEveryGeneratedToken",
+      "to": "M:Monday.Domain.Tests.Assert.True(System.Boolean,System.String)",
+      "kind": "Covers"
+    },
+    {
+      "from": "M:Monday.Domain.Tests.PersonalTokenTests.PrefixParsingHoldsForEveryGeneratedToken",
+      "to": "M:Monday.Domain.Tests.PersonalTokenTests.Issue(Monday.Domain.Access.TokenScope,System.Collections.Generic.IReadOnlyList{Monday.Domain.Projects.ProjectId},System.Nullable{System.TimeSpan},System.String)",
+      "kind": "Covers"
+    },
+    {
       "from": "M:Monday.Domain.Tests.PersonalTokenTests.ProjectLimitRespected",
       "to": "M:Monday.Application.Access.PersonalTokenRights.Allows(Monday.Domain.Access.PersonalToken,Monday.Domain.Projects.ProjectId,Monday.Application.Agent.ToolKind)",
       "kind": "Covers"
@@ -19254,6 +19585,36 @@
     {
       "from": "M:Monday.Domain.Tests.PersonalTokenTests.RevokedTokenInactive",
       "to": "M:Monday.Domain.Tests.PersonalTokenTests.Issue(Monday.Domain.Access.TokenScope,System.Collections.Generic.IReadOnlyList{Monday.Domain.Projects.ProjectId},System.Nullable{System.TimeSpan},System.String)",
+      "kind": "Covers"
+    },
+    {
+      "from": "M:Monday.Domain.Tests.PersonalTokenTests.ServiceRefusesTheTwentyFirstActiveToken",
+      "to": "M:Monday.Application.Access.PersonalTokenService.ListAsync(Monday.Domain.Common.UserId,System.Threading.CancellationToken)",
+      "kind": "Covers"
+    },
+    {
+      "from": "M:Monday.Domain.Tests.PersonalTokenTests.ServiceRefusesTheTwentyFirstActiveToken",
+      "to": "M:Monday.Application.Access.PersonalTokenService.RevokeAsync(Monday.Domain.Common.UserId,Monday.Domain.Access.PersonalTokenId,System.Threading.CancellationToken)",
+      "kind": "Covers"
+    },
+    {
+      "from": "M:Monday.Domain.Tests.PersonalTokenTests.ServiceRefusesTheTwentyFirstActiveToken",
+      "to": "M:Monday.Domain.Tests.Assert.Equal\u0060\u00601(\u0060\u00600,\u0060\u00600)",
+      "kind": "Covers"
+    },
+    {
+      "from": "M:Monday.Domain.Tests.PersonalTokenTests.ServiceRefusesTheTwentyFirstActiveToken",
+      "to": "M:Monday.Domain.Tests.Assert.Throws\u0060\u00601(System.Action,System.String)",
+      "kind": "Covers"
+    },
+    {
+      "from": "M:Monday.Domain.Tests.PersonalTokenTests.ServiceRefusesTheTwentyFirstActiveToken",
+      "to": "M:Monday.Domain.Tests.PersonalTokenTests.World.Build",
+      "kind": "Covers"
+    },
+    {
+      "from": "M:Monday.Domain.Tests.PersonalTokenTests.ServiceRefusesTheTwentyFirstActiveToken",
+      "to": "M:Monday.Domain.Tests.PersonalTokenTests.World.Issue(System.String,System.String,System.Collections.Generic.IReadOnlyList{System.Guid},System.Nullable{System.Int32})",
       "kind": "Covers"
     },
     {
@@ -21204,6 +21565,11 @@
     {
       "from": "T:Monday.Application.Decisions.DecisionProposal",
       "to": "T:Monday.Domain.Decisions.DecisionArea",
+      "kind": "DependsOn"
+    },
+    {
+      "from": "T:Monday.Application.Decisions.DecisionService",
+      "to": "T:Monday.Application.Abstractions.IAuditLog",
       "kind": "DependsOn"
     },
     {
