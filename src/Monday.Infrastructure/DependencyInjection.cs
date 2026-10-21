@@ -2,6 +2,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Monday.Application.Abstractions;
 using Monday.Application.Activity;
+using Monday.Application.Agent;
+using Monday.Application.Agent.Tools;
 using Monday.Application.CodeGraph;
 using Monday.Application.Decisions;
 using Monday.Application.Projects;
@@ -51,6 +53,30 @@ public static class DependencyInjection
         services.AddScoped<ActivityService>();
         services.AddScoped<DecisionService>();
         services.AddScoped<TrafficService>();
+        return services;
+    }
+
+    /// <summary>
+    /// Registers the agent's v1 tools and the registry that filters them by role and channel. Scoped, because
+    /// every tool wraps a scoped use case. Lives here because Monday.Application takes no DI package.
+    /// </summary>
+    public static IServiceCollection AddAgentTools(this IServiceCollection services)
+    {
+        services.AddScoped<IAgentTool, ListProjectsTool>();
+        services.AddScoped<IAgentTool, GraphOverviewTool>();
+        services.AddScoped<IAgentTool, FindNodesTool>();
+        services.AddScoped<IAgentTool, NodeDetailTool>();
+        services.AddScoped<IAgentTool, TrafficStatsTool>();
+        services.AddScoped<IAgentTool, RecentRequestsTool>();
+        services.AddScoped<IAgentTool, RecentActivityTool>();
+        services.AddScoped<IAgentTool, SecurityFindingsTool>();
+        services.AddScoped<IAgentTool, ListDecisionsTool>();
+        services.AddScoped<IAgentTool, FocusNodeTool>();
+        services.AddScoped<IAgentTool, HighlightPathTool>();
+        services.AddScoped<IAgentTool, SetLensTool>();
+        services.AddScoped<IAgentTool, StartReplayTool>();
+        services.AddScoped<IAgentTool, DraftDecisionTool>();
+        services.AddScoped<ToolRegistry>();
         return services;
     }
 
