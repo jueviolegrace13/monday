@@ -11,5 +11,10 @@ export const routes: Routes = [
     title: 'Personal tokens · Monday',
     loadComponent: () => import('./settings/tokens.component').then((m) => m.TokensComponent),
   },
+  {
+    path: 'settings/model',
+    title: 'Model · Monday',
+    loadComponent: () => import('./settings/model.component').then((m) => m.ModelComponent),
+  },
   { path: '**', redirectTo: '' },
 ];

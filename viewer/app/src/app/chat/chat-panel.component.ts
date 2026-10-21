@@ -1,9 +1,6 @@
 import { Component, ElementRef, effect, input, output, signal, viewChild } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { ChatStep, ChatStore } from './chat-store';
-
-/** Where Owners and Admins set the project's model (the settings screen lands in a later task). */
-export const modelSettingsUrl = (projectId: string) =>
-  `/settings/model?project=${encodeURIComponent(projectId)}`;
 
 /**
  * The chat, floating over the graph, docked left. Answers stream in; each tool step is one mono line
@@ -11,6 +8,7 @@ export const modelSettingsUrl = (projectId: string) =>
  */
 @Component({
   selector: 'app-chat-panel',
+  imports: [RouterLink],
   templateUrl: './chat-panel.component.html',
   styleUrl: './chat-panel.component.css',
 })
@@ -31,7 +29,6 @@ export class ChatPanelComponent {
   private readonly stream = viewChild<ElementRef<HTMLElement>>('stream');
 
   protected readonly draft = signal('');
-  protected readonly settingsUrl = modelSettingsUrl;
 
   constructor() {
     // Keep the newest words in view while the answer streams.

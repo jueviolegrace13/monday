@@ -8,12 +8,13 @@ import {
   untracked,
   viewChild,
 } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { MondayApi, ProjectSummary } from './api/monday-api';
 import { ChatPanelComponent } from './chat/chat-panel.component';
 import { ChatStore } from './chat/chat-store';
 import { GraphCanvasComponent } from './graph/graph-canvas.component';
 import { GraphEngine } from './graph/graph-engine';
+import { Lens } from './graph/graph-screen';
 import { GraphScreenRef } from './graph/graph-screen-ref';
 import { NodePanelComponent } from './node/node-panel.component';
 
@@ -27,7 +28,7 @@ const isTyping = (target: EventTarget | null): boolean =>
 
 /**
  * The shell: a top bar with the project picker, and the workspace: the code graph, with the chat
- * floating docked left and the node detail docked right. A routed screen (personal tokens)
+ * floating docked left and the node detail docked right. A routed screen (personal tokens, model)
  * takes the workspace's place below the bar while it is open.
  */
 @Component({
@@ -46,6 +47,7 @@ const isTyping = (target: EventTarget | null): boolean =>
 })
 export class App implements OnInit {
   private readonly api = inject(MondayApi);
+  private readonly router = inject(Router);
 
   protected readonly load = signal<Load>('loading');
   protected readonly error = signal('');
@@ -63,6 +65,8 @@ export class App implements OnInit {
 
   /** True while a routed screen is open in place of the workspace. */
   protected readonly routed = signal(false);
+  /** Kept here, not in the canvas, so coming back from a settings screen keeps the lens. */
+  protected readonly lens = signal<Lens>('structure');
 
   protected readonly chatOpen = signal(false);
   protected readonly nodeOpen = signal(true);
@@ -114,8 +118,21 @@ export class App implements OnInit {
     }
   }
 
+  /**
+   * A routed screen replaces the canvas, and the canvas that comes back draws a fresh graph with
+   * nothing selected, so the node panel must not keep showing the old selection.
+   */
+  protected screenOpened(): void {
+    this.routed.set(true);
+    this.selectedNode.set(null);
+  }
+
   protected select(event: Event): void {
-    this.selectedId.set((event.target as HTMLSelectElement).value);
+    const id = (event.target as HTMLSelectElement).value;
+    this.selectedId.set(id);
+    // The model screen is per project: it follows the picker.
+    if (this.router.url.startsWith('/settings/model'))
+      void this.router.navigate(['/settings/model'], { queryParams: { project: id } });
   }
 
   protected engineReady(engine: GraphEngine | null): void {

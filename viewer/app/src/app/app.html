@@ -14,6 +14,16 @@
       <span class="role mono">{{ project.role }}</span>
     }
   }
+  @if (canManageModel()) {
+    <a
+      class="nav"
+      routerLink="/settings/model"
+      [queryParams]="{ project: selectedId() }"
+      routerLinkActive="current"
+      ariaCurrentWhenActive="page"
+      >Model</a
+    >
+  }
   <a
     class="nav"
     routerLink="/settings/tokens"
@@ -23,7 +33,7 @@
   >
 </header>
 
-<router-outlet (activate)="routed.set(true)" (deactivate)="routed.set(false)" />
+<router-outlet (activate)="screenOpened()" (deactivate)="routed.set(false)" />
 
 @if (!routed()) {
   @switch (load()) {
@@ -47,6 +57,7 @@
           <h1 class="sr-only">{{ project.name }}</h1>
           <app-graph-canvas
             [projectId]="project.id"
+            [(lens)]="lens"
             (engineReady)="engineReady($event)"
             (selected)="selectedNode.set($event)"
           />

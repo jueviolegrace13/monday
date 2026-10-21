@@ -3,6 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { GraphView, MondayApi, TrafficView } from '../api/monday-api';
 import { GraphCanvasComponent } from './graph-canvas.component';
 import { GraphEngine } from './graph-engine';
+import { Lens } from './graph-screen';
 import { VIS_LOADER, VisLib } from './vis';
 
 /** Enough of vis-network to draw nothing: records whether each network was destroyed. */
@@ -45,12 +46,18 @@ const graph: GraphView = {
 @Component({
   imports: [GraphCanvasComponent],
   template: `@if (shown()) {
-    <app-graph-canvas [projectId]="project()" (engineReady)="engine = $event" />
+    <app-graph-canvas
+      [projectId]="project()"
+      [lens]="lens()"
+      (lensChange)="lens.set($event)"
+      (engineReady)="engine = $event"
+    />
   }`,
 })
 class Host {
   readonly project = signal('a');
   readonly shown = signal(true);
+  readonly lens = signal<Lens>('structure');
   engine: GraphEngine | null = null;
 }
 
@@ -105,6 +112,21 @@ describe('GraphCanvasComponent', () => {
 
     expect(liveCalls).toEqual(['a', 'b']);
     expect(host.engine).not.toBeNull();
+  });
+
+  it('opens a new canvas in the lens the person last chose (back from a settings screen)', async () => {
+    const { host, liveCalls, settle } = await setup({ a: graph });
+    host.engine!.chooseLens('live');
+    await settle();
+    expect(host.lens()).toBe('live');
+
+    host.shown.set(false);
+    await settle();
+    host.shown.set(true);
+    await settle();
+
+    expect(liveCalls).toEqual(['a', 'a']);
+    expect(host.lens()).toBe('live');
   });
 
   it('clears the previous graph when the next project has none', async () => {

@@ -163,6 +163,49 @@ export interface IssuedToken {
   plain: string;
 }
 
+// ---- Model settings ------------------------------------------------------------------------
+
+export type ModelProvider = 'Anthropic' | 'OpenAiCompatible' | 'Gemini';
+
+/** A project's model as the settings screen sees it. Never the key: only its last 4 characters. */
+export interface ModelSettingsView {
+  /** False when the server has no MONDAY_SECRETS_KEY: chat and model settings are off. */
+  enabled: boolean;
+  configured: boolean;
+  provider: ModelProvider | null;
+  model: string | null;
+  baseUrl: string | null;
+  keyLast4: string | null;
+  monthlyTokenCap: number | null;
+  updatedBy: string | null;
+  updatedAt: string | null;
+}
+
+/** A null `apiKey` keeps the saved key (only while provider and base URL stay the same). */
+export interface ModelSettingsInput {
+  provider: ModelProvider;
+  model: string;
+  baseUrl: string | null;
+  apiKey: string | null;
+  monthlyTokenCap: number | null;
+}
+
+/** Tokens used this month (UTC, `yyyy-MM`) against the cap. */
+export interface ModelUsageView {
+  month: string;
+  inputTokens: number;
+  outputTokens: number;
+  monthlyTokenCap: number | null;
+  capReached: boolean;
+}
+
+/** "Test connection": ok, or a plain message that never holds the key. */
+export interface ModelTestResult {
+  ok: boolean;
+  code: string | null;
+  message: string | null;
+}
+
 // ---- Chat ----------------------------------------------------------------------------------
 
 /** What the person asks; the server finds the rest (who they are, what they may see). */
@@ -305,6 +348,48 @@ export class MondayApi {
       headers: this.headers({}),
       signal,
     });
+  }
+
+  /** Owners and Admins only; the key never comes back, only its last 4. */
+  modelSettings(projectId: string, signal?: AbortSignal): Promise<ModelSettingsView> {
+    return this.get(`/projects/${projectId}/model/`, signal);
+  }
+
+  /** Saves the model; the answer is the settings as now stored. The key goes in here and nowhere else. */
+  async saveModelSettings(
+    projectId: string,
+    input: ModelSettingsInput,
+    signal?: AbortSignal,
+  ): Promise<ModelSettingsView> {
+    const response = await this.send(`/projects/${projectId}/model/`, {
+      method: 'PUT',
+      headers: this.headers({ 'Content-Type': 'application/json', Accept: 'application/json' }),
+      body: JSON.stringify(input),
+      signal,
+    });
+    return (await response.json()) as ModelSettingsView;
+  }
+
+  async clearModelSettings(projectId: string, signal?: AbortSignal): Promise<void> {
+    await this.send(`/projects/${projectId}/model/`, {
+      method: 'DELETE',
+      headers: this.headers({}),
+      signal,
+    });
+  }
+
+  /** One tiny request to the saved model with a dummy tool. */
+  async testModel(projectId: string, signal?: AbortSignal): Promise<ModelTestResult> {
+    const response = await this.send(`/projects/${projectId}/model/test`, {
+      method: 'POST',
+      headers: this.headers({ Accept: 'application/json' }),
+      signal,
+    });
+    return (await response.json()) as ModelTestResult;
+  }
+
+  modelUsage(projectId: string, signal?: AbortSignal): Promise<ModelUsageView> {
+    return this.get(`/projects/${projectId}/model/usage`, signal);
   }
 
   /** Requests as they happen (server-sent events). Ends when the signal aborts or the server closes. */

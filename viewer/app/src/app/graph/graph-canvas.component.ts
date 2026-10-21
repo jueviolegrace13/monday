@@ -5,6 +5,7 @@ import {
   effect,
   inject,
   input,
+  model,
   output,
   signal,
   untracked,
@@ -40,6 +41,11 @@ export class GraphCanvasComponent implements OnDestroy {
   private readonly loadVis = inject(VIS_LOADER);
 
   readonly projectId = input.required<string>();
+  /**
+   * The lens the person chose. Two-way, so the shell keeps it while another screen replaces the
+   * canvas, and the next canvas (or the next project's graph) opens in it.
+   */
+  readonly lens = model<Lens>('structure');
   /** The engine once a graph is drawn, and null when none is (no graph yet, or it failed to load). */
   readonly engineReady = output<GraphEngine | null>();
   readonly selected = output<string | null>();
@@ -98,9 +104,10 @@ export class GraphCanvasComponent implements OnDestroy {
         this.load.set('empty');
         return;
       }
-      // A new engine per graph; the person's lens carries over to the next project.
-      const lens = this.state().lens;
+      // A new engine per graph; the person's lens carries over to the next project and screen.
+      const lens = this.lens();
       this.drop();
+      this.state.update((s) => ({ ...s, lens }));
       const reduce =
         typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
       const engine = new GraphEngine(
@@ -159,6 +166,7 @@ export class GraphCanvasComponent implements OnDestroy {
   private changed(next: EngineState): void {
     const was = this.state().lens;
     this.state.set(next);
+    if (next.lens !== was) this.lens.set(next.lens);
     if (next.lens === 'live' && was !== 'live') void this.startLive();
     else if (next.lens !== 'live' && was === 'live') this.stopLive();
   }

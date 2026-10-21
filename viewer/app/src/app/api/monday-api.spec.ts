@@ -285,3 +285,41 @@ describe('MondayApi personal tokens', () => {
     ).rejects.toMatchObject({ status: 400, code: 'token.lifetime_max' });
   });
 });
+
+describe('MondayApi model settings', () => {
+  it('reads, saves, tests and clears under /projects/{id}/model', async () => {
+    const calls: { url: string; init: RequestInit }[] = [];
+    const view = { enabled: true, configured: true, keyLast4: 'ABCD' };
+    const api = new MondayApi({
+      fetch: async (url, init = {}) => {
+        calls.push({ url: String(url), init });
+        if (init.method === 'DELETE') return new Response(null, { status: 204 });
+        if (String(url).endsWith('/test')) return json({ ok: true, code: null, message: null });
+        if (String(url).endsWith('/usage')) return json({ month: '2026-10', inputTokens: 1 });
+        return json(view);
+      },
+    });
+    const input = {
+      provider: 'Gemini' as const,
+      model: 'gemini-2.5-pro',
+      baseUrl: null,
+      apiKey: 'gm-key-12345678',
+      monthlyTokenCap: null,
+    };
+
+    expect(await api.modelSettings(PROJECT)).toEqual(view);
+    expect(await api.saveModelSettings(PROJECT, input)).toEqual(view);
+    expect((await api.testModel(PROJECT)).ok).toBe(true);
+    expect((await api.modelUsage(PROJECT)).month).toBe('2026-10');
+    await api.clearModelSettings(PROJECT);
+
+    expect(calls.map((c) => `${c.init.method} ${c.url}`)).toEqual([
+      `GET /projects/${PROJECT}/model/`,
+      `PUT /projects/${PROJECT}/model/`,
+      `POST /projects/${PROJECT}/model/test`,
+      `GET /projects/${PROJECT}/model/usage`,
+      `DELETE /projects/${PROJECT}/model/`,
+    ]);
+    expect(JSON.parse(String(calls[1].init.body))).toEqual(input);
+  });
+});

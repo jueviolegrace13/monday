@@ -101,7 +101,8 @@ p {
   transition: color var(--dur-fast) var(--ease-out);
 }
 
-.role + .nav {
+.role + .nav,
+.nav + .nav {
   margin-left: 0;
 }
 

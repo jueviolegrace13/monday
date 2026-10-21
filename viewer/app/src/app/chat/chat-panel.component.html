@@ -59,7 +59,9 @@
       <div class="setup">
         <p>No model is set up for this project yet.</p>
         @if (canManageModel()) {
-          <a [href]="settingsUrl(projectId())">Set up a model</a>
+          <a routerLink="/settings/model" [queryParams]="{ project: projectId() }"
+            >Set up a model</a
+          >
         } @else {
           <p class="muted">An Owner or Admin can add one.</p>
         }
