@@ -58,7 +58,7 @@ public sealed class PersonalTokenService(IPersonalTokenStore tokens, IProjectRep
         var (token, plain) = PersonalToken.Issue(user, input.Name, TokenScopes.Parse(input.Scope), limited, lifetime, now);
         await tokens.AddAsync(token, ct).ConfigureAwait(false);
 
-        await AuditAsync(token, limited ?? member.Select(p => p.Id).ToList(), "token.issued", now, ct).ConfigureAwait(false);
+        await AuditAsync(token, token.Projects ?? member.Select(p => p.Id).ToList(), "token.issued", now, ct).ConfigureAwait(false);
         return new IssuedPersonalToken(ViewOf(token, now), plain);
     }
 

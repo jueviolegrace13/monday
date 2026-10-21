@@ -215,6 +215,16 @@ internal static class PersonalTokenTests
         Assert.True(everything.All(a => !a.Detail.Contains(secret, StringComparison.Ordinal)), "The audit never holds the secret.");
     }
 
+    public static void RepeatedProjectIdIsAuditedOnce()
+    {
+        var w = World.Build();
+        var issued = w.Issue(projects: [w.Shop.Value, w.Shop.Value]);
+        Assert.Equal(1, w.AuditOf(w.Shop).Count(a => a.Action == "token.issued"));
+
+        w.Service.RevokeAsync(Ana, new PersonalTokenId(issued.Token.Id), default).GetAwaiter().GetResult();
+        Assert.Equal(1, w.AuditOf(w.Shop).Count(a => a.Action == "token.revoked"));
+    }
+
     public static void RevokeIsForTheOwnerOnly()
     {
         var w = World.Build();

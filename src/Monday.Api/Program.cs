@@ -24,6 +24,7 @@ if (builder.Environment.IsDevelopment() || builder.Configuration.GetValue<bool>(
 }
 builder.Services.AddMondayUserAuthentication(builder.Environment);
 builder.Services.AddMondayPersonalTokenAuthentication(); // not a default scheme: /mcp opts in
+builder.Services.AddMondayMcp(); // Monday's tools for outside agents, with its per-token rate limit
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<ErrorHandling>();
 builder.Services.ConfigureHttpJsonOptions(o =>
@@ -56,9 +57,6 @@ builder.Services.AddRateLimiter(o =>
             ReplenishmentPeriod = TimeSpan.FromMinutes(1),
             QueueLimit = 0,
         }));
-
-    // One bucket per personal token for MCP: 60 calls a minute.
-    o.AddPolicy(McpEndpoints.RateLimitPolicy, McpEndpoints.PartitionFor);
 });
 
 // Uploads are graphs and event batches, never files: cap the body size.
@@ -92,6 +90,7 @@ app.MapTraffic();
 app.MapChat();
 app.MapModel();
 app.MapTokens();
+app.MapMondayMcp();
 app.MapViewer(); // last: the fallback only answers what no API route matched
 
 app.Run();

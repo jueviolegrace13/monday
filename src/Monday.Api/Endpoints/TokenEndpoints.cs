@@ -23,9 +23,10 @@ public static class TokenEndpoints
     private static async Task<IResult> List(ClaimsPrincipal user, PersonalTokenService service, CancellationToken ct) =>
         Results.Ok(await service.ListAsync(user.UserIdOf(), ct));
 
-    private static async Task<IResult> Issue(PersonalTokenInput input, ClaimsPrincipal user, PersonalTokenService service, CancellationToken ct)
+    private static async Task<IResult> Issue(PersonalTokenInput input, HttpContext http, PersonalTokenService service, CancellationToken ct)
     {
-        var issued = await service.IssueAsync(user.UserIdOf(), input, ct);
+        var issued = await service.IssueAsync(http.User.UserIdOf(), input, ct);
+        http.Response.Headers.CacheControl = "no-store"; // the plain token is in this response only: no cache keeps it
         return Results.Created($"/me/tokens/{issued.Token.Id}", new { issued.Token, Plain = issued.Plain });
     }
 

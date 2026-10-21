@@ -17,4 +17,8 @@
     <None Include="Fixtures\*.txt" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Monday.Api\Monday.Api.csproj" />
+  </ItemGroup>
+
 </Project>

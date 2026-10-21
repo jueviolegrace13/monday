@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Monday.Application.Projects;
 using Monday.Domain.Access;
+using Monday.Domain.Projects;
 
 namespace Monday.Application.Agent.Tools;
 
@@ -22,7 +23,8 @@ public sealed class ListProjectsTool(ProjectService projects) : IAgentTool
     public async Task<ToolResult> RunAsync(ToolContext context, JsonElement input, CancellationToken ct)
     {
         ArgumentNullException.ThrowIfNull(context);
-        var mine = await projects.ListAsync(context.User, ct).ConfigureAwait(false);
+        var all = await projects.ListAsync(context.User, ct).ConfigureAwait(false);
+        IReadOnlyList<ProjectSummary> mine = context.Reach is { } reach ? [.. all.Where(p => reach.Contains(new ProjectId(p.Id)))] : all;
         var page = mine.Take(ToolInput.MaxItems).ToList();
         return new ToolResult(ToolInput.Data(new { projects = page, total = mine.Count, truncated = mine.Count > page.Count }), []);
     }

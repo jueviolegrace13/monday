@@ -20,8 +20,11 @@ public enum ToolChannel
     Mcp,
 }
 
-/// <summary>Who is asking, on which project, in which role and channel.</summary>
-public sealed record ToolContext(ProjectId Project, UserId User, Role Role, ToolChannel Channel);
+/// <summary>
+/// Who is asking, on which project, in which role and channel. <paramref name="Reach"/> is the projects the caller's
+/// credential may see (a personal token limited to some projects); null means all of the caller's projects.
+/// </summary>
+public sealed record ToolContext(ProjectId Project, UserId User, Role Role, ToolChannel Channel, IReadOnlySet<ProjectId>? Reach = null);
 
 /// <summary>A change to the screen. Type is one of focus_node, highlight_path, set_lens, start_replay.</summary>
 public sealed record ScreenAction(string Type, JsonElement Args);

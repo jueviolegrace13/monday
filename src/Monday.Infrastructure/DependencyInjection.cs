@@ -98,6 +98,7 @@ public static class DependencyInjection
         services.AddScoped<IAgentTool, DraftDecisionTool>();
         services.AddScoped<ToolRegistry>();
         services.AddScoped<AgentService>();
+        services.AddScoped<McpToolService>();
         return services;
     }
 
