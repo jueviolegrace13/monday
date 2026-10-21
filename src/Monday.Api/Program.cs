@@ -78,6 +78,7 @@ app.MapIngest();
 app.MapProjects();
 app.MapTraffic();
 app.MapChat();
+app.MapModel();
 
 app.Run();
 

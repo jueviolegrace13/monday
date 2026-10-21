@@ -15,3 +15,5 @@ services:
         sync: false
       - key: Monday__Agent__UserHashKey
         sync: false
+      - key: MONDAY_SECRETS_KEY          # master key that seals model API keys; base64 of 32 random bytes
+        sync: false

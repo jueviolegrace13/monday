@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using Monday.Application.Abstractions;
 using Monday.Application.Agent;
@@ -7,6 +8,7 @@ using Monday.Domain.Access;
 using Monday.Domain.Agent;
 using Monday.Domain.Common;
 using Monday.Domain.Projects;
+using Monday.Domain.Tests.Fakes;
 using Monday.Infrastructure.InMemory;
 using Monday.Infrastructure.Secrets;
 
@@ -36,6 +38,36 @@ internal static class ModelSettingsServiceTests
         }
     }
 
+    private sealed class FakeFactory(IChatModel model) : IChatModelFactory
+    {
+        public string? Key { get; private set; }
+
+        public IChatModel Create(ModelSettings settings, string apiKey)
+        {
+            Key = apiKey;
+            return model;
+        }
+    }
+
+    private sealed class ThrowingModel(ModelException error) : IChatModel
+    {
+        public async IAsyncEnumerable<ModelEvent> StreamAsync(ModelRequest request, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken ct)
+        {
+            await Task.Yield();
+            throw error;
+#pragma warning disable CS0162
+            yield break;
+#pragma warning restore CS0162
+        }
+    }
+
+    private static readonly Finished Done = new(StopReason.EndTurn, new Usage(5, 5));
+
+    private static ModelTestResult Test(World w, UserId? by = null) =>
+        w.Service.TestAsync(w.Project, by ?? w.Owner, default).GetAwaiter().GetResult();
+
+    private static void Configure(World w) => w.Save(new ModelSettingsInput(ModelProvider.Anthropic, "claude", null, PlainKey, null));
+
     private sealed class World
     {
         public UserId Owner { get; } = new("github:rendee");
@@ -48,7 +80,7 @@ internal static class ModelSettingsServiceTests
         public AesGcmSecretBox Box { get; private init; } = null!;
         public ModelSettingsService Service { get; private set; } = null!;
 
-        public static World Build(bool secrets = true, bool refuse = false)
+        public static World Build(bool secrets = true, bool refuse = false, IChatModel? model = null)
         {
             var key = secrets ? Convert.ToBase64String(RandomNumberGenerator.GetBytes(32)) : null;
             var box = new AesGcmSecretBox(new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?> { ["MONDAY_SECRETS_KEY"] = key }).Build());
@@ -57,7 +89,7 @@ internal static class ModelSettingsServiceTests
             var projects = new ProjectService(w.Projects, w.Audit, clock);
             w.Project = new ProjectId(projects.CreateAsync("Shop", w.Owner, default).GetAwaiter().GetResult().Id);
             projects.SetMemberAsync(w.Project, w.Ana, Role.Debugger, w.Owner, default).GetAwaiter().GetResult();
-            w.Service = new ModelSettingsService(w.Projects, w.Audit, clock, box, w.Guard, w.Usage);
+            w.Service = new ModelSettingsService(w.Projects, w.Audit, clock, box, w.Guard, w.Usage, new FakeFactory(model ?? new ScriptedChatModel()));
             return w;
         }
 
@@ -164,5 +196,73 @@ internal static class ModelSettingsServiceTests
         Assert.Equal(450L, usage.OutputTokens);
         Assert.Equal(1_000L, usage.MonthlyTokenCap);
         Assert.True(usage.CapReached, "1050 tokens is over a 1000 cap.");
+    }
+
+    public static void GetNeverReturnsKey()
+    {
+        var w = World.Build();
+        Configure(w);
+        var view = w.Service.GetAsync(w.Project, w.Owner, default).GetAwaiter().GetResult();
+        Assert.Equal("9876", view.KeyLast4);
+        var names = typeof(ModelSettingsView).GetProperties().Select(p => p.Name).ToList();
+        Assert.True(!names.Any(n => n.Contains("ApiKey", StringComparison.Ordinal) || n.Contains("Cipher", StringComparison.Ordinal)), "The view has no key field.");
+        Assert.True(!JsonSerializer.Serialize(view).Contains("PLAINSECRET", StringComparison.Ordinal), "No key in the JSON.");
+    }
+
+    public static void SaveWithoutKeyKeepsStoredKey()
+    {
+        var w = World.Build();
+        Configure(w);
+        var cipher = w.Load().Model!.KeyCipher;
+        w.Save(new ModelSettingsInput(ModelProvider.Anthropic, "claude-opus-4-1", null, null, 5));
+        Assert.Equal(cipher, w.Load().Model!.KeyCipher);
+        Assert.Equal("9876", w.Load().Model!.KeyLast4);
+    }
+
+    public static void TestPassesWhenModelCallsPing()
+    {
+        var model = new ScriptedChatModel([new ToolCall("c1", "ping", JsonDocument.Parse("{}").RootElement.Clone()), Done]);
+        var w = World.Build(model: model);
+        Configure(w);
+
+        var result = Test(w);
+
+        Assert.True(result.Ok && result.Code is null, "A ping call passes.");
+        var request = model.Requests.Single();
+        Assert.Equal("ping", request.Tools.Single().Name);
+        Assert.Equal("Call the ping tool.", request.Messages.Single().Text);
+    }
+
+    public static void TestFailsWhenModelNeverCallsTool()
+    {
+        var w = World.Build(model: new ScriptedChatModel([new TextDelta("pong"), Done]));
+        Configure(w);
+
+        var result = Test(w);
+
+        Assert.True(!result.Ok, "Text only is a failure.");
+        Assert.Equal("model.no_tool_call", result.Code);
+    }
+
+    public static void TestReportsModelErrorsWithoutTheKey()
+    {
+        var w = World.Build(model: new ThrowingModel(new ModelException("model.auth", "The provider refused the key.")));
+        Configure(w);
+
+        var result = Test(w);
+
+        Assert.True(!result.Ok, "A refused key fails.");
+        Assert.Equal("model.auth", result.Code);
+        Assert.True(!JsonSerializer.Serialize(result).Contains("PLAINSECRET", StringComparison.Ordinal), "The result never holds the key.");
+    }
+
+    public static void TestNeedsSettingsAndManagerRole()
+    {
+        var w = World.Build();
+        Assert.Equal("model.not_configured", Test(w).Code);
+        Configure(w);
+        Assert.Throws<DomainException>(() => Test(w, w.Ana), "access.denied");
+        Assert.Throws<NotFoundException>(() => Test(w, new UserId("github:stranger")));
+        Assert.Equal("model.keys_disabled", Test(World.Build(secrets: false)).Code);
     }
 }

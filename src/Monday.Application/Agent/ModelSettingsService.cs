@@ -1,4 +1,6 @@
 using System.Globalization;
+using System.Security.Cryptography;
+using System.Text.Json;
 using Monday.Application.Abstractions;
 using Monday.Application.Projects;
 using Monday.Domain.Access;
@@ -36,10 +38,16 @@ public sealed record ModelSettingsView(
 /// <summary>Tokens used this month (UTC) against the cap.</summary>
 public sealed record ModelUsageView(string Month, long InputTokens, long OutputTokens, long? MonthlyTokenCap, bool CapReached);
 
+/// <summary>The outcome of "test connection". The message never holds the key.</summary>
+public sealed record ModelTestResult(bool Ok, string? Code, string? Message);
+
 /// <summary>Use cases for a project's model settings and usage. Only Owners and Admins see or change them.</summary>
 public sealed class ModelSettingsService(
-    IProjectRepository projects, IAuditLog audit, IClock clock, ISecretBox secrets, IModelEndpointGuard endpoints, IModelUsageStore usage)
+    IProjectRepository projects, IAuditLog audit, IClock clock, ISecretBox secrets, IModelEndpointGuard endpoints, IModelUsageStore usage, IChatModelFactory models)
 {
+    private static readonly TimeSpan TestTimeout = TimeSpan.FromSeconds(30);
+    private static readonly JsonElement PingSchema = JsonDocument.Parse("""{"type":"object","properties":{}}""").RootElement.Clone();
+
     public async Task SaveAsync(ProjectId id, ModelSettingsInput input, UserId by, CancellationToken ct)
     {
         ArgumentNullException.ThrowIfNull(input);
@@ -100,6 +108,56 @@ public sealed class ModelSettingsService(
         var cap = project.Model?.MonthlyTokenCap;
         long total = (long)used.InputTokens + used.OutputTokens;
         return new ModelUsageView(month, used.InputTokens, used.OutputTokens, cap, cap is { } c && total >= c);
+    }
+
+    /// <summary>
+    /// Sends one request with a dummy <c>ping</c> tool and passes only if the model calls it, which proves the key,
+    /// the model name and tool support at once. A failure comes back as a result, never as the key.
+    /// </summary>
+    public async Task<ModelTestResult> TestAsync(ProjectId id, UserId by, CancellationToken ct)
+    {
+        var project = await LoadForManagerAsync(id, by, ct).ConfigureAwait(false);
+        if (!secrets.Enabled)
+        {
+            return new ModelTestResult(false, "model.keys_disabled", "Model settings are disabled: MONDAY_SECRETS_KEY is not set.");
+        }
+
+        if (project.Model is not { } settings)
+        {
+            return new ModelTestResult(false, "model.not_configured", "No model is set for this project.");
+        }
+
+        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        timeout.CancelAfter(TestTimeout);
+        try
+        {
+            var model = models.Create(settings, secrets.Open(settings.KeyCipher));
+            var request = new ModelRequest(
+                "You are checking a connection. Use the tool you are given.",
+                [new ChatMessage(ChatRole.User, "Call the ping tool.")],
+                [new ToolSpec("ping", "Answers pong. Call it once.", PingSchema)]);
+            await foreach (var e in model.StreamAsync(request, timeout.Token).ConfigureAwait(false))
+            {
+                if (e is ToolCall { Name: "ping" })
+                {
+                    return new ModelTestResult(true, null, null);
+                }
+            }
+
+            return new ModelTestResult(false, "model.no_tool_call", "The model answered but did not call the test tool. Pick a model that supports tools.");
+        }
+        catch (CryptographicException)
+        {
+            return new ModelTestResult(false, "model.key_unreadable", "The saved model key can't be opened. Enter it again.");
+        }
+        catch (ModelException e)
+        {
+            return new ModelTestResult(false, e.Code, e.Message);
+        }
+        catch (OperationCanceledException) when (!ct.IsCancellationRequested)
+        {
+            return new ModelTestResult(false, "model.unavailable", "The model did not answer within 30 seconds.");
+        }
     }
 
     /// <summary>The usage month for a moment: <c>yyyy-MM</c> in UTC.</summary>
