@@ -139,7 +139,7 @@ public sealed class StartReplayTool(TrafficService traffic, GraphService graph) 
         var requests = await traffic.ReplayAsync(context.Project, since, until, userId, context.User, ct).ConfigureAwait(false);
         var view = await graph.GetAsync(context.Project, context.User, ct).ConfigureAwait(false);
         var known = view?.Nodes.Select(n => n.Id).ToHashSet(StringComparer.Ordinal) ?? [];
-        var ids = requests.Select(r => r.NodeId).Where(known.Contains).Distinct().Take(200).ToList();
+        var ids = requests.Select(r => r.NodeId).Where(known.Contains).Distinct().Take(ToolInput.MaxItems).ToList();
 
         var args = userId is null ? ToolInput.Data(new { since, until }) : ToolInput.Data(new { since, until, userId });
         return new ToolResult(ToolInput.Data(new { requests = requests.Count, since, until, user = userId is not null }), ids, new ScreenAction(Name, args));

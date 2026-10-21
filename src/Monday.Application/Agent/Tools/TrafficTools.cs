@@ -38,7 +38,7 @@ public sealed class RecentRequestsTool(TrafficService traffic, IClock clock) : I
 {
     public string Name => "recent_requests";
 
-    public string Description => "The most recent requests (method, route template, status, duration, outcome, guards), newest last. Default window is the last hour; at most 50 are returned. Never any body, query or IP.";
+    public string Description => "The most recent requests (method, route template, status, duration, outcome, guards), the newest 50 of the window, oldest first. Default window is the last hour; at most 50 are returned. Never any body, query or IP.";
 
     public JsonElement InputSchema { get; } = ToolInput.Schema("""
         {"type":"object","properties":{
@@ -57,13 +57,14 @@ public sealed class RecentRequestsTool(TrafficService traffic, IClock clock) : I
     {
         ArgumentNullException.ThrowIfNull(context);
         var (since, until) = ToolInput.Window(input, clock.Now);
-        var all = await traffic.ReplayAsync(context.Project, since, until, null, context.User, ct).ConfigureAwait(false);
+        var newest = await traffic.RecentAsync(context.Project, since, until, ToolInput.MaxItems + 1, context.User, ct).ConfigureAwait(false);
+        var truncated = newest.Count > ToolInput.MaxItems;
 
         // The service already hides the hash from people who may not follow users; this keeps that true for the role asking.
         var withUser = RolePermissions.Allows(context.Role, Permission.ReplayUserTraffic);
-        var page = all.TakeLast(ToolInput.MaxItems).Select(t => withUser ? t : t with { UserHash = null }).ToList();
+        var page = newest.Take(ToolInput.MaxItems).Reverse().Select(t => withUser ? t : t with { UserHash = null }).ToList();
         return new ToolResult(
-            ToolInput.Data(new { requests = page, total = all.Count, truncated = all.Count > page.Count }),
+            ToolInput.Data(new { requests = page, truncated }),
             [.. page.Select(t => t.NodeId).Distinct()]);
     }
 }

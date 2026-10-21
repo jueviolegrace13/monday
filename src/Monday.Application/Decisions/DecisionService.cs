@@ -27,7 +27,7 @@ public sealed class DecisionService(IDecisionRepository decisions, ProjectServic
         ArgumentNullException.ThrowIfNull(proposal);
         var project = await projects.LoadForMemberAsync(id, by, ct).ConfigureAwait(false);
         project.EnsureCan(by, Permission.ChatAct);
-        var decision = Decision.Draft(id, proposal.Area, proposal.Title, proposal.Context, proposal.Options, proposal.RecommendedKey, by, clock.Now);
+        var decision = Decision.Draft(id, proposal.Area, proposal.Title, proposal.Context, proposal.Options, proposal.RecommendedKey, by, clock.Now, proposal.Supersedes is { } s ? new DecisionId(s) : null);
         await decisions.SaveAsync(decision, ct).ConfigureAwait(false);
         return decision;
     }

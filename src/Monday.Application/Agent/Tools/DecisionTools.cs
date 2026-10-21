@@ -24,14 +24,14 @@ public sealed class ListDecisionsTool(DecisionService decisions) : IAgentTool
     public async Task<ToolResult> RunAsync(ToolContext context, JsonElement input, CancellationToken ct)
     {
         ArgumentNullException.ThrowIfNull(context);
-        DecisionStatus? status = ToolInput.String(input, "status") is { } s && Enum.TryParse<DecisionStatus>(s, true, out var parsed) ? parsed : null;
+        var status = ToolInput.Enum<DecisionStatus>(input, "status");
         var all = await decisions.ListAsync(context.Project, context.User, ct).ConfigureAwait(false);
         var matches = all.Where(d => status is null || d.Status == status).OrderByDescending(d => d.ProposedAt).ToList();
         var page = matches.Take(ToolInput.MaxItems).ToList();
         var items = page.Select(d => new
         {
-            id = d.Id.Value, d.Area, d.Title, d.Context, d.Options, d.RecommendedKey, d.Status, d.ChosenKey, d.ProposedAt, d.Note,
-            draftedBy = d.DraftedBy?.Value,
+            id = d.Id.Value, d.Area, d.Title, d.Context, d.Options, d.RecommendedKey,
+            supersedes = d.Supersedes?.Value, d.Status, d.ChosenKey, resolvedBy = d.ResolvedBy?.Value, d.ProposedAt, d.ResolvedAt, d.Note,
         });
         return new ToolResult(ToolInput.Data(new { decisions = items, total = matches.Count, truncated = matches.Count > page.Count }), []);
     }

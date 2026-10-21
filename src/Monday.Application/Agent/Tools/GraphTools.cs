@@ -76,7 +76,7 @@ public sealed class FindNodesTool(GraphService graph) : IAgentTool
     {
         ArgumentNullException.ThrowIfNull(context);
         var query = ToolInput.RequiredString(input, "query");
-        NodeKind? kind = ToolInput.String(input, "kind") is { } k && Enum.TryParse<NodeKind>(k, true, out var parsed) ? parsed : null;
+        var kind = ToolInput.Enum<NodeKind>(input, "kind");
         var view = await graph.GetAsync(context.Project, context.User, ct).ConfigureAwait(false);
         var matches = (view?.Nodes ?? [])
             .Where(n => (kind is null || n.Kind == kind)
@@ -137,7 +137,8 @@ public sealed class NodeDetailTool(GraphService graph) : IAgentTool
         return new ToolResult(ToolInput.Data(data), [.. ids]);
     }
 
-    // Without ViewCode the service gives the graph already stripped of source, so shape questions still work.
+    // Without ViewCode shape questions still work. Source is dropped here too, because the role in the context
+    // may be weaker than the asker's real one, and the service strips by real membership.
     private async Task<ToolResult> ShapeOnlyAsync(ToolContext context, string nodeId, CancellationToken ct)
     {
         var view = await graph.GetAsync(context.Project, context.User, ct).ConfigureAwait(false) ?? throw new NotFoundException("graph");
@@ -149,7 +150,7 @@ public sealed class NodeDetailTool(GraphService graph) : IAgentTool
         var callers = Related(e => e.Kind == EdgeKind.Calls && e.To == nodeId, e => e.From);
         var callees = Related(e => e.Kind == EdgeKind.Calls && e.From == nodeId, e => e.To);
         var tests = Related(e => e.Kind == EdgeKind.Covers && e.To == nodeId, e => e.From);
-        var data = new { node, codeTruncated = false, callers = Summaries(callers), callees = Summaries(callees), tests = Summaries(tests) };
+        var data = new { node = node with { Code = null }, codeTruncated = false, callers = Summaries(callers), callees = Summaries(callees), tests = Summaries(tests) };
         var ids = new[] { node }.AsEnumerable().Concat(callers).Concat(callees).Concat(tests).Select(n => n.Id).Distinct();
         return new ToolResult(ToolInput.Data(data), [.. ids]);
     }
@@ -177,7 +178,7 @@ public sealed class SecurityFindingsTool(GraphService graph) : IAgentTool
     public async Task<ToolResult> RunAsync(ToolContext context, JsonElement input, CancellationToken ct)
     {
         ArgumentNullException.ThrowIfNull(context);
-        Severity? severity = ToolInput.String(input, "severity") is { } s && Enum.TryParse<Severity>(s, true, out var parsed) ? parsed : null;
+        var severity = ToolInput.Enum<Severity>(input, "severity");
         var view = await graph.GetAsync(context.Project, context.User, ct).ConfigureAwait(false);
         var matches = (view?.Findings ?? []).Where(f => severity is null || f.Severity == severity).ToList();
         var page = matches.Take(ToolInput.MaxItems).ToList();

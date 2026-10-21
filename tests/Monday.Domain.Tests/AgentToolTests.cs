@@ -257,6 +257,74 @@ internal static class AgentToolTests
         Assert.True(result.NodeIds.SequenceEqual([Method]), "The event's nodes light up.");
     }
 
+    public static void RecentRequestsReturnsTheNewestFiftyOfABusyWindow()
+    {
+        var w = World.Build(requests: 80);
+
+        var result = Run(new RecentRequestsTool(w.TrafficService, new FixedClock()), w.As(w.Ana, Role.Debugger));
+
+        var requests = result.Data.GetProperty("requests");
+        Assert.Equal(50, requests.GetArrayLength());
+        Assert.True(result.Data.GetProperty("truncated").GetBoolean(), "The window held more than 50.");
+
+        // Fixture traces run one second apart from -1 minute, and the window ends at Now, so offsets 0..60 are in it;
+        // the 11 oldest (0..10) must be the ones dropped.
+        var first = requests[0].GetProperty("at").GetDateTimeOffset();
+        var last = requests[49].GetProperty("at").GetDateTimeOffset();
+        Assert.Equal(Now.AddMinutes(-1).AddSeconds(11), first);
+        Assert.Equal(Now.AddMinutes(-1).AddSeconds(60), last);
+    }
+
+    public static void NodeDetailShapeOnlyDropsCodeEvenForARealDebugger()
+    {
+        var w = World.Build();
+
+        // Ana really is a Debugger, so the service would hand over source; a Monitor context must not.
+        var result = Run(new NodeDetailTool(w.Graph), w.As(w.Ana, Role.Monitor), $$"""{"nodeId":"{{Method}}"}""");
+
+        Assert.Equal(JsonValueKind.Null, result.Data.GetProperty("node").GetProperty("code").ValueKind);
+    }
+
+    public static void DraftWithSupersedesStoresIt()
+    {
+        var w = World.Build();
+        var earlier = w.Decisions.DraftAsync(w.Project, new DecisionProposal(DecisionArea.Stack, "Old", "Old call.", [new("a", "A", "x"), new("b", "B", "y")], "a", null), w.Ana, default).GetAwaiter().GetResult();
+        var input = $$"""
+            {"area":"Stack","title":"New","context":"Changed our mind.","supersedes":"{{earlier.Id.Value}}",
+             "options":[{"key":"a","title":"A","tradeOffs":"x"},{"key":"b","title":"B","tradeOffs":"y"}],"recommendedKey":"b"}
+            """;
+
+        Run(new DraftDecisionTool(w.Decisions), w.As(w.Ana, Role.Debugger), input);
+
+        var stored = w.Decisions.ListAsync(w.Project, w.Owner, default).GetAwaiter().GetResult().Single(d => d.Title == "New");
+        Assert.Equal(earlier.Id, stored.Supersedes!.Value);
+    }
+
+    public static void ListDecisionsReturnsTheApiFields()
+    {
+        var w = World.Build();
+        w.Decisions.DraftAsync(w.Project, new DecisionProposal(DecisionArea.Stack, "Old", "Old call.", [new("a", "A", "x"), new("b", "B", "y")], "a", null), w.Ana, default).GetAwaiter().GetResult();
+
+        var item = Run(new ListDecisionsTool(w.Decisions), w.As(w.Mia, Role.Monitor)).Data.GetProperty("decisions")[0];
+
+        foreach (var field in new[] { "supersedes", "resolvedBy", "resolvedAt" })
+        {
+            Assert.True(item.TryGetProperty(field, out _), $"{field} is returned.");
+        }
+
+        Assert.True(!item.TryGetProperty("draftedBy", out _), "draftedBy is not part of the view.");
+    }
+
+    public static void UnknownFilterValuesAreToolErrors()
+    {
+        var w = World.Build();
+        var ctx = w.As(w.Ana, Role.Debugger);
+
+        Assert.Throws<DomainException>(() => Run(new ListDecisionsTool(w.Decisions), ctx, """{"status":"Maybe"}"""), "agent.input");
+        Assert.Throws<DomainException>(() => Run(new FindNodesTool(w.Graph), ctx, """{"query":"x","kind":"Widget"}"""), "agent.input");
+        Assert.Throws<DomainException>(() => Run(new SecurityFindingsTool(w.Graph), ctx, """{"severity":"Dire"}"""), "agent.input");
+    }
+
     public static void RegistrationOffersTheSpecTable()
     {
         var services = new ServiceCollection();

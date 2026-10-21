@@ -102,9 +102,9 @@ public sealed class Decision : AggregateRoot<DecisionId>
     /// A member drafts a decision through the agent. Same guards as <see cref="Propose"/>; the draft waits
     /// as Proposed and only an Owner can resolve it.
     /// </summary>
-    public static Decision Draft(ProjectId projectId, DecisionArea area, string title, string context, IReadOnlyList<DecisionOption> options, string recommendedKey, UserId draftedBy, DateTimeOffset now)
+    public static Decision Draft(ProjectId projectId, DecisionArea area, string title, string context, IReadOnlyList<DecisionOption> options, string recommendedKey, UserId draftedBy, DateTimeOffset now, DecisionId? supersedes = null)
     {
-        var decision = Propose(projectId, area, title, context, options, recommendedKey, now);
+        var decision = Propose(projectId, area, title, context, options, recommendedKey, now, supersedes);
         decision.DraftedBy = draftedBy;
         return decision;
     }

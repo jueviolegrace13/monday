@@ -30,10 +30,12 @@ internal static class ToolInput
     public static string RequiredString(JsonElement input, string name) =>
         String(input, name) is { Length: > 0 } s ? s : throw Invalid($"'{name}' is required.");
 
-    public static int Count(JsonElement input, string name, int fallback) =>
-        input.ValueKind == JsonValueKind.Object && input.TryGetProperty(name, out var p) && p.TryGetInt32(out var n)
-            ? Math.Clamp(n, 1, MaxItems)
-            : fallback;
+    /// <summary>An optional enum value; text that is not one of its names is a tool error, not "no filter".</summary>
+    public static T? Enum<T>(JsonElement input, string name)
+        where T : struct, Enum =>
+        String(input, name) is { } s
+            ? System.Enum.TryParse<T>(s, true, out var parsed) && System.Enum.IsDefined(parsed) ? parsed : throw Invalid($"'{name}' is not one of: {string.Join(", ", System.Enum.GetNames<T>())}.")
+            : null;
 
     public static DateTimeOffset? Time(JsonElement input, string name) =>
         String(input, name) is { } s

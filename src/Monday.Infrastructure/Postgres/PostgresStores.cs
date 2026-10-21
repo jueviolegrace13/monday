@@ -363,16 +363,31 @@ public sealed class PostgresTrafficStore(NpgsqlDataSource db) : ITrafficStore
 
     public async Task<IReadOnlyList<RequestTrace>> RangeAsync(ProjectId project, DateTimeOffset since, DateTimeOffset until, string? userHash, int limit, CancellationToken ct)
     {
-        var list = new List<RequestTrace>();
         await using var cmd = db.CreateCommand("""
             SELECT environment_id, trace_id, at, method, route, status, duration_ms, guards, user_hash, error_type
             FROM traffic WHERE project_id = @p AND at BETWEEN @a AND @b AND (@u::char(32) IS NULL OR user_hash = @u)
             ORDER BY at LIMIT @n
             """);
+        cmd.Parameters.Add(new NpgsqlParameter("u", NpgsqlDbType.Char) { Value = (object?)userHash ?? DBNull.Value });
+        return await ReadAsync(cmd, project, since, until, limit, ct).ConfigureAwait(false);
+    }
+
+    public async Task<IReadOnlyList<RequestTrace>> NewestAsync(ProjectId project, DateTimeOffset since, DateTimeOffset until, int limit, CancellationToken ct)
+    {
+        await using var cmd = db.CreateCommand("""
+            SELECT environment_id, trace_id, at, method, route, status, duration_ms, guards, user_hash, error_type
+            FROM traffic WHERE project_id = @p AND at BETWEEN @a AND @b
+            ORDER BY at DESC LIMIT @n
+            """);
+        return await ReadAsync(cmd, project, since, until, limit, ct).ConfigureAwait(false);
+    }
+
+    private static async Task<IReadOnlyList<RequestTrace>> ReadAsync(NpgsqlCommand cmd, ProjectId project, DateTimeOffset since, DateTimeOffset until, int limit, CancellationToken ct)
+    {
+        var list = new List<RequestTrace>();
         cmd.Parameters.AddWithValue("p", project.Value);
         cmd.Parameters.AddWithValue("a", since);
         cmd.Parameters.AddWithValue("b", until);
-        cmd.Parameters.Add(new NpgsqlParameter("u", NpgsqlDbType.Char) { Value = (object?)userHash ?? DBNull.Value });
         cmd.Parameters.AddWithValue("n", Math.Max(1, limit));
         await using var reader = await cmd.ExecuteReaderAsync(ct).ConfigureAwait(false);
         while (await reader.ReadAsync(ct).ConfigureAwait(false))

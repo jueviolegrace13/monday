@@ -24,6 +24,9 @@ public interface ITrafficStore
     Task AppendAsync(IReadOnlyList<RequestTrace> traces, CancellationToken ct);
 
     Task<IReadOnlyList<RequestTrace>> RangeAsync(ProjectId project, DateTimeOffset since, DateTimeOffset until, string? userHash, int limit, CancellationToken ct);
+
+    /// <summary>The newest <paramref name="limit"/> requests in the window, newest first.</summary>
+    Task<IReadOnlyList<RequestTrace>> NewestAsync(ProjectId project, DateTimeOffset since, DateTimeOffset until, int limit, CancellationToken ct);
 }
 
 /// <summary>Fans new requests out to everyone watching a project live.</summary>
@@ -89,6 +92,23 @@ public sealed class TrafficService(ITrafficStore store, ITrafficFeed feed, Proje
         }
 
         var traces = await store.RangeAsync(id, since, until, userHash, MaxRange, ct).ConfigureAwait(false);
+        var withUser = project.Can(user, Permission.ReplayUserTraffic);
+        return traces.Select(t => TrafficView.Of(t, withUser)).ToList();
+    }
+
+    /// <summary>
+    /// The newest requests in a time window, newest first. Same permission and window rules as replay, but it
+    /// cannot follow one user, so there is no user-replay audit.
+    /// </summary>
+    public async Task<IReadOnlyList<TrafficView>> RecentAsync(ProjectId id, DateTimeOffset since, DateTimeOffset until, int limit, UserId user, CancellationToken ct)
+    {
+        var project = await projects.LoadForMemberAsync(id, user, ct).ConfigureAwait(false);
+        project.EnsureCan(user, Permission.ReplayAppTraffic);
+        Guard.That(since < until && until - since <= TimeSpan.FromDays(1), "traffic.range", "Look at most one day at a time.");
+        Guard.That(clock.Now - since <= TrafficRetention.Live, "traffic.archived", "That window is older than 7 days: restore it from the archive first.");
+        Guard.That(limit is > 0 and <= MaxRange, "traffic.limit", $"Ask for between 1 and {MaxRange} requests.");
+
+        var traces = await store.NewestAsync(id, since, until, limit, ct).ConfigureAwait(false);
         var withUser = project.Can(user, Permission.ReplayUserTraffic);
         return traces.Select(t => TrafficView.Of(t, withUser)).ToList();
     }
