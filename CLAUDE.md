@@ -32,6 +32,7 @@ Clean code, SOLID, DDD. Dependencies point inward only:
 | `Monday.Infrastructure` | Port implementations (in-memory now, Postgres and R2 next) | Application, Domain |
 | `Monday.Api` | Minimal API endpoints, auth, rate limits, error mapping | all above |
 | `Monday.Indexer` | `monday-index`: Roslyn code graph of a repo | Domain |
+| `tools/monday-index-ts` | `monday-index-ts`: the same graph file for TypeScript/JavaScript (Next.js), with the TypeScript compiler | nothing |
 
 - Rules live in the domain and are enforced there, so they hold whichever screen or API asks.
 - Every domain rule has a test in `tests/Monday.Domain.Tests`.
@@ -44,6 +45,7 @@ dotnet build                                            # whole solution (needs 
 dotnet run --project tests/Monday.Domain.Tests          # domain tests
 dotnet run --project src/Monday.Api                     # API on Development (X-Monday-Dev-User header signs in)
 dotnet run --project src/Monday.Indexer -- --root .     # writes .monday/graph.json
+node tools/monday-index-ts/src/cli.ts --root <ts repo>  # TypeScript/Next.js repos (npm install there once)
 ```
 
 Offline (no NuGet), build the indexer against the SDK's own Roslyn:

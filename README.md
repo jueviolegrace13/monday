@@ -30,8 +30,9 @@ Monday watches itself for now. Adding another project later takes no change to M
 
 1. **Register it.** Create the project in Monday and issue an API key for a local or development
    environment. Production environments are refused.
-2. **Map its code.** Run `monday-index --root <repo> --name "<Project>"` (C# today; more languages to come),
-   or add the indexer step to the project's CI with `MONDAY_URL` and `MONDAY_KEY` as secrets.
+2. **Map its code.** Run `monday-index --root <repo> --name "<Project>"` for C#, or
+   `node tools/monday-index-ts/src/cli.ts --root <repo> --name "<Project>"` for TypeScript and JavaScript
+   (Next.js aware), or add the indexer step to the project's CI with `MONDAY_URL` and `MONDAY_KEY` as secrets.
 3. **Show it in the Monday Graph.** Publish the graph file beside the viewer and add a row to the viewer's
    `projects` registry: `{ key, name, file, live, order }`. Its activity goes in `activity-<key>`.
 4. **Set the project's model.** An Owner or Admin picks the provider, model and key in the viewer's Model
