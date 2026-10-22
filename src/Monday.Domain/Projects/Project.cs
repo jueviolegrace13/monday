@@ -147,17 +147,11 @@ public sealed class Project : AggregateRoot<ProjectId>
         _environments.FirstOrDefault(e => e.Id == id)
         ?? throw new DomainException("environment.not_found", "No such environment in this project.");
 
-    /// <summary>Adding a non-production environment is an admin task; production is Owner-only.</summary>
+    /// <summary>Adding an environment is an admin task. Production is off limits, so it cannot be added.</summary>
     public ProjectEnvironment AddEnvironment(string name, EnvironmentKind kind, UserId by)
     {
-        if (kind == EnvironmentKind.Production)
-        {
-            EnsureOwner(by);
-        }
-        else
-        {
-            EnsureCan(by, Permission.ManageMembersAndKeys);
-        }
+        EnsureCan(by, Permission.ManageMembersAndKeys);
+        ProductionGuard.EnsureNotProduction(kind);
 
         Guard.That(
             _environments.TrueForAll(e => !string.Equals(e.Name, name.Trim(), StringComparison.OrdinalIgnoreCase)),
@@ -168,10 +162,14 @@ public sealed class Project : AggregateRoot<ProjectId>
         return environment;
     }
 
-    /// <summary>Only the Owner can mark an environment production or move it out; the move is an audited event.</summary>
+    /// <summary>
+    /// Only the Owner changes an environment's kind; the move is an audited event. Nothing can become production,
+    /// but a production environment stored before the rule can be moved out.
+    /// </summary>
     public void ChangeEnvironmentKind(EnvironmentId id, EnvironmentKind kind, UserId by, DateTimeOffset now)
     {
         EnsureOwner(by);
+        ProductionGuard.EnsureNotProduction(kind);
         var environment = Environment(id);
         if (environment.Kind == kind)
         {
@@ -187,7 +185,7 @@ public sealed class Project : AggregateRoot<ProjectId>
     public string IssueApiKey(EnvironmentId environmentId, UserId by, DateTimeOffset now)
     {
         EnsureCan(by, Permission.ManageMembersAndKeys);
-        _ = Environment(environmentId);
+        ProductionGuard.EnsureNotProduction(Environment(environmentId).Kind);
         var (key, plain) = ApiKey.Issue(environmentId, now);
         _apiKeys.Add(key);
         Raise(new ApiKeyIssued(Id, key.Id, environmentId, by, now));
@@ -213,7 +211,7 @@ public sealed class Project : AggregateRoot<ProjectId>
         Raise(new ApiKeyRevoked(Id, keyId, by, now));
     }
 
-    /// <summary>Finds the active key and environment a presented key belongs to, or null.</summary>
+    /// <summary>Finds the active key and environment a presented key belongs to, or null. Production keys never match.</summary>
     public (ApiKey Key, ProjectEnvironment Environment)? Authenticate(string presented, DateTimeOffset now)
     {
         var prefix = ApiKey.PrefixOf(presented);
@@ -223,7 +221,13 @@ public sealed class Project : AggregateRoot<ProjectId>
         }
 
         var key = _apiKeys.FirstOrDefault(k => k.Prefix == prefix);
-        return key is not null && key.Matches(presented, now) ? (key, Environment(key.EnvironmentId)) : null;
+        if (key is null || !key.Matches(presented, now))
+        {
+            return null;
+        }
+
+        var environment = Environment(key.EnvironmentId);
+        return environment.Kind == EnvironmentKind.Production ? null : (key, environment);
     }
 
     public void SetMember(UserId member, Role role, UserId by, DateTimeOffset now)

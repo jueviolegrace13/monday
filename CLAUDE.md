@@ -1,15 +1,18 @@
 # Monday
 
-Monday is one deployed service that watches any number of apps: their code graph, their security
-layers, their traffic, and what Claude does while building them. Rendee decides; Claude builds.
+Monday watches any number of apps: their code graph, their security layers, their traffic, and what
+Claude does while building them. For now it runs locally and assists engineers on their local
+codebase only. Rendee decides; Claude builds.
 The full plan is the "Monday — Plan" doc; decisions are logged in Sunday under `01-Projects/monday/`.
 
 ## Rules that are never bent
 
-1. **Production is read-only.** Monday monitors production and never changes it: no code, data,
-   config or infrastructure changes, no test requests. Every write path calls
-   `ProductionGuard.EnsureWritable` and the guard has no override. Changes happen locally or in
-   development, then reach production through Rendee's normal release.
+1. **Production is off limits.** For now Monday is used locally only. It never visits, watches or
+   touches production: no connections, no monitoring, no code, data, config or infrastructure
+   changes, no test requests. The domain refuses production environments, production API keys and
+   data sent with them (`ProductionGuard.EnsureNotProduction`, `production.off_limits`), and every
+   write path still calls `ProductionGuard.EnsureWritable`. Neither check has an override. Changes
+   happen locally or in development, then reach production through Rendee's normal release.
 2. **Approval gates.** Architecture, stack, schema changes, new dependencies, security choices and
    deploys are proposed to Rendee (2–3 options, trade-offs, a recommendation) and wait for his
    decision. Code inside a method is Claude's call.

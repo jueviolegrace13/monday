@@ -44,8 +44,8 @@ public sealed class TrafficService(ITrafficStore store, ITrafficFeed feed, Proje
     private static readonly TimeSpan MaxSkew = TimeSpan.FromMinutes(5);
 
     /// <summary>
-    /// The agent's batch. Inbound only: Monday never calls back into the app, so this is allowed from
-    /// production keys too. Requests timed in the future (clock skew) are pulled back to now.
+    /// The agent's batch. Inbound only: Monday never calls back into the app, and production keys never authenticate.
+    /// Requests timed in the future (clock skew) are pulled back to now.
     /// </summary>
     public async Task<int> IngestAsync(AppReporter reporter, IReadOnlyList<TrafficUpload> uploads, CancellationToken ct)
     {

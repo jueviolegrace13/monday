@@ -26,7 +26,7 @@ public sealed record NodeDetail(
 /// <summary>Receives code graphs from CI and serves them to the viewer, filtered by what the person may see.</summary>
 public sealed class GraphService(IGraphStore graphs, ProjectService projects, IClock clock)
 {
-    /// <summary>CI uploads the graph for the commit it just built. Read-only toward the app: production keys may upload too.</summary>
+    /// <summary>CI uploads the graph for the commit it just built. Read-only toward the app. Production keys never authenticate.</summary>
     public async Task<int> IngestAsync(AppReporter reporter, GraphUpload upload, CancellationToken ct)
     {
         ArgumentNullException.ThrowIfNull(reporter);
