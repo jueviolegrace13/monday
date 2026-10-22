@@ -78,27 +78,39 @@ internal static class ProjectTests
         Assert.Throws<DomainException>(() => project.RemoveMember(Owner, Owner, Now), "member.last_owner");
     }
 
-    public static void OnlyOwnerMarksProduction()
+    public static void ProductionIsOffLimits()
     {
         var project = Project.Create("Monday", Owner, Now);
-        project.SetMember(Ana, Role.Admin, Owner, Now);
-
-        Assert.Throws<DomainException>(() => project.AddEnvironment("production", EnvironmentKind.Production, Ana), "access.owner_only");
-        var prod = project.AddEnvironment("production", EnvironmentKind.Production, Owner);
-        Assert.True(prod.IsReadOnly, "Production is read-only.");
-        Assert.Throws<DomainException>(() => project.ChangeEnvironmentKind(prod.Id, EnvironmentKind.Development, Ana, Now), "access.owner_only");
-    }
-
-    public static void ProductionRefusesEveryWriteAction()
-    {
-        var project = Project.Create("Monday", Owner, Now);
-        var prod = project.AddEnvironment("production", EnvironmentKind.Production, Owner);
         var dev = project.Environments[0];
 
+        Assert.Throws<DomainException>(() => project.AddEnvironment("production", EnvironmentKind.Production, Owner), "production.off_limits");
+        Assert.Throws<DomainException>(() => project.ChangeEnvironmentKind(dev.Id, EnvironmentKind.Production, Owner, Now), "production.off_limits");
+        Assert.Equal(EnvironmentKind.Development, dev.Kind);
+        Assert.True(project.Environments.Count == 1, "No production environment was added.");
+    }
+
+    public static void ProductionStoredBeforeTheRuleTakesNoKeysAndNoData()
+    {
+        var created = Project.Create("Monday", Owner, Now);
+        var dev = created.Environments[0];
+        var plain = created.IssueApiKey(dev.Id, Owner, Now);
+        var project = Project.Restore(
+            created.Id, created.Name, Now, created.UserHashKey,
+            [(dev.Id, "production", EnvironmentKind.Production)], created.ApiKeys, [new Membership(Owner, Role.Owner)]);
+        var prod = project.Environments[0];
+
+        Assert.True(project.Authenticate(plain, Now) is null, "A production key sends nothing.");
+        Assert.Throws<DomainException>(() => project.IssueApiKey(prod.Id, Owner, Now), "production.off_limits");
         foreach (var action in Enum.GetValues<WriteAction>())
         {
             Assert.Throws<ProductionReadOnlyException>(() => ProductionGuard.EnsureWritable(prod, action), "production.read_only");
-            ProductionGuard.EnsureWritable(dev, action);
+        }
+
+        project.ChangeEnvironmentKind(prod.Id, EnvironmentKind.Development, Owner, Now);
+        Assert.True(project.Authenticate(plain, Now) is not null, "Moved out of production, the key works again.");
+        foreach (var action in Enum.GetValues<WriteAction>())
+        {
+            ProductionGuard.EnsureWritable(prod, action);
         }
     }
 

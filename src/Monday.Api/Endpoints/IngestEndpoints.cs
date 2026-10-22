@@ -8,7 +8,7 @@ namespace Monday.Api.Endpoints;
 
 /// <summary>
 /// Where apps, their CI and Claude sessions send data. Every route here only receives:
-/// none of them reaches back into an app, so production keys are safe to use.
+/// none of them reaches back into an app. Production is off limits, so a production key never gets past sign-in.
 /// </summary>
 public static class IngestEndpoints
 {

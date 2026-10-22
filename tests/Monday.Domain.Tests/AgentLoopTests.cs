@@ -175,6 +175,7 @@ internal static class AgentLoopTests
         Assert.True(request.Instructions.Contains("Shop", StringComparison.Ordinal), "Instructions name the project.");
         Assert.True(request.Instructions.Contains("Debugger", StringComparison.Ordinal), "Instructions name the asker's role.");
         Assert.True(request.Instructions.Contains("read-only", StringComparison.Ordinal), "Instructions say Monday is read-only.");
+        Assert.True(request.Instructions.Contains("never sees or touches production", StringComparison.Ordinal), "Instructions keep the agent off production.");
         Assert.True(!request.Instructions.Contains(PlainKey, StringComparison.Ordinal), "The key never reaches the instructions.");
         Assert.Equal("Hi", request.Messages.Single().Text);
 

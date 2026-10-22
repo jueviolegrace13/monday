@@ -9,7 +9,8 @@ Mission control for apps that Claude builds. One Monday instance watches many pr
 - **Decisions** — Claude proposes, the Owner approves.
 - **Agent** — ask about the app in the graph (`/`), with each project's own model; the same tools over MCP.
 
-Production is read-only: Monday watches it, never changes it.
+For now Monday runs locally and assists engineers on their local codebase. Production is off limits:
+Monday never visits, watches or touches it, and it refuses production environments, keys and data.
 
 ## Status
 
@@ -27,8 +28,8 @@ Publishing Monday for other organisations is not decided.
 
 Monday watches itself for now. Adding another project later takes no change to Monday's code:
 
-1. **Register it.** Create the project in Monday and issue an API key per environment. Mark production
-   read-only (Owner only).
+1. **Register it.** Create the project in Monday and issue an API key for a local or development
+   environment. Production environments are refused.
 2. **Map its code.** Run `monday-index --root <repo> --name "<Project>"` (C# today; more languages to come),
    or add the indexer step to the project's CI with `MONDAY_URL` and `MONDAY_KEY` as secrets.
 3. **Show it in the Monday Graph.** Publish the graph file beside the viewer and add a row to the viewer's

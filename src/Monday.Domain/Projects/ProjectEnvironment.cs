@@ -42,18 +42,25 @@ public sealed class ProjectEnvironment
 
     public EnvironmentKind Kind { get; private set; }
 
-    /// <summary>Production can be watched, never touched.</summary>
+    /// <summary>Production is off limits: Monday neither watches nor touches it.</summary>
     public bool IsReadOnly => Kind == EnvironmentKind.Production;
 
     internal void ChangeKind(EnvironmentKind kind) => Kind = kind;
 }
 
 /// <summary>
-/// The production rule from the Monday plan: "PROD is PROD". Every write path in Monday asks
-/// this guard first, and the guard has no override.
+/// The production rule: for now Monday only assists engineers on their local codebase, so production is off limits.
+/// No production environment can be added, keyed or sent from. Every write path still asks <see cref="EnsureWritable"/>
+/// first, for environments stored before the rule. Neither check has an override.
 /// </summary>
 public static class ProductionGuard
 {
+    public static void EnsureNotProduction(EnvironmentKind kind) =>
+        Guard.That(
+            kind != EnvironmentKind.Production,
+            "production.off_limits",
+            "Production is off limits: Monday works only on local and development environments for now.");
+
     public static void EnsureWritable(ProjectEnvironment environment, WriteAction action)
     {
         ArgumentNullException.ThrowIfNull(environment);
