@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using Monday.Agent;
@@ -8,15 +9,22 @@ using Monday.Infrastructure;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddMonday(builder.Configuration);
+builder.Services.AddAgentTools();
 
 // Monday watches itself: its own agent records every request it serves (never bodies, queries,
 // headers or IPs). Locally it reports in-process; deployed, set Monday:Agent:Self=true and its key.
-builder.Services.AddMondayAgent(builder.Configuration, o => o.ExcludeRoutes.Add("/ingest/traffic"));
+builder.Services.AddMondayAgent(builder.Configuration, o =>
+{
+    o.ExcludeRoutes.Add("/ingest/traffic");
+    o.ExcludeRoutes.Add(ViewerEndpoints.FallbackRoute); // the viewer's page fallback, not an API route
+});
 if (builder.Environment.IsDevelopment() || builder.Configuration.GetValue<bool>("Monday:Agent:Self"))
 {
     builder.Services.AddSingleton<ITraceSink, SelfTraceSink>();
 }
 builder.Services.AddMondayUserAuthentication(builder.Environment);
+builder.Services.AddMondayPersonalTokenAuthentication(); // not a default scheme: /mcp opts in
+builder.Services.AddMondayMcp(); // Monday's tools for outside agents, with its per-token rate limit
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<ErrorHandling>();
 builder.Services.ConfigureHttpJsonOptions(o =>
@@ -38,6 +46,17 @@ builder.Services.AddRateLimiter(o =>
             ReplenishmentPeriod = TimeSpan.FromSeconds(1),
             QueueLimit = 0,
         }));
+
+    // One bucket per person for chat: each question can run up to 8 model turns on the project's key.
+    o.AddPolicy(ChatEndpoints.RateLimitPolicy, http => RateLimitPartition.GetTokenBucketLimiter(
+        http.User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "anonymous",
+        _ => new TokenBucketRateLimiterOptions
+        {
+            TokenLimit = 20,
+            TokensPerPeriod = 20,
+            ReplenishmentPeriod = TimeSpan.FromMinutes(1),
+            QueueLimit = 0,
+        }));
 });
 
 // Uploads are graphs and event batches, never files: cap the body size.
@@ -47,6 +66,10 @@ var app = builder.Build();
 
 await app.Services.MigrateMondayAsync();
 await DevBootstrap.RunAsync(app);
+
+// The viewer (built from viewer/app into wwwroot). Before the agent so serving a file is not recorded as traffic.
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
 app.UseMondayAgent();
 app.UseExceptionHandler();
@@ -64,6 +87,11 @@ app.MapGet("/health", () => Results.Ok(new { status = "ok" })).WithTags("Health"
 app.MapIngest();
 app.MapProjects();
 app.MapTraffic();
+app.MapChat();
+app.MapModel();
+app.MapTokens();
+app.MapMondayMcp();
+app.MapViewer(); // last: the fallback only answers what no API route matched
 
 app.Run();
 

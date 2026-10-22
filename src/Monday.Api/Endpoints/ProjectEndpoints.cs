@@ -27,11 +27,12 @@ public sealed record RejectRequest(string Note);
 
 public sealed record DecisionView(
     Guid Id, DecisionArea Area, string Title, string Context, IReadOnlyList<DecisionOption> Options, string RecommendedKey,
-    Guid? Supersedes, DecisionStatus Status, string? ChosenKey, string? ResolvedBy, DateTimeOffset ProposedAt, DateTimeOffset? ResolvedAt, string? Note)
+    Guid? Supersedes, DecisionStatus Status, string? ChosenKey, string? ResolvedBy, DateTimeOffset ProposedAt, DateTimeOffset? ResolvedAt, string? Note,
+    string? DraftedBy)
 {
     public static DecisionView Of(Decision d) => new(
         d.Id.Value, d.Area, d.Title, d.Context, d.Options, d.RecommendedKey, d.Supersedes?.Value, d.Status, d.ChosenKey,
-        d.ResolvedBy?.Value, d.ProposedAt, d.ResolvedAt, d.Note);
+        d.ResolvedBy?.Value, d.ProposedAt, d.ResolvedAt, d.Note, d.DraftedBy?.Value);
 }
 
 /// <summary>What signed-in people do. Every call is checked against their role on that project.</summary>

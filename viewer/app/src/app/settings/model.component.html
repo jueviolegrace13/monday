@@ -1,0 +1,252 @@
+<div class="page">
+  <header class="intro">
+    <a class="back" routerLink="/">Back to the graph</a>
+    <h1>Model</h1>
+    <p class="muted">
+      The model that answers this project's chat, with your own key.
+      @if (summary(); as p) {
+        Project <span class="mono">{{ p.name }}</span
+        >.
+      }
+    </p>
+  </header>
+
+  @switch (load()) {
+    @case ('loading') {
+      <p class="muted">Loading model settings</p>
+    }
+    @case ('no-project') {
+      <section class="card">
+        <p>This project is not one of yours. Pick a project in the bar above, then open Model.</p>
+      </section>
+    }
+    @case ('not-allowed') {
+      <section class="card">
+        <p>Only Owners and Admins can change the model.</p>
+        @if (summary(); as p) {
+          <p class="muted">
+            Your role on {{ p.name }} is <span class="mono">{{ p.role }}</span
+            >.
+          </p>
+        }
+      </section>
+    }
+    @case ('failed') {
+      <section class="card">
+        <p class="error" role="alert">{{ loadError() }}</p>
+        <div>
+          <button type="button" class="ghost" (click)="open(project())">Try again</button>
+        </div>
+      </section>
+    }
+    @default {
+      @if (saved()?.enabled === false) {
+        <section class="card">
+          <h2>Model settings are off</h2>
+          <p>
+            This server has no <span class="mono">MONDAY_SECRETS_KEY</span>, so it cannot store a
+            model key. Chat and model settings stay off until it is set.
+          </p>
+        </section>
+      } @else {
+        <form class="card" (submit)="save($event)">
+          <h2 id="model-title" tabindex="-1">Settings</h2>
+
+          <label class="label" for="model-provider">Provider</label>
+          <select id="model-provider" [value]="provider()" (change)="chooseProvider($event)">
+            @for (p of providers; track p.value) {
+              <option [value]="p.value" [selected]="p.value === provider()">{{ p.label }}</option>
+            }
+          </select>
+
+          <label class="label" for="model-name">Model</label>
+          <input
+            id="model-name"
+            class="mono"
+            autocomplete="off"
+            maxlength="200"
+            placeholder="claude-sonnet-4-5"
+            [value]="modelName()"
+            (input)="typed('modelName', $event)"
+          />
+
+          @if (openAi()) {
+            <label class="label" for="model-base-url">Base URL</label>
+            <input
+              id="model-base-url"
+              class="mono"
+              type="url"
+              autocomplete="off"
+              placeholder="https://api.openai.com/v1"
+              aria-describedby="model-base-url-note"
+              [value]="baseUrl()"
+              (input)="typed('baseUrl', $event)"
+            />
+            @if (baseUrlError(); as e) {
+              <p id="model-base-url-note" class="error">{{ e }}</p>
+            } @else {
+              <p id="model-base-url-note" class="note">
+                HTTPS only. Empty uses OpenAI's own address.
+              </p>
+            }
+          }
+
+          <label class="label" for="model-key">API key</label>
+          <input
+            id="model-key"
+            class="mono"
+            type="password"
+            autocomplete="new-password"
+            spellcheck="false"
+            aria-describedby="model-key-note"
+            [placeholder]="keyPlaceholder()"
+            [required]="keyRequired()"
+            [value]="key()"
+            (input)="typed('key', $event)"
+          />
+          @if (keyError(); as e) {
+            <p id="model-key-note" class="error">{{ e }}</p>
+          } @else if (keyMoves()) {
+            <p id="model-key-note" class="warn">
+              Enter the key again: a saved key only goes to the provider and base URL it was saved
+              for.
+            </p>
+          } @else if (saved()?.configured) {
+            <p id="model-key-note" class="note">
+              Leave empty to keep the saved key. Monday never shows a key, only its last 4.
+            </p>
+          } @else {
+            <p id="model-key-note" class="note">
+              Stored encrypted. Monday never shows it again, only its last 4.
+            </p>
+          }
+
+          <label class="label" for="model-cap">Monthly token cap</label>
+          <div class="row">
+            <input
+              id="model-cap"
+              class="cap mono"
+              type="number"
+              min="1"
+              step="1"
+              placeholder="none"
+              aria-describedby="model-cap-note"
+              [value]="cap()"
+              (input)="typed('cap', $event)"
+            />
+            @if (capError(); as e) {
+              <span id="model-cap-note" class="error">{{ e }}</span>
+            } @else {
+              <span id="model-cap-note" class="note">
+                Input plus output tokens. At the cap, chat pauses. Empty means no cap.
+              </span>
+            }
+          </div>
+
+          @if (saveError(); as e) {
+            <p id="model-save-error" class="error" role="alert" tabindex="-1">{{ e }}</p>
+          }
+          <div class="row">
+            <button id="model-save" type="submit" class="primary" [disabled]="!canSave()">
+              Save
+            </button>
+            <span class="note mono" aria-live="polite">{{ savedNote() }}</span>
+          </div>
+          @if (saved()?.updatedAt; as at) {
+            <p class="note">
+              Last changed <span class="mono">{{ at | date: 'yyyy-MM-dd HH:mm' }}</span>
+            </p>
+          }
+        </form>
+
+        @if (saved()?.configured) {
+          <section class="card" aria-labelledby="test-title">
+            <h2 id="test-title">Connection</h2>
+            <p class="muted">
+              Sends one tiny request to the saved model with a test tool. It passes only if the
+              model calls the tool, which Monday's chat needs.
+            </p>
+            <div class="row">
+              <button type="button" class="ghost" [disabled]="testing()" (click)="test()">
+                Test connection
+              </button>
+              @if (testing()) {
+                <span class="note mono">testing</span>
+              }
+            </div>
+            @if (testResult(); as r) {
+              @if (r.ok) {
+                <p class="test ok" role="status">
+                  <span class="mono">ok</span> Connection works: the model called the test tool.
+                </p>
+              } @else {
+                <p class="test error" role="alert">
+                  <span class="mono">failed</span> {{ r.message ?? 'The test failed.' }}
+                </p>
+              }
+            }
+
+            <div class="row clear">
+              @if (confirmingClear()) {
+                <span>Clear the model and its key? Chat stops until a model is set again.</span>
+                <button
+                  type="button"
+                  class="danger"
+                  data-confirm
+                  [disabled]="clearing()"
+                  (click)="clear()"
+                >
+                  Yes, clear
+                </button>
+                <button type="button" class="ghost" (click)="cancelClear()">Cancel</button>
+              } @else {
+                <button type="button" class="ghost" data-clear (click)="askClear()">
+                  Clear settings
+                </button>
+              }
+            </div>
+            @if (clearError(); as e) {
+              <p class="error" role="alert">{{ e }}</p>
+            }
+          </section>
+        }
+      }
+
+      @if (usage(); as u) {
+        <section class="card usage" aria-labelledby="usage-title">
+          <h2 id="usage-title">
+            Usage <span class="mono muted">{{ u.month }}</span>
+          </h2>
+          <dl class="counts">
+            <div>
+              <dt class="label">Input</dt>
+              <dd class="mono">{{ u.inputTokens | number }}</dd>
+            </div>
+            <div>
+              <dt class="label">Output</dt>
+              <dd class="mono">{{ u.outputTokens | number }}</dd>
+            </div>
+          </dl>
+          @if (u.monthlyTokenCap != null) {
+            <div class="meter" [class.full]="u.capReached" aria-hidden="true">
+              <div class="fill" [style.width.%]="percent()"></div>
+            </div>
+            <p class="mono">
+              {{ total() | number }} of {{ u.monthlyTokenCap | number }} tokens
+              <span class="muted">({{ percent() }}%)</span>
+            </p>
+            @if (u.capReached) {
+              <p class="warn">
+                Cap reached: chat is paused until next month or until the cap is raised.
+              </p>
+            }
+          } @else {
+            <p>
+              <span class="mono">{{ total() | number }}</span> tokens. No monthly cap.
+            </p>
+          }
+        </section>
+      }
+    }
+  }
+</div>

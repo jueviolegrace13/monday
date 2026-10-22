@@ -40,6 +40,21 @@ public sealed class InMemoryTrafficStore : ITrafficStore
                 .OrderBy(t => t.At).Take(limit).ToList());
         }
     }
+
+    public Task<IReadOnlyList<RequestTrace>> NewestAsync(ProjectId project, DateTimeOffset since, DateTimeOffset until, int limit, CancellationToken ct)
+    {
+        if (!_byProject.TryGetValue(project, out var list))
+        {
+            return Task.FromResult<IReadOnlyList<RequestTrace>>([]);
+        }
+
+        lock (list)
+        {
+            return Task.FromResult<IReadOnlyList<RequestTrace>>(list
+                .Where(t => t.At >= since && t.At <= until)
+                .OrderByDescending(t => t.At).Take(limit).ToList());
+        }
+    }
 }
 
 /// <summary>Broadcasts new requests to every live viewer of a project. A slow viewer drops its oldest, never blocks ingest.</summary>

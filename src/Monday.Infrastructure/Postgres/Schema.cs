@@ -90,6 +90,64 @@ public static class Schema
         CREATE INDEX traffic_by_time ON traffic (project_id, at);
         CREATE INDEX traffic_by_user ON traffic (project_id, user_hash, at) WHERE user_hash IS NOT NULL;
         """,
+        """
+        ALTER TABLE decisions ADD COLUMN drafted_by_user text NULL;
+        """,
+        """
+        CREATE TABLE model_settings (
+            project_id uuid PRIMARY KEY REFERENCES projects(id),
+            provider text NOT NULL,
+            model text NOT NULL,
+            base_url text NULL,
+            key_cipher text NOT NULL,
+            key_last4 text NOT NULL,
+            monthly_cap bigint NULL,
+            updated_by text NOT NULL,
+            updated_at timestamptz NOT NULL
+        );
+        CREATE TABLE model_usage (
+            project_id uuid NOT NULL REFERENCES projects(id),
+            month char(7) NOT NULL,
+            input_tokens bigint NOT NULL DEFAULT 0,
+            output_tokens bigint NOT NULL DEFAULT 0,
+            PRIMARY KEY (project_id, month)
+        );
+        """,
+        """
+        CREATE TABLE conversations (
+            id uuid PRIMARY KEY,
+            project_id uuid NOT NULL REFERENCES projects(id),
+            owner_user text NOT NULL,
+            title text NOT NULL,
+            created_at timestamptz NOT NULL,
+            updated_at timestamptz NOT NULL
+        );
+        CREATE INDEX conversations_by_owner ON conversations (project_id, owner_user, updated_at DESC);
+        CREATE TABLE conversation_messages (
+            conversation_id uuid NOT NULL REFERENCES conversations(id),
+            seq int NOT NULL,
+            role text NOT NULL,
+            at timestamptz NOT NULL,
+            body jsonb NOT NULL,
+            PRIMARY KEY (conversation_id, seq)
+        );
+        """,
+        """
+        CREATE TABLE personal_tokens (
+            id uuid PRIMARY KEY,
+            user_id text NOT NULL,
+            name text NOT NULL,
+            prefix text NOT NULL UNIQUE,
+            hash text NOT NULL,
+            scope text NOT NULL,
+            project_ids uuid[],
+            created_at timestamptz NOT NULL,
+            expires_at timestamptz NOT NULL,
+            revoked_at timestamptz,
+            last_used_at timestamptz
+        );
+        CREATE INDEX personal_tokens_by_user ON personal_tokens (user_id, created_at DESC);
+        """,
     ];
 
     public static async Task MigrateAsync(NpgsqlDataSource db, CancellationToken ct)

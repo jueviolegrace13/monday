@@ -1,0 +1,224 @@
+<div class="page">
+  <header class="intro">
+    <a class="back" routerLink="/">Back to the graph</a>
+    <h1>Personal tokens</h1>
+    <p class="muted">
+      A token lets an outside agent, such as Claude Code, use Monday's MCP tools as you. It can
+      read, or read and propose decisions. It can never approve a decision or change production.
+    </p>
+  </header>
+
+  @if (issued(); as i) {
+    <section class="card issued" aria-labelledby="issued-title">
+      <h2 id="issued-title" tabindex="-1">Copy your new token now</h2>
+      <p class="muted">This is the only time it is shown. Monday keeps only a hash of it.</p>
+      <div class="secret">
+        <code class="mono">{{ i.plain }}</code>
+        <button type="button" class="ghost" (click)="copy('token', i.plain)">Copy token</button>
+      </div>
+      <p class="label">Connect Claude Code</p>
+      <div class="secret">
+        <code class="mono">{{ i.command }}</code>
+        <button type="button" class="ghost" (click)="copy('command', i.command)">
+          Copy command
+        </button>
+      </div>
+      <p class="note mono" aria-live="polite">
+        @if (copied(); as what) {
+          {{ what }} copied
+        }
+      </p>
+      @if (copyError(); as e) {
+        <p class="error" role="alert">{{ e }}</p>
+      }
+      <button type="button" class="primary" (click)="dismiss()">Done</button>
+    </section>
+  }
+
+  <form class="card create" (submit)="create($event)">
+    <h2>New token</h2>
+
+    <label class="label" for="token-name">Name</label>
+    <input
+      id="token-name"
+      autocomplete="off"
+      maxlength="60"
+      placeholder="laptop · claude code"
+      [value]="name()"
+      (input)="typed('name', $event)"
+    />
+
+    <fieldset>
+      <legend class="label">Scope</legend>
+      <label class="choice">
+        <input
+          type="radio"
+          name="scope"
+          value="read"
+          [checked]="scope() === 'read'"
+          (change)="setScope('read')"
+        />
+        Read
+      </label>
+      <label class="choice">
+        <input
+          type="radio"
+          name="scope"
+          value="read_propose"
+          [checked]="scope() === 'read_propose'"
+          (change)="setScope('read_propose')"
+        />
+        Read and propose decisions
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend class="label">Projects</legend>
+      <label class="choice">
+        <input
+          type="radio"
+          name="reach"
+          value="all"
+          [checked]="reach() === 'all'"
+          (change)="setReach('all')"
+        />
+        All my projects
+      </label>
+      <label class="choice">
+        <input
+          type="radio"
+          name="reach"
+          value="some"
+          [checked]="reach() === 'some'"
+          [disabled]="!projects().length"
+          (change)="setReach('some')"
+        />
+        Only these
+      </label>
+      @if (reach() === 'some') {
+        <div class="picks">
+          @for (p of projects(); track p.id) {
+            <label class="choice">
+              <input
+                type="checkbox"
+                name="project"
+                [value]="p.id"
+                [checked]="picked().has(p.id)"
+                (change)="togglePick(p.id, $event)"
+              />
+              {{ p.name }}
+            </label>
+          }
+        </div>
+      }
+    </fieldset>
+
+    <label class="label" for="token-days">Expires in (days)</label>
+    <div class="row">
+      <input
+        id="token-days"
+        class="days mono"
+        type="number"
+        min="1"
+        [max]="maxDays"
+        [value]="days()"
+        (input)="typed('days', $event)"
+      />
+      @if (expiresOn(); as on) {
+        <span class="note mono">until {{ on | date: 'yyyy-MM-dd' }}</span>
+      } @else {
+        <span class="error">A token lasts 1 to {{ maxDays }} days.</span>
+      }
+    </div>
+
+    @if (createError(); as e) {
+      <p class="error" role="alert">{{ e }}</p>
+    }
+    <div>
+      <button type="submit" class="primary" [disabled]="!canCreate()">Create token</button>
+    </div>
+  </form>
+
+  <section class="list" aria-labelledby="list-title">
+    <h2 id="list-title" tabindex="-1">Your tokens</h2>
+    @if (revokeError(); as e) {
+      <p class="error" role="alert">{{ e }}</p>
+    }
+    @switch (load()) {
+      @case ('loading') {
+        <p class="muted">Loading tokens</p>
+      }
+      @case ('failed') {
+        <p class="error" role="alert">{{ loadError() }}</p>
+        <button type="button" class="ghost" (click)="refresh()">Try again</button>
+      }
+      @default {
+        @if (tokens().length) {
+          <div class="scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Name</th>
+                  <th scope="col">Scope</th>
+                  <th scope="col">Projects</th>
+                  <th scope="col">Expires</th>
+                  <th scope="col">Last used</th>
+                  <th scope="col">State</th>
+                  <th scope="col"><span class="sr-only">Actions</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (t of tokens(); track t.id) {
+                  <tr [class.gone]="!t.active">
+                    <td>
+                      {{ t.name }} <span class="mono muted">{{ t.prefix }}</span>
+                    </td>
+                    <td class="mono">{{ scopeLabel(t.scope) }}</td>
+                    <td>{{ projectsLabel(t.projects) }}</td>
+                    <td class="mono" [title]="t.expiresAt">
+                      {{ t.expiresAt | date: 'yyyy-MM-dd' }}
+                    </td>
+                    <td class="mono" [title]="t.lastUsedAt ?? ''">
+                      {{ t.lastUsedAt ? (t.lastUsedAt | date: 'yyyy-MM-dd') : 'never' }}
+                    </td>
+                    <td [attr.data-state]="state(t)">{{ state(t) }}</td>
+                    <td class="actions">
+                      @if (t.active) {
+                        @if (confirming() === t.id) {
+                          <span>Revoke {{ t.name }}? Agents using it stop at once.</span>
+                          <button
+                            type="button"
+                            class="danger"
+                            data-confirm
+                            [disabled]="revoking()"
+                            (click)="revoke(t)"
+                          >
+                            Yes, revoke
+                          </button>
+                          <button type="button" class="ghost" (click)="cancelRevoke(t.id)">
+                            Cancel
+                          </button>
+                        } @else {
+                          <button
+                            type="button"
+                            class="ghost"
+                            [attr.data-revoke]="t.id"
+                            (click)="askRevoke(t.id)"
+                          >
+                            Revoke
+                          </button>
+                        }
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        } @else {
+          <p class="muted">No tokens yet. Create one above to connect an agent.</p>
+        }
+      }
+    }
+  </section>
+</div>

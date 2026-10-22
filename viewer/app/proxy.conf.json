@@ -1,0 +1,5 @@
+{
+  "/projects": { "target": "http://localhost:5257", "secure": false },
+  "/me/": { "target": "http://localhost:5257", "secure": false },
+  "/mcp": { "target": "http://localhost:5257", "secure": false }
+}

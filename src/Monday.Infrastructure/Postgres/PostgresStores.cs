@@ -4,6 +4,7 @@ using Monday.Application.Abstractions;
 using Monday.Application.Traffic;
 using Monday.Domain.Access;
 using Monday.Domain.Activity;
+using Monday.Domain.Agent;
 using Monday.Domain.Audit;
 using Monday.Domain.CodeGraph;
 using Monday.Domain.Common;
@@ -116,7 +117,38 @@ public sealed class PostgresProjectRepository(NpgsqlDataSource db) : IProjectRep
             await add.ExecuteNonQueryAsync(ct).ConfigureAwait(false);
         }
 
+        await SaveModelAsync(project, conn, tx, ct).ConfigureAwait(false);
         await tx.CommitAsync(ct).ConfigureAwait(false);
+    }
+
+    /// <summary>The model settings row: upserted when set, deleted when cleared. Holds the sealed key only.</summary>
+    private static async Task SaveModelAsync(Project project, NpgsqlConnection conn, NpgsqlTransaction tx, CancellationToken ct)
+    {
+        if (project.Model is not { } m)
+        {
+            await using var delete = new NpgsqlCommand("DELETE FROM model_settings WHERE project_id = @p", conn, tx);
+            delete.Parameters.AddWithValue("p", project.Id.Value);
+            await delete.ExecuteNonQueryAsync(ct).ConfigureAwait(false);
+            return;
+        }
+
+        await using var upsert = new NpgsqlCommand("""
+            INSERT INTO model_settings (project_id, provider, model, base_url, key_cipher, key_last4, monthly_cap, updated_by, updated_at)
+            VALUES (@p, @provider, @model, @url, @cipher, @last4, @cap, @by, @at)
+            ON CONFLICT (project_id) DO UPDATE SET provider = excluded.provider, model = excluded.model, base_url = excluded.base_url,
+                key_cipher = excluded.key_cipher, key_last4 = excluded.key_last4, monthly_cap = excluded.monthly_cap,
+                updated_by = excluded.updated_by, updated_at = excluded.updated_at
+            """, conn, tx);
+        upsert.Parameters.AddWithValue("p", project.Id.Value);
+        upsert.Parameters.AddWithValue("provider", m.Provider.ToString());
+        upsert.Parameters.AddWithValue("model", m.Model);
+        upsert.Parameters.AddWithValue("url", (object?)m.BaseUrl?.ToString() ?? DBNull.Value);
+        upsert.Parameters.AddWithValue("cipher", m.KeyCipher);
+        upsert.Parameters.AddWithValue("last4", m.KeyLast4);
+        upsert.Parameters.AddWithValue("cap", (object?)m.MonthlyTokenCap ?? DBNull.Value);
+        upsert.Parameters.AddWithValue("by", project.ModelUpdatedBy!.Value.Value);
+        upsert.Parameters.AddWithValue("at", project.ModelUpdatedAt!.Value);
+        await upsert.ExecuteNonQueryAsync(ct).ConfigureAwait(false);
     }
 
     private async Task<Project?> LoadAsync(string sql, Action<NpgsqlCommand> bind, CancellationToken ct)
@@ -146,10 +178,25 @@ public sealed class PostgresProjectRepository(NpgsqlDataSource db) : IProjectRep
             }
         }
 
-        return Project.Restore(new ProjectId(id), name, created, hashKey,
+        var project = Project.Restore(new ProjectId(id), name, created, hashKey,
             Json.Read<List<EnvRow>>(envs).Select(e => (new EnvironmentId(e.Id), e.Name, e.Kind)),
             keys,
             Json.Read<List<MemberRow>>(members).Select(m => new Membership(new UserId(m.UserId), m.Role)));
+
+        await using (var cmd = db.CreateCommand("SELECT provider, model, base_url, key_cipher, key_last4, monthly_cap, updated_by, updated_at FROM model_settings WHERE project_id = @p"))
+        {
+            cmd.Parameters.AddWithValue("p", id);
+            await using var reader = await cmd.ExecuteReaderAsync(ct).ConfigureAwait(false);
+            if (await reader.ReadAsync(ct).ConfigureAwait(false))
+            {
+                var model = ModelSettings.Create(
+                    Enum.Parse<ModelProvider>(reader.GetString(0)), reader.GetString(1), reader.IsDBNull(2) ? null : new Uri(reader.GetString(2)),
+                    reader.GetString(3), reader.GetString(4), reader.IsDBNull(5) ? null : reader.GetInt64(5));
+                project.RestoreModel(model, new UserId(reader.GetString(6)), reader.GetFieldValue<DateTimeOffset>(7));
+            }
+        }
+
+        return project;
     }
 }
 
@@ -256,7 +303,7 @@ public sealed class PostgresActivityStore(NpgsqlDataSource db) : IActivityStore
 public sealed class PostgresDecisionRepository(NpgsqlDataSource db) : IDecisionRepository
 {
     private sealed record Row(Guid Id, Guid ProjectId, DecisionArea Area, string Title, string Context, IReadOnlyList<DecisionOption> Options, string RecommendedKey,
-        Guid? Supersedes, DateTimeOffset ProposedAt, DecisionStatus Status, string? ChosenKey, string? ResolvedBy, DateTimeOffset? ResolvedAt, string? Note);
+        Guid? Supersedes, DateTimeOffset ProposedAt, DecisionStatus Status, string? ChosenKey, string? ResolvedBy, DateTimeOffset? ResolvedAt, string? Note, string? DraftedBy = null);
 
     public async Task<Decision?> GetAsync(DecisionId id, CancellationToken ct)
     {
@@ -283,18 +330,20 @@ public sealed class PostgresDecisionRepository(NpgsqlDataSource db) : IDecisionR
     {
         ArgumentNullException.ThrowIfNull(decision);
         var row = new Row(decision.Id.Value, decision.ProjectId.Value, decision.Area, decision.Title, decision.Context, decision.Options, decision.RecommendedKey,
-            decision.Supersedes?.Value, decision.ProposedAt, decision.Status, decision.ChosenKey, decision.ResolvedBy?.Value, decision.ResolvedAt, decision.Note);
-        await using var cmd = db.CreateCommand("INSERT INTO decisions (id, project_id, proposed_at, body) VALUES (@id, @p, @at, @b::jsonb) ON CONFLICT (id) DO UPDATE SET body = excluded.body");
+            decision.Supersedes?.Value, decision.ProposedAt, decision.Status, decision.ChosenKey, decision.ResolvedBy?.Value, decision.ResolvedAt, decision.Note, decision.DraftedBy?.Value);
+        await using var cmd = db.CreateCommand("INSERT INTO decisions (id, project_id, proposed_at, body, drafted_by_user) VALUES (@id, @p, @at, @b::jsonb, @d) ON CONFLICT (id) DO UPDATE SET body = excluded.body");
         cmd.Parameters.AddWithValue("id", row.Id);
         cmd.Parameters.AddWithValue("p", row.ProjectId);
         cmd.Parameters.AddWithValue("at", row.ProposedAt);
         cmd.Parameters.AddWithValue("b", Json.Write(row));
+        cmd.Parameters.AddWithValue("d", (object?)row.DraftedBy ?? DBNull.Value);
         await cmd.ExecuteNonQueryAsync(ct).ConfigureAwait(false);
         decision.ClearDomainEvents();
     }
 
     private static Decision FromRow(Row r) => Decision.Restore(new DecisionId(r.Id), new ProjectId(r.ProjectId), r.Area, r.Title, r.Context, r.Options, r.RecommendedKey,
-        r.Supersedes is { } s ? new DecisionId(s) : null, r.ProposedAt, r.Status, r.ChosenKey, r.ResolvedBy is { } u ? new UserId(u) : null, r.ResolvedAt, r.Note);
+        r.Supersedes is { } s ? new DecisionId(s) : null, r.ProposedAt, r.Status, r.ChosenKey, r.ResolvedBy is { } u ? new UserId(u) : null, r.ResolvedAt, r.Note,
+        r.DraftedBy is { } d ? new UserId(d) : null);
 }
 
 public sealed class PostgresAuditLog(NpgsqlDataSource db) : IAuditLog
@@ -361,16 +410,31 @@ public sealed class PostgresTrafficStore(NpgsqlDataSource db) : ITrafficStore
 
     public async Task<IReadOnlyList<RequestTrace>> RangeAsync(ProjectId project, DateTimeOffset since, DateTimeOffset until, string? userHash, int limit, CancellationToken ct)
     {
-        var list = new List<RequestTrace>();
         await using var cmd = db.CreateCommand("""
             SELECT environment_id, trace_id, at, method, route, status, duration_ms, guards, user_hash, error_type
             FROM traffic WHERE project_id = @p AND at BETWEEN @a AND @b AND (@u::char(32) IS NULL OR user_hash = @u)
             ORDER BY at LIMIT @n
             """);
+        cmd.Parameters.Add(new NpgsqlParameter("u", NpgsqlDbType.Char) { Value = (object?)userHash ?? DBNull.Value });
+        return await ReadAsync(cmd, project, since, until, limit, ct).ConfigureAwait(false);
+    }
+
+    public async Task<IReadOnlyList<RequestTrace>> NewestAsync(ProjectId project, DateTimeOffset since, DateTimeOffset until, int limit, CancellationToken ct)
+    {
+        await using var cmd = db.CreateCommand("""
+            SELECT environment_id, trace_id, at, method, route, status, duration_ms, guards, user_hash, error_type
+            FROM traffic WHERE project_id = @p AND at BETWEEN @a AND @b
+            ORDER BY at DESC LIMIT @n
+            """);
+        return await ReadAsync(cmd, project, since, until, limit, ct).ConfigureAwait(false);
+    }
+
+    private static async Task<IReadOnlyList<RequestTrace>> ReadAsync(NpgsqlCommand cmd, ProjectId project, DateTimeOffset since, DateTimeOffset until, int limit, CancellationToken ct)
+    {
+        var list = new List<RequestTrace>();
         cmd.Parameters.AddWithValue("p", project.Value);
         cmd.Parameters.AddWithValue("a", since);
         cmd.Parameters.AddWithValue("b", until);
-        cmd.Parameters.Add(new NpgsqlParameter("u", NpgsqlDbType.Char) { Value = (object?)userHash ?? DBNull.Value });
         cmd.Parameters.AddWithValue("n", Math.Max(1, limit));
         await using var reader = await cmd.ExecuteReaderAsync(ct).ConfigureAwait(false);
         while (await reader.ReadAsync(ct).ConfigureAwait(false))
@@ -378,6 +442,237 @@ public sealed class PostgresTrafficStore(NpgsqlDataSource db) : ITrafficStore
             list.Add(RequestTrace.Record(project, new EnvironmentId(reader.GetGuid(0)), reader.GetString(1).Trim(), reader.GetFieldValue<DateTimeOffset>(2),
                 reader.GetString(3), reader.GetString(4), reader.GetInt16(5), reader.GetDouble(6), reader.GetFieldValue<string[]>(7),
                 reader.IsDBNull(8) ? null : reader.GetString(8).Trim(), reader.IsDBNull(9) ? null : reader.GetString(9)));
+        }
+
+        return list;
+    }
+}
+
+/// <summary>Monthly token totals per project; each call adds to its month's row.</summary>
+public sealed class PostgresModelUsageStore(NpgsqlDataSource db) : IModelUsageStore
+{
+    public async Task AddAsync(ProjectId project, string month, Usage usage, CancellationToken ct)
+    {
+        ArgumentNullException.ThrowIfNull(usage);
+        await using var cmd = db.CreateCommand("""
+            INSERT INTO model_usage (project_id, month, input_tokens, output_tokens) VALUES (@p, @m, @i, @o)
+            ON CONFLICT (project_id, month) DO UPDATE SET input_tokens = model_usage.input_tokens + excluded.input_tokens,
+                output_tokens = model_usage.output_tokens + excluded.output_tokens
+            """);
+        cmd.Parameters.AddWithValue("p", project.Value);
+        cmd.Parameters.AddWithValue("m", month);
+        cmd.Parameters.AddWithValue("i", (long)usage.InputTokens);
+        cmd.Parameters.AddWithValue("o", (long)usage.OutputTokens);
+        await cmd.ExecuteNonQueryAsync(ct).ConfigureAwait(false);
+    }
+
+    public async Task<Usage> MonthAsync(ProjectId project, string month, CancellationToken ct)
+    {
+        await using var cmd = db.CreateCommand("SELECT input_tokens, output_tokens FROM model_usage WHERE project_id = @p AND month = @m");
+        cmd.Parameters.AddWithValue("p", project.Value);
+        cmd.Parameters.AddWithValue("m", month);
+        await using var reader = await cmd.ExecuteReaderAsync(ct).ConfigureAwait(false);
+        return await reader.ReadAsync(ct).ConfigureAwait(false)
+            ? new Usage((int)Math.Min(int.MaxValue, reader.GetInt64(0)), (int)Math.Min(int.MaxValue, reader.GetInt64(1)))
+            : new Usage(0, 0);
+    }
+}
+
+/// <summary>Conversations and their messages. Messages are append-only: a save inserts only the ones past those stored, and a stale save fails.</summary>
+public sealed class PostgresConversationStore(NpgsqlDataSource db) : IConversationStore
+{
+    private sealed record MessageBody(string? Text, IReadOnlyList<ConversationToolCall>? ToolCalls, ConversationToolResult? ToolResult);
+
+    public async Task<Conversation?> GetAsync(ConversationId id, CancellationToken ct)
+    {
+        await using var conn = await db.OpenConnectionAsync(ct).ConfigureAwait(false);
+        Guid project;
+        string owner, title;
+        DateTimeOffset created;
+        await using (var head = new NpgsqlCommand("SELECT project_id, owner_user, title, created_at FROM conversations WHERE id = @id", conn))
+        {
+            head.Parameters.AddWithValue("id", id.Value);
+            await using var reader = await head.ExecuteReaderAsync(ct).ConfigureAwait(false);
+            if (!await reader.ReadAsync(ct).ConfigureAwait(false))
+            {
+                return null;
+            }
+
+            (project, owner, title, created) = (reader.GetGuid(0), reader.GetString(1), reader.GetString(2), reader.GetFieldValue<DateTimeOffset>(3));
+        }
+
+        var messages = new List<ConversationMessage>();
+        await using (var rows = new NpgsqlCommand("SELECT role, at, body FROM conversation_messages WHERE conversation_id = @id ORDER BY seq", conn))
+        {
+            rows.Parameters.AddWithValue("id", id.Value);
+            await using var reader = await rows.ExecuteReaderAsync(ct).ConfigureAwait(false);
+            while (await reader.ReadAsync(ct).ConfigureAwait(false))
+            {
+                var body = Json.Read<MessageBody>(reader.GetString(2));
+                messages.Add(ConversationMessage.Restore(Enum.Parse<ConversationRole>(reader.GetString(0)), body.Text, body.ToolCalls, body.ToolResult,
+                    reader.GetFieldValue<DateTimeOffset>(1)));
+            }
+        }
+
+        return Conversation.Restore(id, new ProjectId(project), new UserId(owner), title, created, messages);
+    }
+
+    public async Task<IReadOnlyList<ConversationSummary>> ListAsync(ProjectId project, UserId owner, CancellationToken ct)
+    {
+        var list = new List<ConversationSummary>();
+        await using var cmd = db.CreateCommand("""
+            SELECT id, title, created_at, updated_at FROM conversations WHERE project_id = @p AND owner_user = @o ORDER BY updated_at DESC
+            """);
+        cmd.Parameters.AddWithValue("p", project.Value);
+        cmd.Parameters.AddWithValue("o", owner.Value);
+        await using var reader = await cmd.ExecuteReaderAsync(ct).ConfigureAwait(false);
+        while (await reader.ReadAsync(ct).ConfigureAwait(false))
+        {
+            list.Add(new ConversationSummary(reader.GetGuid(0), reader.GetString(1), reader.GetFieldValue<DateTimeOffset>(2), reader.GetFieldValue<DateTimeOffset>(3)));
+        }
+
+        return list;
+    }
+
+    public async Task SaveAsync(Conversation conversation, CancellationToken ct)
+    {
+        ArgumentNullException.ThrowIfNull(conversation);
+        await using var conn = await db.OpenConnectionAsync(ct).ConfigureAwait(false);
+        await using var tx = await conn.BeginTransactionAsync(ct).ConfigureAwait(false);
+
+        await using (var upsert = new NpgsqlCommand("""
+            INSERT INTO conversations (id, project_id, owner_user, title, created_at, updated_at) VALUES (@id, @p, @o, @t, @c, @u)
+            ON CONFLICT (id) DO UPDATE SET updated_at = excluded.updated_at
+            """, conn, tx))
+        {
+            upsert.Parameters.AddWithValue("id", conversation.Id.Value);
+            upsert.Parameters.AddWithValue("p", conversation.ProjectId.Value);
+            upsert.Parameters.AddWithValue("o", conversation.Owner.Value);
+            upsert.Parameters.AddWithValue("t", conversation.Title);
+            upsert.Parameters.AddWithValue("c", conversation.CreatedAt);
+            upsert.Parameters.AddWithValue("u", conversation.UpdatedAt);
+            await upsert.ExecuteNonQueryAsync(ct).ConfigureAwait(false);
+        }
+
+        int stored;
+        await using (var count = new NpgsqlCommand("SELECT count(*) FROM conversation_messages WHERE conversation_id = @id", conn, tx))
+        {
+            count.Parameters.AddWithValue("id", conversation.Id.Value);
+            stored = Convert.ToInt32(await count.ExecuteScalarAsync(ct).ConfigureAwait(false), System.Globalization.CultureInfo.InvariantCulture);
+        }
+
+        // A copy loaded before another save is stale; so is one whose insert races another (the seq key is unique).
+        if (stored != conversation.StoredCount)
+        {
+            throw new ConversationConflictException();
+        }
+
+        for (var seq = stored; seq < conversation.Messages.Count; seq++)
+        {
+            var m = conversation.Messages[seq];
+            await using var insert = new NpgsqlCommand("""
+                INSERT INTO conversation_messages (conversation_id, seq, role, at, body) VALUES (@id, @s, @r, @at, @b::jsonb)
+                """, conn, tx);
+            insert.Parameters.AddWithValue("id", conversation.Id.Value);
+            insert.Parameters.AddWithValue("s", seq);
+            insert.Parameters.AddWithValue("r", m.Role.ToString());
+            insert.Parameters.AddWithValue("at", m.At);
+            insert.Parameters.AddWithValue("b", Json.Write(new MessageBody(m.Text, m.ToolCalls, m.ToolResult)));
+            try
+            {
+                await insert.ExecuteNonQueryAsync(ct).ConfigureAwait(false);
+            }
+            catch (PostgresException e) when (e.SqlState == PostgresErrorCodes.UniqueViolation)
+            {
+                throw new ConversationConflictException();
+            }
+        }
+
+        await tx.CommitAsync(ct).ConfigureAwait(false);
+        conversation.MarkStored();
+    }
+}
+
+/// <summary>Personal access tokens. Revoking and last-used are single-column updates, so a use racing a revoke can never undo it.</summary>
+public sealed class PostgresPersonalTokenStore(NpgsqlDataSource db) : IPersonalTokenStore
+{
+    private const string Columns = "id, user_id, name, prefix, hash, scope, project_ids, created_at, expires_at, revoked_at, last_used_at";
+
+    public async Task AddAsync(PersonalToken token, CancellationToken ct)
+    {
+        ArgumentNullException.ThrowIfNull(token);
+        await using var cmd = db.CreateCommand($"INSERT INTO personal_tokens ({Columns}) VALUES (@id, @u, @n, @pf, @h, @s, @pr, @c, @e, @r, @l)");
+        cmd.Parameters.AddWithValue("id", token.Id.Value);
+        cmd.Parameters.AddWithValue("u", token.UserId.Value);
+        cmd.Parameters.AddWithValue("n", token.Name);
+        cmd.Parameters.AddWithValue("pf", token.Prefix);
+        cmd.Parameters.AddWithValue("h", token.Hash);
+        cmd.Parameters.AddWithValue("s", token.Scope.ToWire());
+        cmd.Parameters.Add(new NpgsqlParameter("pr", NpgsqlDbType.Array | NpgsqlDbType.Uuid)
+        {
+            Value = token.Projects is null ? DBNull.Value : token.Projects.Select(p => p.Value).ToArray(),
+        });
+        cmd.Parameters.AddWithValue("c", token.CreatedAt);
+        cmd.Parameters.AddWithValue("e", token.ExpiresAt);
+        cmd.Parameters.Add(new NpgsqlParameter("r", NpgsqlDbType.TimestampTz) { Value = (object?)token.RevokedAt ?? DBNull.Value });
+        cmd.Parameters.Add(new NpgsqlParameter("l", NpgsqlDbType.TimestampTz) { Value = (object?)token.LastUsedAt ?? DBNull.Value });
+        await cmd.ExecuteNonQueryAsync(ct).ConfigureAwait(false);
+    }
+
+    public async Task<PersonalToken?> GetAsync(PersonalTokenId id, CancellationToken ct)
+    {
+        await using var cmd = db.CreateCommand($"SELECT {Columns} FROM personal_tokens WHERE id = @id");
+        cmd.Parameters.AddWithValue("id", id.Value);
+        var found = await ReadAsync(cmd, ct).ConfigureAwait(false);
+        return found.Count > 0 ? found[0] : null;
+    }
+
+    public async Task<PersonalToken?> FindByPrefixAsync(string prefix, CancellationToken ct)
+    {
+        await using var cmd = db.CreateCommand($"SELECT {Columns} FROM personal_tokens WHERE prefix = @p");
+        cmd.Parameters.AddWithValue("p", prefix);
+        var found = await ReadAsync(cmd, ct).ConfigureAwait(false);
+        return found.Count > 0 ? found[0] : null;
+    }
+
+    public async Task<IReadOnlyList<PersonalToken>> ListForUserAsync(UserId user, CancellationToken ct)
+    {
+        await using var cmd = db.CreateCommand($"SELECT {Columns} FROM personal_tokens WHERE user_id = @u ORDER BY created_at DESC");
+        cmd.Parameters.AddWithValue("u", user.Value);
+        return await ReadAsync(cmd, ct).ConfigureAwait(false);
+    }
+
+    public async Task SaveRevokedAsync(PersonalToken token, CancellationToken ct)
+    {
+        ArgumentNullException.ThrowIfNull(token);
+        await using var cmd = db.CreateCommand("UPDATE personal_tokens SET revoked_at = coalesce(revoked_at, @r) WHERE id = @id");
+        cmd.Parameters.Add(new NpgsqlParameter("r", NpgsqlDbType.TimestampTz) { Value = (object?)token.RevokedAt ?? DBNull.Value });
+        cmd.Parameters.AddWithValue("id", token.Id.Value);
+        await cmd.ExecuteNonQueryAsync(ct).ConfigureAwait(false);
+    }
+
+    public async Task SaveUsedAsync(PersonalToken token, CancellationToken ct)
+    {
+        ArgumentNullException.ThrowIfNull(token);
+        await using var cmd = db.CreateCommand("UPDATE personal_tokens SET last_used_at = greatest(last_used_at, @l) WHERE id = @id");
+        cmd.Parameters.Add(new NpgsqlParameter("l", NpgsqlDbType.TimestampTz) { Value = (object?)token.LastUsedAt ?? DBNull.Value });
+        cmd.Parameters.AddWithValue("id", token.Id.Value);
+        await cmd.ExecuteNonQueryAsync(ct).ConfigureAwait(false);
+    }
+
+    private static async Task<IReadOnlyList<PersonalToken>> ReadAsync(NpgsqlCommand cmd, CancellationToken ct)
+    {
+        var list = new List<PersonalToken>();
+        await using var reader = await cmd.ExecuteReaderAsync(ct).ConfigureAwait(false);
+        while (await reader.ReadAsync(ct).ConfigureAwait(false))
+        {
+            IReadOnlyList<ProjectId>? projects = reader.IsDBNull(6) ? null : reader.GetFieldValue<Guid[]>(6).Select(g => new ProjectId(g)).ToList();
+            list.Add(PersonalToken.Restore(
+                new PersonalTokenId(reader.GetGuid(0)), new UserId(reader.GetString(1)), reader.GetString(2), reader.GetString(3),
+                reader.GetString(4), TokenScopes.Parse(reader.GetString(5)), projects,
+                reader.GetFieldValue<DateTimeOffset>(7), reader.GetFieldValue<DateTimeOffset>(8),
+                reader.IsDBNull(9) ? null : reader.GetFieldValue<DateTimeOffset>(9),
+                reader.IsDBNull(10) ? null : reader.GetFieldValue<DateTimeOffset>(10)));
         }
 
         return list;

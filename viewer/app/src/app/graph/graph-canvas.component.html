@@ -1,0 +1,65 @@
+<div class="field">
+  <div
+    #graph
+    class="graph"
+    role="img"
+    aria-label="Code graph of the selected project"
+    [attr.data-pulsing]="state().pulsing.join(' ')"
+  ></div>
+
+  @switch (load()) {
+    @case ('loading') {
+      <p class="notice">Loading the graph</p>
+    }
+    @case ('empty') {
+      <section class="notice">
+        <h2>No graph yet</h2>
+        <p>The code graph appears after the first index of this project.</p>
+      </section>
+    }
+    @case ('failed') {
+      <section class="notice">
+        <h2>Could not load the graph</h2>
+        <p>{{ error() }}</p>
+        <button type="button" class="ghost" (click)="retry()">Try again</button>
+      </section>
+    }
+    @default {
+      <div class="hud">
+        <div class="seg" role="group" aria-label="Lens">
+          @for (l of lenses; track l) {
+            <button type="button" [attr.aria-pressed]="state().lens === l" (click)="chooseLens(l)">
+              {{ lensLabel[l] }}
+            </button>
+          }
+        </div>
+        <div class="seg" role="group" aria-label="Navigate">
+          <button type="button" title="Back (Esc)" [disabled]="!state().canBack" (click)="back()">
+            Back
+          </button>
+          <button type="button" title="Close everything and show the modules" (click)="home()">
+            Home
+          </button>
+          <button type="button" title="Open every ring" (click)="openAll()">Open all</button>
+        </div>
+      </div>
+
+      <p class="crumb" aria-live="polite">
+        {{ state().crumb }}
+        @if (liveUnavailable()) {
+          · live traffic unavailable
+        }
+      </p>
+      <p class="sr-only" aria-live="polite">
+        @if (state().pulsing.length) {
+          {{ state().pulsing.length }} nodes pulsing
+        }
+      </p>
+      <ul class="legend" aria-label="Edge legend">
+        @for (e of legend; track e.kind) {
+          <li><i [class]="'edge-' + e.kind" [class.dashed]="e.dashed"></i>{{ e.label }}</li>
+        }
+      </ul>
+    }
+  }
+</div>

@@ -1,0 +1,101 @@
+@if (open()) {
+  <section class="panel" aria-label="Chat with Monday">
+    <header class="head">
+      <h2 class="title">Ask Monday</h2>
+      <span class="mode mono">{{ canAct() ? 'ask · act' : 'ask only' }}</span>
+      <button type="button" class="ghost" aria-label="Hide chat" (click)="toggle.emit()">
+        Hide
+      </button>
+    </header>
+
+    <div class="stream" #stream aria-live="polite" aria-relevant="additions text">
+      @for (m of store().messages(); track m.id) {
+        @if (m.role === 'user') {
+          <p class="question">{{ m.text }}</p>
+        } @else {
+          <div class="answer" [attr.data-state]="m.state">
+            @for (s of m.steps; track $index) {
+              <button
+                type="button"
+                class="step mono"
+                [class.failed]="s.isError"
+                [disabled]="!s.nodeIds.length"
+                [attr.aria-label]="
+                  stepLine(s) + (s.isError ? ', failed' : '') + ', show on the graph'
+                "
+                (click)="showNodes.emit(s.nodeIds)"
+              >
+                {{ stepLine(s) }}
+                @if (s.isError) {
+                  · failed
+                }
+              </button>
+            }
+            @if (m.text) {
+              <p class="text">{{ m.text }}</p>
+            }
+            @if (m.state === 'streaming' && !m.text) {
+              <p class="muted">Looking through the project</p>
+            }
+            @if (m.state === 'stopped') {
+              <p class="note mono">stopped</p>
+            }
+            @if (m.error; as e) {
+              <p class="error"><span class="mono">error</span> {{ e.message }}</p>
+            }
+          </div>
+        }
+      } @empty {
+        <p class="muted">
+          Ask about this project's code, traffic, threats or tests.
+          @if (canAct()) {
+            Monday can also move the graph to show you.
+          }
+        </p>
+      }
+    </div>
+
+    @if (store().notConfigured()) {
+      <div class="setup">
+        <p>No model is set up for this project yet.</p>
+        @if (canManageModel()) {
+          <a routerLink="/settings/model" [queryParams]="{ project: projectId() }"
+            >Set up a model</a
+          >
+        } @else {
+          <p class="muted">An Owner or Admin can add one.</p>
+        }
+      </div>
+    }
+
+    <form class="ask" (submit)="submit($event)">
+      <label class="label" for="chat-question">
+        Question
+        @if (selectedName(); as name) {
+          <span class="context mono">about {{ name }}</span>
+        }
+      </label>
+      <div class="row">
+        <textarea
+          id="chat-question"
+          #question
+          rows="2"
+          autocomplete="off"
+          placeholder="Which endpoints skip authorization?"
+          [value]="draft()"
+          (input)="typed($event)"
+          (keydown)="keydown($event)"
+        ></textarea>
+        @if (store().streaming()) {
+          <button type="button" class="stop" (click)="store().stop()">Stop</button>
+        } @else {
+          <button type="submit" class="send" [disabled]="!draft().trim()">Ask</button>
+        }
+      </div>
+    </form>
+  </section>
+} @else {
+  <button type="button" class="tab" aria-label="Open chat (/)" (click)="toggle.emit()">
+    Ask Monday <kbd class="mono">/</kbd>
+  </button>
+}

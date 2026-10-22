@@ -10,7 +10,15 @@
     <ProjectReference Include="..\..\src\Monday.Domain\Monday.Domain.csproj" />
     <ProjectReference Include="..\..\src\Monday.Application\Monday.Application.csproj" />
     <ProjectReference Include="..\..\src\Monday.Agent\Monday.Agent.csproj" />
+    <ProjectReference Include="..\..\src\Monday.Infrastructure\Monday.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="Fixtures\*.txt" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Monday.Api\Monday.Api.csproj" />
+  </ItemGroup>
 
 </Project>

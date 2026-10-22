@@ -1,6 +1,7 @@
 using Monday.Application.Abstractions;
 using Monday.Application.Projects;
 using Monday.Domain.Access;
+using Monday.Domain.Audit;
 using Monday.Domain.Decisions;
 using Monday.Domain.Common;
 using Monday.Domain.Projects;
@@ -10,7 +11,7 @@ namespace Monday.Application.Decisions;
 public sealed record DecisionProposal(DecisionArea Area, string Title, string Context, IReadOnlyList<DecisionOption> Options, string RecommendedKey, Guid? Supersedes);
 
 /// <summary>The approval gates: a Claude session proposes, the Owner decides.</summary>
-public sealed class DecisionService(IDecisionRepository decisions, ProjectService projects, IClock clock)
+public sealed class DecisionService(IDecisionRepository decisions, ProjectService projects, IAuditLog audit, IClock clock)
 {
     public async Task<Decision> ProposeAsync(AppReporter reporter, DecisionProposal proposal, CancellationToken ct)
     {
@@ -19,6 +20,18 @@ public sealed class DecisionService(IDecisionRepository decisions, ProjectServic
         var supersedes = proposal.Supersedes is { } s ? new DecisionId(s) : (DecisionId?)null;
         var decision = Decision.Propose(reporter.Project.Id, proposal.Area, proposal.Title, proposal.Context, proposal.Options, proposal.RecommendedKey, clock.Now, supersedes);
         await decisions.SaveAsync(decision, ct).ConfigureAwait(false);
+        return decision;
+    }
+
+    /// <summary>A member drafts through the agent. Audited with the title only; it waits as Proposed for an Owner.</summary>
+    public async Task<Decision> DraftAsync(ProjectId id, DecisionProposal proposal, UserId by, CancellationToken ct)
+    {
+        ArgumentNullException.ThrowIfNull(proposal);
+        var project = await projects.LoadForMemberAsync(id, by, ct).ConfigureAwait(false);
+        project.EnsureCan(by, Permission.ChatAct);
+        var decision = Decision.Draft(id, proposal.Area, proposal.Title, proposal.Context, proposal.Options, proposal.RecommendedKey, by, clock.Now, proposal.Supersedes is { } s ? new DecisionId(s) : null);
+        await decisions.SaveAsync(decision, ct).ConfigureAwait(false);
+        await audit.AppendAsync(new AuditEntry(id, by, "decision.drafted", decision.Title, decision.ProposedAt), ct).ConfigureAwait(false);
         return decision;
     }
 

@@ -1,0 +1,221 @@
+:host {
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  bottom: var(--space-3);
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  pointer-events: none;
+}
+
+.panel,
+.tab {
+  pointer-events: auto;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  width: var(--panel-min);
+  max-height: 100%;
+  background: var(--surface-glass);
+  border: var(--border-hairline) solid var(--border-strong);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-float);
+  backdrop-filter: blur(var(--space-2));
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: var(--border-hairline) solid var(--border);
+}
+
+.title,
+.sub {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-strong);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.sub {
+  margin: var(--space-3) 0 var(--space-1h);
+}
+
+.body {
+  overflow-y: auto;
+  padding: var(--space-3);
+}
+
+.name {
+  margin: 0 0 var(--space-1);
+  font-size: var(--text-md);
+  font-weight: var(--weight-strong);
+  line-height: var(--leading-snug);
+  word-break: break-word;
+}
+
+.meta {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  word-break: break-all;
+}
+
+.kind {
+  margin-right: var(--space-1h);
+  padding: 0 var(--space-1);
+  border: var(--border-hairline) solid currentColor;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+}
+
+.muted {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+.row {
+  display: flex;
+  gap: var(--space-2);
+}
+
+button {
+  font: inherit;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.action,
+.icon,
+.tab {
+  font-family: var(--font-display);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-strong);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  transition:
+    color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
+}
+
+.action {
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: var(--border-hairline) solid var(--accent);
+}
+
+.icon,
+.tab {
+  color: var(--text-muted);
+  background: var(--surface-glass);
+  border: var(--border-hairline) solid var(--border-strong);
+}
+
+.icon:hover,
+.tab:hover {
+  color: var(--text);
+}
+
+.guards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1h);
+}
+
+.guard {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  padding: var(--space-0) var(--space-1h);
+  border: var(--border-hairline) solid var(--status-ok);
+  border-radius: var(--radius-sm);
+  color: var(--status-ok);
+}
+
+.guard.open {
+  border-color: var(--status-bad);
+  color: var(--status-bad);
+  background: var(--status-bad-soft);
+}
+
+.explain {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border-left: var(--border-hairline) solid var(--accent);
+  background: var(--accent-soft);
+  white-space: pre-wrap;
+}
+
+.explain.stale {
+  border-left-color: var(--text-faint);
+  background: var(--surface-raised);
+}
+
+.code {
+  margin: 0;
+  max-height: 34vh;
+  overflow: auto;
+  padding: var(--space-2);
+  background: var(--bg);
+  border: var(--border-hairline) solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  line-height: var(--leading-code);
+}
+
+.rel {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rel button {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+  background: none;
+  border: 0;
+  border-left: var(--border-hairline) solid var(--border-strong);
+  padding: var(--space-0) 0 var(--space-0) var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+}
+
+.rel button:hover {
+  border-left-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Narrow screens: full width under the graph controls; the chat docks below. */
+@media (max-width: 900px) {
+  :host {
+    top: calc(var(--space-8) + var(--space-5));
+    left: var(--space-3);
+    bottom: auto;
+    max-height: 30%;
+  }
+
+  .panel {
+    width: 100%;
+  }
+}

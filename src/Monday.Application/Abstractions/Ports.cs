@@ -59,3 +59,17 @@ public interface IAuditLog
 
     Task<IReadOnlyList<AuditEntry>> ListAsync(ProjectId project, CancellationToken ct);
 }
+
+/// <summary>Tokens a project's chat used, per UTC month (<c>yyyy-MM</c>), for the monthly cap.</summary>
+public interface IModelUsageStore
+{
+    Task AddAsync(ProjectId project, string month, Usage usage, CancellationToken ct);
+
+    Task<Usage> MonthAsync(ProjectId project, string month, CancellationToken ct);
+}
+
+/// <summary>Refuses model base URLs that resolve inside Monday's own network (loopback, private, link-local, metadata).</summary>
+public interface IModelEndpointGuard
+{
+    Task EnsurePublicAsync(Uri baseUrl, CancellationToken ct);
+}

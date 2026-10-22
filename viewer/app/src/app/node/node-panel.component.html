@@ -1,0 +1,87 @@
+@if (open()) {
+  <aside class="panel" aria-label="Node detail">
+    <header class="head">
+      <h2 class="title">Node</h2>
+      <button type="button" class="icon" aria-label="Hide node detail" (click)="toggle.emit()">
+        Hide
+      </button>
+    </header>
+
+    <div class="body">
+      @switch (load()) {
+        @case ('idle') {
+          <p class="muted">
+            Click a node to see what it is, its code, who calls it, and the tests and endpoints that
+            reach it.
+          </p>
+        }
+        @case ('loading') {
+          <p class="muted">Loading</p>
+        }
+        @case ('failed') {
+          <p class="muted">{{ error() }}</p>
+        }
+        @default {
+          @if (detail(); as d) {
+            <p class="name">{{ label(d.node) }}</p>
+            <p class="meta">
+              <span class="kind" [style.color]="'var(--kind-' + d.node.kind.toLowerCase() + ')'">{{
+                d.node.kind
+              }}</span>
+              {{ location(d.node) }}
+            </p>
+            <div class="row">
+              <button type="button" class="action" (click)="focusNode.emit(d.node.id)">
+                Focus
+              </button>
+            </div>
+
+            @if (d.node.guards.length) {
+              <h3 class="sub">{{ d.node.kind === 'Endpoint' ? 'Guards' : 'Request pipeline' }}</h3>
+              <div class="guards">
+                @for (g of d.node.guards; track g) {
+                  <span class="guard" [class.open]="isOpenGuard(g)"
+                    >{{ isOpenGuard(g) ? 'open' : 'guard' }} · {{ g }}</span
+                  >
+                }
+              </div>
+            } @else if (d.node.kind === 'Endpoint') {
+              <h3 class="sub">Guards</h3>
+              <div class="guards"><span class="guard open">open · none found</span></div>
+            }
+
+            @if (d.explanation) {
+              <h3 class="sub">What it does</h3>
+              <p class="explain" [class.stale]="!d.explanationIsCurrent">{{ d.explanation }}</p>
+              @if (!d.explanationIsCurrent) {
+                <p class="muted">Written for an earlier version of this code.</p>
+              }
+            }
+
+            @if (d.node.code) {
+              <h3 class="sub">Code</h3>
+              <pre class="code"><code>{{ d.node.code }}</code></pre>
+            }
+
+            @for (r of relations(d); track r.title) {
+              <h3 class="sub">
+                {{ r.title }} · <span class="mono">{{ r.nodes.length }}</span>
+              </h3>
+              <ul class="rel">
+                @for (n of r.nodes.slice(0, 40); track n.id) {
+                  <li>
+                    <button type="button" (click)="selectNode.emit(n.id)">{{ label(n) }}</button>
+                  </li>
+                }
+              </ul>
+            }
+          }
+        }
+      }
+    </div>
+  </aside>
+} @else {
+  <button type="button" class="tab" aria-label="Show node detail" (click)="toggle.emit()">
+    Node
+  </button>
+}
